@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_DIR=/tmp/video_integrity
+      - APP_ENV=dev
+      - PURGE_AFTER_HOURS=48
+    volumes:
+      - ../api:/app
+      - video_storage:/tmp/video_integrity
+    depends_on:
+      - redis
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_DIR=/tmp/video_integrity
+      - APP_ENV=dev
+      - PURGE_AFTER_HOURS=48
+    volumes:
+      - ../api:/app
+      - video_storage:/tmp/video_integrity
+    depends_on:
+      - redis
+    command: python worker.py
+
+volumes:
+  redis_data:
+  video_storage:
+

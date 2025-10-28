@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/method-card",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/report/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@api_url"
+  }
+}
+

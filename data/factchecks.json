@@ -1,0 +1,93 @@
+[
+  {
+    "id": "fc001",
+    "title": "Non, les vaccins ne contiennent pas de micropuces",
+    "url": "https://www.lemonde.fr/les-decodeurs/article/2021/04/14/non-les-vaccins-ne-contiennent-pas-de-micropuces_6077053_4355770.html",
+    "text": "Les affirmations selon lesquelles les vaccins contre le Covid-19 contiendraient des micropuces sont fausses. Les ingrédients des vaccins sont transparents et documentés."
+  },
+  {
+    "id": "fc002",
+    "title": "Faux: les impôts n'ont pas augmenté de 300%",
+    "url": "https://www.francetvinfo.fr/politique/faux-les-impots-n-ont-pas-augmente-de-300_4357891.html",
+    "text": "Les affirmations d'une augmentation de 300% des impôts sont infondées. Les données de l'INSEE montrent une évolution bien inférieure."
+  },
+  {
+    "id": "fc003",
+    "title": "Non, 5G ne provoque pas le Covid-19",
+    "url": "https://www.francetvinfo.fr/sante/maladie/coronavirus/non-la-5g-ne-provogue-pas-le-covid-19_3915961.html",
+    "text": "Il n'existe aucun lien entre la technologie 5G et la transmission du Covid-19. Cette théorie du complot a été démentie par les autorités sanitaires."
+  },
+  {
+    "id": "fc004",
+    "title": "Faux: les entreprises ne fuient pas en masse",
+    "url": "https://www.lemonde.fr/economie/article/2022/11/15/les-entreprises-quittent-elles-reellement-la-france-en-masse_6149659_3234.html",
+    "text": "Les données de l'INSEE ne montrent pas d'exode massif des entreprises. Les délocalisations restent minoritaires."
+  },
+  {
+    "id": "fc005",
+    "title": "Non, l'immigration coûte 50 milliards par an",
+    "url": "https://www.liberation.fr/france/immigration-c-est-complexe-les-chiffres-expliques_1356789",
+    "text": "Les analyses de la Cour des comptes et de l'OCDE montrent que l'impact fiscal de l'immigration est largement positif."
+  },
+  {
+    "id": "fc006",
+    "title": "Faux: les chèques énergie ne sont pas réservés aux étrangers",
+    "url": "https://www.lemonde.fr/les-decodeurs/article/2022/10/11/non-les-chevques-energie-ne-sont-pas-reserves-aux-etrangers_6145394_4355770.html",
+    "text": "Les chèques énergie sont distribués en fonction des revenus, pas de la nationalité. Cette information est vérifiable sur service-public.fr."
+  },
+  {
+    "id": "fc007",
+    "title": "Non, l'UE n'interdit pas les pommes de terre françaises",
+    "url": "https://www.francetvinfo.fr/monde/europe/non-l-ue-n-interdit-pas-les-pommes-de-terre-francaises_5223456.html",
+    "text": "La réglementation européenne autorise la production et la commercialisation de pommes de terre en France."
+  },
+  {
+    "id": "fc008",
+    "title": "Faux: les fonctionnaires ne gagnent pas 8 000€ par mois",
+    "url": "https://www.lemonde.fr/les-decodeurs/article/2023/05/02/non-les-fonctionnaires-ne-gagnent-pas-8000-euros-par-mois_6170212_4355770.html",
+    "text": "Selon les données de l'INSEE, le salaire moyen dans la fonction publique est inférieur à cette affirmation."
+  },
+  {
+    "id": "fc009",
+    "title": "Non, le réchauffement climatique n'est pas un hoax",
+    "url": "https://www.francetvinfo.fr/meteo/climat/le-rechauffement-climatique-est-bien-reel_3456789.html",
+    "text": "Le consensus scientifique est unanime sur la réalité du réchauffement climatique. Les données du GIEC sont incontestables."
+  },
+  {
+    "id": "fc010",
+    "title": "Faux: les retraites n'ont pas explosé",
+    "url": "https://www.lemonde.fr/les-decodeurs/article/2022/12/01/retraites-analyse-des-chiffres_6155432_4355770.html",
+    "text": "Les données de la Caisse nationale d'assurance vieillesse montrent une évolution contrôlée des dépenses."
+  },
+  {
+    "id": "fc011",
+    "title": "Non, les médias ne sont pas tous censurés",
+    "url": "https://rsf.org/fr/pays/france",
+    "text": "La France est classée 26e dans le classement de Reporters sans frontières pour la liberté de la presse."
+  },
+  {
+    "id": "fc012",
+    "title": "Faux: les transports ne sont pas gratuits dans toute l'Europe",
+    "url": "https://www.lemonde.fr/economie/article/2023/01/05/la-gratuite-des-transports-en-commune_6012345_3234.html",
+    "text": "Seule une minorité de villes européennes ont adopté la gratuité totale des transports."
+  },
+  {
+    "id": "fc013",
+    "title": "Non, le gaz russe ne représente pas 90% de nos imports",
+    "url": "https://www.francetvinfo.fr/monde/europe/guerre-en-ukraine/non-le-gaz-russe-ne-represente-pas-90-de-nos-imports_5234567.html",
+    "text": "Selon les données du Ministère de la Transition énergétique, la part du gaz russe est bien inférieure."
+  },
+  {
+    "id": "fc014",
+    "title": "Faux: l'école n'est pas obligatoire jusqu'à 18 ans partout",
+    "url": "https://www.education.gouv.fr/loi-sur-l-ecole-obligatoire_123456",
+    "text": "En France, l'instruction est obligatoire jusqu'à 16 ans, pas 18 ans. Voir Legifrance pour le détail législatif."
+  },
+  {
+    "id": "fc015",
+    "title": "Non, les pesticides ne sont pas interdits partout",
+    "url": "https://www.ecologie.gouv.fr/pesticides-et-qualite-des-eaux_789012",
+    "text": "La réglementation européenne encadre strictement les pesticides mais ne les interdit pas totalement."
+  }
+]
+
