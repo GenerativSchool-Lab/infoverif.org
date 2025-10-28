@@ -1,8 +1,5 @@
-[providers]
-python = "3.11"
-
 [phases.setup]
-nixPkgs = ['ffmpeg', 'libgl', 'libglib', 'libSM', 'libXext', 'libXrender']
+aptPkgs = ['ffmpeg', 'libgl1-mesa-glx', 'libglib2.0-0', 'libsm6', 'libxext6', 'libxrender-dev', 'libgomp1']
 
 [phases.install]
 cmds = [
