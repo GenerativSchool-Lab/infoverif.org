@@ -3,9 +3,6 @@ import os
 import subprocess
 from typing import Optional, Tuple
 from pathlib import Path
-
-from moviepy.editor import VideoFileClip
-import cv2
 import requests
 
 from storage import get_storage_path

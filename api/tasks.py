@@ -8,14 +8,15 @@ from typing import Optional, Dict, Any
 
 import redis
 
-from video_processing import process_video
-from scoring import compute_risk_score
-from factcheck import match_factchecks
-from storage import save_report, get_report
-from asr import transcribe_audio
-from ocr import extract_ocr_text
-from scene_detection import detect_scenes
-from claims import extract_claims
+# Lazy imports - only load when analyze_video is actually called
+# from video_processing import process_video
+# from scoring import compute_risk_score
+# from factcheck import match_factchecks
+# from storage import save_report, get_report
+# from asr import transcribe_audio
+# from ocr import extract_ocr_text
+# from scene_detection import detect_scenes
+# from claims import extract_claims
 
 def _get_queue():
     """Get RQ queue."""
@@ -37,6 +38,16 @@ def analyze_video(job_id: str, url: Optional[str], platform: str, language: str,
         uploaded_url: If file was uploaded
         filename: Original filename if uploaded
     """
+    # Lazy import heavy dependencies only when this function is called
+    from video_processing import process_video
+    from scoring import compute_risk_score
+    from factcheck import match_factchecks
+    from storage import save_report, get_report
+    from asr import transcribe_audio
+    from ocr import extract_ocr_text
+    from scene_detection import detect_scenes
+    from claims import extract_claims
+    
     try:
         update_status(job_id, "running", 10, "Downloading video...")
         

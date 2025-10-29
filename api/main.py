@@ -11,7 +11,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import redis
 
-from tasks import get_job_status, get_job_result
+# Lazy import to avoid loading heavy dependencies on startup
+# from tasks import get_job_status, get_job_result
 
 load_dotenv()
 
@@ -112,6 +113,7 @@ async def analyze(
 @app.get("/status/{job_id}")
 async def get_status(job_id: str):
     """Get job status."""
+    from tasks import get_job_status
     status = get_job_status(job_id)
     if not status:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -121,6 +123,7 @@ async def get_status(job_id: str):
 @app.get("/report/{job_id}")
 async def get_report(job_id: str):
     """Get full analysis report."""
+    from tasks import get_job_result
     result = get_job_result(job_id)
     if not result:
         raise HTTPException(status_code=404, detail="Job not found or not completed")
