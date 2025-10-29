@@ -1,0 +1,22 @@
+[phases.setup]
+nixPkgs = ["python311"]
+aptPackages = [
+  "ffmpeg",
+  "libgl1",
+  "libglib2.0-0",
+  "libgomp1",
+  "pkg-config",
+  "build-essential",
+  "curl"
+]
+
+[phases.install]
+cmds = [
+  "python3.11 -m venv --without-pip /app/.venv",
+  ". /app/.venv/bin/activate && curl -sS https://bootstrap.pypa.io/get-pip.py | python",
+  "cd api && . /app/.venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
+]
+
+[start]
+cmd = "cd api && . /app/.venv/bin/activate && python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+

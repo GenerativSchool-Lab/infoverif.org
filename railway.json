@@ -1,0 +1,93 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "cd api && uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3
+  },
+  "environment": {
+    "PYTHON_VERSION": "3.11",
+    "PYTHONPATH": ".",
+    "ENVIRONMENT": "production"
+  },
+  "variables": {
+    "REDIS_URL": {
+      "description": "Redis connection URL (set automatically by Railway Redis plugin)",
+      "required": false
+    },
+    "STORAGE_DIR": {
+      "description": "Directory for video storage",
+      "default": "/tmp/video_integrity"
+    },
+    "PURGE_AFTER_HOURS": {
+      "description": "Auto-purge videos after N hours",
+      "default": "48"
+    },
+    "APP_ENV": {
+      "description": "Application environment",
+      "default": "production"
+    },
+    "ALLOW_DEV_BROWSERLESS": {
+      "description": "Allow dev browserless (for testing)",
+      "default": "false"
+    },
+    "YOUTUBE_API_KEY": {
+      "description": "YouTube API key (optional, for YouTube video support)",
+      "required": false,
+      "sensitive": true
+    },
+    "EMBEDDING_MODEL": {
+      "description": "Sentence transformer model for embeddings",
+      "default": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    },
+    "LOG_LEVEL": {
+      "description": "Logging level",
+      "default": "INFO"
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "enabled": true,
+      "endpoints": [
+        "/health"
+      ]
+    },
+    "alerts": {
+      "enabled": true,
+      "conditions": [
+        {
+          "metric": "response_time",
+          "threshold": 30,
+          "operator": ">",
+          "action": "alert"
+        },
+        {
+          "metric": "error_rate",
+          "threshold": 0.1,
+          "operator": ">",
+          "action": "alert"
+        }
+      ]
+    }
+  },
+  "scaling": {
+    "minInstances": 1,
+    "maxInstances": 3,
+    "targetCPU": 70,
+    "targetMemory": 80
+  },
+  "networking": {
+    "ports": [
+      {
+        "port": 8000,
+        "protocol": "http"
+      }
+    ]
+  }
+}
+
