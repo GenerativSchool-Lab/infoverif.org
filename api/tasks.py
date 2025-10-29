@@ -132,11 +132,16 @@ def update_status(job_id: str, status: str, progress: int, message: str):
 
 def get_job_status(job_id: str) -> Optional[Dict[str, Any]]:
     """Get job status from Redis."""
-    redis_conn = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
-    data = redis_conn.get(f"job_status:{job_id}")
-    if not data:
+    try:
+        redis_conn = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+        data = redis_conn.get(f"job_status:{job_id}")
+        if not data:
+            return None
+        return json.loads(data)
+    except (redis.ConnectionError, redis.TimeoutError, Exception) as e:
+        # If Redis is unavailable, return None (job not found)
+        # This allows the API to work even if Redis is temporarily down
         return None
-    return json.loads(data)
 
 
 def get_job_result(job_id: str) -> Optional[Dict[str, Any]]:

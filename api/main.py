@@ -52,7 +52,20 @@ class StatusResponse(BaseModel):
 @app.get("/health")
 async def health():
     """Health check endpoint."""
-    return {"status": "ok"}
+    health_data = {"status": "ok", "service": "infoverif-api"}
+    
+    # Check Redis connection if available
+    try:
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+        test_conn = redis.from_url(redis_url)
+        test_conn.ping()
+        health_data["redis"] = "connected"
+        health_data["redis_url"] = redis_url.split("@")[-1] if "@" in redis_url else redis_url.split("//")[-1]
+    except Exception as e:
+        health_data["redis"] = "disconnected"
+        health_data["redis_error"] = str(e)[:50]
+    
+    return health_data
 
 
 @app.post("/analyze")
@@ -113,11 +126,14 @@ async def analyze(
 @app.get("/status/{job_id}")
 async def get_status(job_id: str):
     """Get job status."""
-    from tasks import get_job_status
-    status = get_job_status(job_id)
-    if not status:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return StatusResponse(**status)
+    try:
+        from tasks import get_job_status
+        status = get_job_status(job_id)
+        if not status:
+            raise HTTPException(status_code=404, detail="Job not found")
+        return StatusResponse(**status)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving job status: {str(e)}")
 
 
 @app.get("/report/{job_id}")
