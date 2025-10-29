@@ -1,0 +1,24 @@
+{
+  "buildCommand": "cd web && npm install && npm run build",
+  "outputDirectory": "web/dist",
+  "installCommand": "cd web && npm install",
+  "rootDirectory": "web",
+  "rewrites": [
+    {
+      "source": "/method-card",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/report/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@api_url"
+  }
+}
+

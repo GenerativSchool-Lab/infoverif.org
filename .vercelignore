@@ -1,0 +1,87 @@
+# Backend API - deployed separately on Railway
+api/
+
+# Railway deployment files
+railway.toml
+railway.json
+nixpacks.toml
+runtime.txt
+ops/
+
+# Python and backend dependencies
+requirements.txt
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+
+# Data files (potentially large)
+data/
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.json.gz
+
+# ML models and cached data
+models/
+.cache/
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.pb
+*.onnx
+
+# Scripts (not needed for frontend)
+scripts/
+
+# Documentation files
+*.md
+!web/README.md
+
+# Deployment scripts
+test_deployment.sh
+DEPLOY*.md
+RAILWAY*.md
+SETUP.md
+DEPLOYMENT.md
+API.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs (Vercel will build from web/)
+dist/
+build/
+.vercel/
+
+# Environment files (should be set in Vercel dashboard)
+.env
+.env.local
+.env.*.local
+
+# Large video storage
+storage/
+tmp/
+/tmp/
+
+# Logs
+*.log
+logs/
+
