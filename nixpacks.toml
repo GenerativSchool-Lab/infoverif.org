@@ -14,7 +14,11 @@ aptPackages = [
   "libgomp1",
   "pkg-config",
   "build-essential",
-  "curl"
+  "curl",
+  "libmupdf-dev",
+  "mupdf-tools",
+  "python3-dev",
+  "swig"
 ]
 
 [phases.install]

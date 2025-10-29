@@ -3,7 +3,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "cd api && uvicorn main:app --host 0.0.0.0 --port $PORT"
+startCommand = "cd api && . /app/.venv/bin/activate && python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
