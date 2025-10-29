@@ -12,6 +12,7 @@ aptPackages = [
   "libgl1",
   "libglib2.0-0",
   "libgomp1",
+  "libstdc++6",
   "pkg-config",
   "build-essential",
   "curl",
@@ -22,10 +23,24 @@ aptPackages = [
 ]
 
 [phases.install]
+# Optimized for caching: pip will skip if packages already satisfy requirements
+# Railway/Docker layer caching: if requirements.txt unchanged, this entire step is cached
 cmds = [
   "python3.11 -m venv --without-pip /app/.venv",
   ". /app/.venv/bin/activate && curl -sS https://bootstrap.pypa.io/get-pip.py | python",
-  "cd api && . /app/.venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
+  "cd api && . /app/.venv/bin/activate && pip install --upgrade pip setuptools wheel",
+  # --upgrade-strategy only-if-needed: only upgrades if necessary
+  # Railway caches this layer if requirements.txt hash hasn't changed
+  "cd api && . /app/.venv/bin/activate && pip install --cache-dir /tmp/pip-cache --upgrade-strategy only-if-needed -r requirements.txt"
+]
+
+# Cache pip downloads and built wheels between builds
+# Railway/Docker will reuse these layers if requirements.txt hasn't changed
+[phases.cache]
+directories = [
+  "/tmp/pip-cache",
+  "/root/.cache/pip",
+  "/app/.venv"  # Cache the venv itself if possible
 ]
 
 [start]

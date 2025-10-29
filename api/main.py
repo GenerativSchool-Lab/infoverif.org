@@ -126,14 +126,11 @@ async def analyze(
 @app.get("/status/{job_id}")
 async def get_status(job_id: str):
     """Get job status."""
-    try:
-        from tasks import get_job_status
-        status = get_job_status(job_id)
-        if not status:
-            raise HTTPException(status_code=404, detail="Job not found")
-        return StatusResponse(**status)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving job status: {str(e)}")
+    from tasks import get_job_status
+    status = get_job_status(job_id)
+    if not status:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return StatusResponse(**status)
 
 
 @app.get("/report/{job_id}")
