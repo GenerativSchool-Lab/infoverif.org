@@ -137,15 +137,38 @@ def get_job_status(job_id: str) -> Optional[Dict[str, Any]]:
         data = redis_conn.get(f"job_status:{job_id}")
         if not data:
             return None
-        return json.loads(data)
-    except (redis.ConnectionError, redis.TimeoutError, Exception) as e:
-        # If Redis is unavailable, return None (job not found)
-        # This allows the API to work even if Redis is temporarily down
+        
+        # Handle bytes response from Redis
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+        
+        status_dict = json.loads(data)
+        
+        # Validate and normalize the response
+        if not isinstance(status_dict, dict):
+            print(f"Warning: Invalid status data format for job {job_id}")
+            return None
+        
+        # Ensure required fields with defaults
+        return {
+            "status": str(status_dict.get("status", "unknown")),
+            "progress": int(status_dict.get("progress", 0)),
+            "message": str(status_dict.get("message", "")) if status_dict.get("message") else None
+        }
+    except json.JSONDecodeError as e:
+        print(f"Warning: Failed to parse status JSON for job {job_id}: {e}")
+        return None
+    except (redis.ConnectionError, redis.TimeoutError) as e:
+        print(f"Warning: Redis connection error for job {job_id}: {e}")
+        return None
+    except Exception as e:
+        print(f"Warning: Unexpected error getting status for job {job_id}: {e}")
         return None
 
 
 def get_job_result(job_id: str) -> Optional[Dict[str, Any]]:
     """Get completed job result."""
+    from storage import get_report
     return get_report(job_id)
 
 

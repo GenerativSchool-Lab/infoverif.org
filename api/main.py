@@ -126,11 +126,24 @@ async def analyze(
 @app.get("/status/{job_id}")
 async def get_status(job_id: str):
     """Get job status."""
-    from tasks import get_job_status
-    status = get_job_status(job_id)
-    if not status:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return StatusResponse(**status)
+    try:
+        from tasks import get_job_status
+        status = get_job_status(job_id)
+        if not status:
+            raise HTTPException(status_code=404, detail="Job not found")
+        
+        # Validate and create response
+        try:
+            return StatusResponse(**status)
+        except Exception as e:
+            # If status data is invalid, return 404 (job not found)
+            print(f"Error validating status response for job {job_id}: {e}")
+            raise HTTPException(status_code=404, detail="Job not found or invalid status data")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Unexpected error in get_status for job {job_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving job status: {str(e)}")
 
 
 @app.get("/report/{job_id}")
