@@ -123,7 +123,7 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an expert media analyst. Return ONLY valid JSON matching the schema shown in the user prompt."},
+            {"role": "system", "content": "You are an expert media analyst. You MUST respond with valid JSON only, no markdown, no code blocks, no explanations."},
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"},
@@ -134,10 +134,24 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     if not content:
         raise ValueError("OpenAI returned empty content")
     
+    # Strip any markdown code blocks if present
+    content = content.strip()
+    if content.startswith("```"):
+        # Remove markdown code blocks
+        lines = content.split('\n')
+        # Remove first line (```json or ```)
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        # Remove last line (```)
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        content = '\n'.join(lines).strip()
+    
     try:
         parsed = json.loads(content)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Failed to parse OpenAI response as JSON: {e}. Response: {content[:500]}")
+        # Log the actual content for debugging
+        raise ValueError(f"JSON parse error: {str(e)}. Raw response (first 500 chars): {content[:500]}")
     
     # Validate and set defaults for required fields
     parsed.setdefault("propaganda_score", 0)
