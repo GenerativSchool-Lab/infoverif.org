@@ -141,7 +141,7 @@ async def method_card():
         },
         
         "roadmap": {
-            "phase_2_q2_2025": {
+            "phase_2_q2_2026": {
                 "title": "Fine-tuning & Modèles Spécialisés",
                 "objectives": [
                     "Fine-tuning BERT/RoBERTa sur corpus de propagande annoté",
@@ -152,7 +152,7 @@ async def method_card():
                     "Taxonomie de 100+ variantes de techniques"
                 ]
             },
-            "phase_3_q3_2025": {
+            "phase_3_q3_2026": {
                 "title": "Agent Autonome & Monitoring",
                 "objectives": [
                     "Scan automatisé YouTube/TikTok/Twitter via APIs",
@@ -164,7 +164,7 @@ async def method_card():
                     "API publique pour intégrations tierces"
                 ]
             },
-            "phase_4_q4_2025": {
+            "phase_4_q4_2026": {
                 "title": "Détection Multimodale Avancée",
                 "objectives": [
                     "Détection de deepfakes (Vision Transformers)",
