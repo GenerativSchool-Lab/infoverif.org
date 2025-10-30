@@ -77,7 +77,7 @@ def tokenize(text: str) -> List[str]:
 
 def extract_claims_from_text(text: str) -> List[Dict]:
     # Import locally to avoid circular import on startup
-    from .claims import contains_numbers, contains_sensational_language
+    from claims import contains_numbers, contains_sensational_language
 
     claims: List[Dict] = []
     if not text:
