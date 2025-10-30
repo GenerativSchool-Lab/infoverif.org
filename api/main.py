@@ -145,7 +145,9 @@ async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] =
         result = analyze_text(text, platform or "text")
         return JSONResponse(content=result)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"analyze-text failed: {str(e)[:300]}")
+        import traceback
+        full_error = traceback.format_exc()
+        raise HTTPException(status_code=400, detail=f"analyze-text failed: {str(e)}\n\nFull traceback:\n{full_error}")
 
 
 @app.post("/analyze-video")
