@@ -13,7 +13,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 ANALYSIS_PROMPT = """You are an expert in media manipulation, propaganda analysis, and misinformation detection.
 
-Analyze this video transcript and metadata for:
+Analyze this content and metadata for:
 
 1. PROPAGANDA TECHNIQUES (0-100):
    - Emotional manipulation (fear, anger, outrage)
@@ -42,17 +42,17 @@ Return ONLY valid JSON in this exact format:
   "conspiracy_score": 0-100,
   "misinfo_score": 0-100,
   "overall_risk": 0-100,
-  "techniques": [{"name": "technique name", "evidence": "quote from transcript", "severity": "high/medium/low"}],
+  "techniques": [{"name": "technique name", "evidence": "quote from content", "severity": "high/medium/low"}],
   "claims": [{"claim": "claim text", "confidence": "supported/unsupported/misleading", "issues": ["issue1", "issue2"]}],
   "summary": "2-3 sentence analysis"
 }
 
-VIDEO METADATA:
+METADATA:
 Title: {title}
 Description: {description}
 Platform: {platform}
 
-TRANSCRIPT:
+CONTENT:
 {transcript}
 """
 
@@ -111,7 +111,7 @@ def transcribe_audio(audio_path: str) -> str:
 
 
 def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
-    """Analyze transcript using OpenAI with strict JSON Schema output."""
+    """Analyze content using OpenAI with strict JSON Schema output."""
     prompt = ANALYSIS_PROMPT.format(
         title=metadata.get('title', 'N/A'),
         description=metadata.get('description', 'N/A'),
@@ -119,79 +119,74 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
         transcript=transcript[:8000]
     )
 
-    schema = {
-        "name": "AnalysisResult",
-        "schema": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-                "propaganda_score": {"type": "integer", "minimum": 0, "maximum": 100},
-                "conspiracy_score": {"type": "integer", "minimum": 0, "maximum": 100},
-                "misinfo_score": {"type": "integer", "minimum": 0, "maximum": 100},
-                "overall_risk": {"type": "integer", "minimum": 0, "maximum": 100},
-                "techniques": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "properties": {
-                            "name": {"type": "string"},
-                            "evidence": {"type": "string"},
-                            "severity": {"type": "string", "enum": ["high", "medium", "low"]}
-                        },
-                        "required": ["name"]
-                    }
-                },
-                "claims": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "properties": {
-                            "claim": {"type": "string"},
-                            "confidence": {"type": "string", "enum": ["supported", "unsupported", "misleading"]},
-                            "issues": {"type": "array", "items": {"type": "string"}}
-                        },
-                        "required": ["claim"]
-                    }
-                },
-                "summary": {"type": "string"}
-            },
-            "required": [
-                "propaganda_score",
-                "conspiracy_score",
-                "misinfo_score",
-                "overall_risk",
-                "techniques",
-                "claims",
-                "summary"
-            ]
-        },
-        "strict": True
-    }
-
+    # Correct schema structure for OpenAI json_schema mode
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "Return ONLY JSON matching the provided schema. No prose."},
+            {"role": "system", "content": "You are an expert media analyst. Return ONLY valid JSON matching the schema."},
             {"role": "user", "content": prompt}
         ],
-        response_format={"type": "json_schema", "json_schema": schema},
+        response_format={
+            "type": "json_schema",
+            "json_schema": {
+                "name": "analysis_result",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "propaganda_score": {"type": "integer"},
+                        "conspiracy_score": {"type": "integer"},
+                        "misinfo_score": {"type": "integer"},
+                        "overall_risk": {"type": "integer"},
+                        "techniques": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "evidence": {"type": "string"},
+                                    "severity": {"type": "string"}
+                                },
+                                "required": ["name", "evidence", "severity"],
+                                "additionalProperties": False
+                            }
+                        },
+                        "claims": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "claim": {"type": "string"},
+                                    "confidence": {"type": "string"},
+                                    "issues": {"type": "array", "items": {"type": "string"}}
+                                },
+                                "required": ["claim", "confidence", "issues"],
+                                "additionalProperties": False
+                            }
+                        },
+                        "summary": {"type": "string"}
+                    },
+                    "required": [
+                        "propaganda_score",
+                        "conspiracy_score",
+                        "misinfo_score",
+                        "overall_risk",
+                        "techniques",
+                        "claims",
+                        "summary"
+                    ],
+                    "additionalProperties": False
+                }
+            }
+        },
         temperature=0
     )
 
-    content = response.choices[0].message.content or "{}"
+    content = response.choices[0].message.content
+    if not content:
+        raise ValueError("OpenAI returned empty content")
+    
     parsed = json.loads(content)
-    
-    # Ensure all required fields exist with defaults
-    parsed.setdefault("propaganda_score", 0)
-    parsed.setdefault("conspiracy_score", 0)
-    parsed.setdefault("misinfo_score", 0)
-    parsed.setdefault("overall_risk", 0)
-    parsed.setdefault("techniques", [])
-    parsed.setdefault("claims", [])
-    parsed.setdefault("summary", "")
-    
     return parsed
 
 
