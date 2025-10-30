@@ -4,39 +4,49 @@ export default function MethodCard() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-3xl font-bold text-gray-900">Méthode & Feuille de route</h1>
-          <p className="text-gray-600 mt-2">Capacités légères actuelles et trajectoire vers une analyse enrichie par les embeddings.</p>
+          <p className="text-gray-600 mt-2">Objectif : décortiquer la propagande et les techniques de communication avec des scores explicables.</p>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-lg p-8 space-y-8">
           <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Capacités actuelles (mode léger)</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Capacités actuelles (analyse avancée par défaut)</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Récupération des métadonnées de page (titre, description) pour la plupart des liens</li>
-              <li>Extraction de déclarations potentielles à partir des métadonnées</li>
-              <li>Calcul d’un score de risque heuristique et interprétable</li>
+              <li>Transcription du contenu et segmentation en unités analysables (phrases, slogans, chiffres).</li>
+              <li>Analyse sémantique des déclarations et détection de techniques avec extraits probants.</li>
+              <li>Scores principaux : P (propagande), C (conspiration), M (désinformation), et risque global R.</li>
+              <li>Formulation : P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle ; R = f(P, C, M).</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Mode léger (secours)</h2>
+            <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <li>Analyse sur métadonnées (titre + description) lorsque la transcription n’est pas disponible.</li>
+              <li>Score heuristique : S = min(100, 5·T + 3·N + 10·D) avec T, N, D explicables.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Feuille de route à court terme</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Extraction de transcriptions pour les plateformes prises en charge (ASR si nécessaire)</li>
-              <li>Extraction de texte à l’écran (OCR) sur les images clés</li>
-              <li>Embeddings de texte pour la recherche sémantique et le regroupement des déclarations</li>
-              <li>Appariement par similarité avec des vérifications de faits et sources de référence</li>
-              <li>Score enrichi basé sur des caractéristiques, avec explications transparentes</li>
+              <li>Transcription + texte à l’écran : extraction de segments temporels (phrases, slogans, chiffres clés).</li>
+              <li>Représentations sémantiques : vecteurs de phrases pour regrouper et rapprocher les idées proches.</li>
+              <li>Appariement sémantique : similarité cosine avec vérifications/archives pour repérer des narratifs connus.</li>
+              <li>Score de propagande multi‑composantes : P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle.
+                <div className="text-xs text-gray-500">Poids wᵢ calibrés empiriquement et expliqués dans le rapport.</div>
+              </li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Améliorations à moyen terme</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Indices multimodaux (miniature/contexte des images vidéo) pour affiner la détection</li>
-              <li>Contexte source/domaine via signaux de réputation et indices de provenance</li>
-              <li>Conscience temporelle (récence des affirmations, dynamiques de diffusion, évolution des récits)</li>
-              <li>Flux de travail analyste : surlignages, notes, relectures collaboratives</li>
+              <li>Structure rhétorique : repérer accumulation, faux dilemme, glissement sémantique, appels d’autorité.</li>
+              <li>Trajectoires narratives : détection d’« épisodes » et d’éléments récurrents dans le temps (narrative drift).</li>
+              <li>Contexte des sources : signaux de fiabilité et réseaux de citation/domaines pour contextualiser les références.</li>
+              <li>Tableau de bord analyste : extraits clés, justification des scores, annotations collaboratives.</li>
             </ul>
           </section>
 
@@ -51,8 +61,8 @@ export default function MethodCard() {
 
           <section className="text-sm text-gray-600">
             <p>
-              InfoVerif vise à outiller les vérificateurs et communautés avec des signaux rapides et explicables.
-              À mesure que les capacités progressent, les résultats intégreront davantage de contexte, d’appariements et de liens probants.
+              Notre cap : rendre visibles les mécanismes de persuasion et de propagande via des scores, formules
+              et éléments de preuve consultables, pour des décisions éclairées et auditables.
             </p>
           </section>
         </div>

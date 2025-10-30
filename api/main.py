@@ -18,6 +18,9 @@ load_dotenv()
 
 app = FastAPI(title="InfoVerif API", version="1.0.0")
 
+# Feature flags (Deep is default)
+DEEP_ANALYSIS_ENABLED = os.getenv("DEEP_ANALYSIS_ENABLED", "true").lower() == "true"
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
@@ -66,33 +69,51 @@ async def health():
 
 @app.get("/method-card")
 async def method_card():
-    """Return method card with capabilities, roadmap, and principles."""
+    """Return method card highlighting algorithms and roadmap (tool-agnostic)."""
     card = {
-        "title": "InfoVerif — Method & Roadmap",
+        "title": "InfoVerif — Méthode & Feuille de route",
+        "goal": "Décortiquer la propagande et les techniques de communication via des scores explicables.",
         "current_capabilities": {
-            "overview": "Lightweight, metadata‑based analysis for fast triage",
-            "items": [
-                "Fetch page metadata (title, description)",
-                "Extract potential statements from metadata",
-                "Compute interpretable heuristic risk score"
+            "overview": "Analyse avancée par défaut (transcription + analyse sémantique)",
+            "formulas": {
+                "propaganda_score": "P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle",
+                "overall_risk": "R = f(P, C, M) ∈ [0,100]",
+                "variables": {
+                    "P": "score de propagande (0–100)",
+                    "C": "score de conspiration (0–100)",
+                    "M": "score de désinformation (0–100)"
+                }
+            },
+            "explainability": [
+                "techniques détectées avec preuves (extraits)",
+                "déclarations évaluées avec niveau de confiance"
             ],
+            "fallback_lite": {
+                "overview": "Mode léger de secours (métadonnées uniquement)",
+                "risk_score": "S = min(100, 5·T + 3·N + 10·D)",
+                "variables": {
+                    "T": "termes sensationnalistes",
+                    "N": "mentions chiffrées/statistiques",
+                    "D": "domaines inconnus/suspects"
+                }
+            }
         },
         "near_term_roadmap": [
-            "Transcript extraction (ASR) and on‑screen text (OCR)",
-            "Text embeddings for semantic retrieval and clustering",
-            "Similarity matching against curated fact‑checks and sources",
-            "Richer feature‑based scoring with transparent reasons",
+            "Segmentation de contenu (phrases/slogans/chiffres) à partir de transcriptions et texte à l’écran",
+            "Représentations sémantiques pour regrouper et rapprocher les idées (similarité cosine)",
+            "Appariement sémantique avec vérifications/archives pour relier à des narratifs connus",
+            "Score de propagande P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle (poids expliqués)",
         ],
         "mid_term_enhancements": [
-            "Multimodal cues from frames and thumbnails",
-            "Source/domain context and provenance hints",
-            "Temporal awareness for claim recency and narratives",
-            "Analyst workflows: highlights, notes, collaboration",
+            "Structure rhétorique (accumulation, faux dilemme, glissement sémantique, appels d’autorité)",
+            "Trajectoires narratives (épisodes récurrents, dérive narrative dans le temps)",
+            "Contexte des sources (réputation, réseaux de citation et domaines)",
+            "Outils d’analyse (extraits clés, justifications, annotations collaboratives)",
         ],
         "principles": [
-            "Data minimization and short retention for user‑submitted content",
-            "Transparency via explainable features and rationales",
-            "No tracking or profiling beyond service delivery",
+            "Minimisation des données et rétention courte",
+            "Transparence par scores/formules et justifications",
+            "Pas de pistage ni de profilage non nécessaire",
         ],
         "contact": "Github: github.com/infoverif",
     }
@@ -120,6 +141,8 @@ async def analyze_deep(
     platform: Optional[str] = Form(None)
 ):
     """Deep analysis using Whisper + GPT-4 (transcript + propaganda detection)."""
+    if not DEEP_ANALYSIS_ENABLED:
+        raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     from deep import analyze_url, analyze_file
     import tempfile
     from pathlib import Path

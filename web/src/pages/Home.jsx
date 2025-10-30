@@ -6,6 +6,7 @@ const API_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL
 
 export default function Home() {
   const [url, setUrl] = useState('')
+  const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
@@ -17,15 +18,26 @@ export default function Home() {
 
     try {
       const formData = new FormData()
-      formData.append('url', url)
+      const hasUrl = url && url.trim().length > 0
+      const hasFile = !!file
 
-      const response = await axios.post(`${API_URL}/analyze-lite`, formData, {
+      if ((hasUrl && hasFile) || (!hasUrl && !hasFile)) {
+        throw new Error("Veuillez fournir une URL ou un fichier, mais pas les deux.")
+      }
+
+      if (hasUrl) {
+        formData.append('url', url)
+      } else if (hasFile) {
+        formData.append('file', file)
+      }
+
+      const response = await axios.post(`${API_URL}/analyze-deep`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
-      navigate('/report-lite', { state: { report: response.data } })
+      navigate('/report-deep', { state: { report: response.data } })
     } catch (err) {
-      console.error('Erreur lors de l\'analyse de l\'URL :', err)
+      console.error('Erreur lors de l\'analyse :', err)
       setError(err.response?.data?.detail || err.message)
     } finally {
       setLoading(false)
@@ -46,23 +58,35 @@ export default function Home() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-            Analyse légère
+            Analyse avancée (par défaut)
           </h2>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                URL du contenu
+                URL du contenu (ou téléverser un fichier ci‑dessous)
               </label>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="Collez une URL YouTube, X/Twitter, TikTok ou un article"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus-border-transparent"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ou téléverser un fichier vidéo
+              </label>
+              <input
+                type="file"
+                accept="video/*"
+                onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500 mt-1">Fournissez une URL ou un fichier, pas les deux.</p>
             </div>
 
             {error && (
@@ -74,14 +98,14 @@ export default function Home() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Analyse en cours…' : "Analyser l'URL"}
+              {loading ? 'Analyse en cours…' : "Lancer l\'analyse"}
             </button>
           </form>
 
           {/* Info */}
           <div className="mt-8 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
-              ℹ️ Le mode léger fonctionne pour la plupart des liens et analyse uniquement les métadonnées de la page (titre/description).
+              ℹ️ L\'analyse avancée utilise la transcription (captions/Whisper) et une analyse sémantique.
               <a href="/method-card" className="underline ml-1">En savoir plus</a>
             </p>
           </div>
