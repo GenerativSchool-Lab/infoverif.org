@@ -37,15 +37,15 @@ Analyze this content and metadata for:
    - Conflation of correlation/causation
 
 Return ONLY valid JSON in this exact format:
-{
+{{
   "propaganda_score": 0-100,
   "conspiracy_score": 0-100,
   "misinfo_score": 0-100,
   "overall_risk": 0-100,
-  "techniques": [{"name": "technique name", "evidence": "quote from content", "severity": "high/medium/low"}],
-  "claims": [{"claim": "claim text", "confidence": "supported/unsupported/misleading", "issues": ["issue1", "issue2"]}],
+  "techniques": [{{"name": "technique name", "evidence": "quote from content", "severity": "high/medium/low"}}],
+  "claims": [{{"claim": "claim text", "confidence": "supported/unsupported/misleading", "issues": ["issue1", "issue2"]}}],
   "summary": "2-3 sentence analysis"
-}
+}}
 
 METADATA:
 Title: {title}

@@ -61,6 +61,50 @@ async def health():
     return data
 
 
+@app.get("/test-openai")
+async def test_openai():
+    """Test OpenAI API connection."""
+    import json
+    from openai import OpenAI
+    
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return {"status": "error", "message": "OPENAI_API_KEY not configured"}
+    
+    try:
+        client = OpenAI(api_key=api_key)
+        
+        # Simple JSON test
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You respond only in JSON."},
+                {"role": "user", "content": "Return JSON with: test_score (integer 42), message (string 'working')"}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0
+        )
+        
+        content = response.choices[0].message.content
+        parsed = json.loads(content)
+        
+        return {
+            "status": "ok",
+            "openai_api": "connected",
+            "raw_response": content,
+            "parsed_response": parsed
+        }
+        
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "traceback": traceback.format_exc()
+        }
+
+
 # Remove old heavy job/queue endpoints for this POC
 
 
