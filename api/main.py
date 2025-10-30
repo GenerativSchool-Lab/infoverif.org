@@ -97,11 +97,15 @@ async def method_card():
 @app.post("/analyze-lite")
 async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None)):
     """Lightweight synchronous metadata analysis (no Redis/jobs)."""
-    from .lite import analyze_metadata
+    from lite import analyze_metadata
     if not url:
         raise HTTPException(status_code=400, detail="url is required")
-    output = analyze_metadata(url, platform)
-    return JSONResponse(content=output)
+    try:
+        output = analyze_metadata(url, platform)
+        return JSONResponse(content=output)
+    except Exception as e:
+        # Return structured error for easier debugging
+        raise HTTPException(status_code=400, detail=f"analyze-lite failed: {str(e)[:200]}")
 
 
 if __name__ == "__main__":
