@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import Report from './pages/Report'
 import MethodCard from './pages/MethodCard'
+import ReportLite from './pages/ReportLite'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/report/:jobId" element={<Report />} />
+        <Route path="/report-lite" element={<ReportLite />} />
         <Route path="/method-card" element={<MethodCard />} />
       </Routes>
     </BrowserRouter>

@@ -103,7 +103,7 @@ def match_factchecks_keywords(claims: List[Dict], top_k: int = 3) -> List[Dict]:
 
 def compute_lite_heuristics(text: str, claims: List[Dict]) -> Dict:
     # Sensational terms count
-    from .claims import SENSATIONAL_TERMS, NUMBER_PATTERNS
+    from claims import SENSATIONAL_TERMS, NUMBER_PATTERNS
     text_lower = (text or "").lower()
     sensational = sum(text_lower.count(t) for t in SENSATIONAL_TERMS)
 

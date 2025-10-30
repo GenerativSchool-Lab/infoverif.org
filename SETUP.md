@@ -20,9 +20,7 @@ cd infoverif.org
 cp api/.env.example api/.env
 cp web/.env.example web/.env
 
-# Edit api/.env and set:
-# - REDIS_URL=redis://localhost:6379/0
-# - STORAGE_DIR=/tmp/video_integrity
+# Edit api/.env if needed (Lite mode requires minimal config)
 ```
 
 ### 2. Start with Docker (Recommended)
@@ -31,15 +29,15 @@ cp web/.env.example web/.env
 # Start all services
 make dev
 
-# Or manually:
-cd ops
-docker-compose up --build
+# Or manually run backend and frontend separately (Lite):
+# Backend
+cd api && uvicorn main:app --reload
+# Frontend
+cd ../web && npm install && npm run dev
 ```
 
 This starts:
 - FastAPI backend: http://localhost:8000
-- Redis: localhost:6379
-- RQ worker (in background)
 - Frontend: http://localhost:5173
 
 ### 3. Access the Application
@@ -58,18 +56,10 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-lite.txt
 
-# Start Redis (required)
-# Mac: brew install redis && brew services start redis
-# Linux: sudo apt-get install redis && sudo systemctl start redis
-# Or use Docker: docker run -d -p 6379:6379 redis:7-alpine
-
-# Run API
+# Run API (Lite)
 uvicorn main:app --reload
-
-# In another terminal, run worker
-python worker.py
 ```
 
 ### Frontend
@@ -84,7 +74,7 @@ npm install
 npm run dev
 ```
 
-## Architecture
+## Architecture (Lite)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -94,54 +84,27 @@ npm run dev
                  │
                  ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Backend API (FastAPI)                   │
-│                      http://localhost:8000                  │
-│                                                              │
-│  Endpoints:                                                 │
-│  - POST /analyze    → Enqueue video analysis                │
-│  - GET /status/:id  → Check job status                      │
-│  - GET /report/:id  → Get full report                       │
-│  - GET /health      → Health check                          │
-│  - GET /method-card → Ethics & limitations                 │
-└──────┬────────────────────────┬────────────────────────────┘
-       │                        │
-       ▼                        ▼
-┌──────────────┐        ┌──────────────┐
-│   Redis      │        │ RQ Worker    │
-│  (job queue) │        │ (background)  │
-└──────────────┘        └──────┬───────┘
-                               │
-                               ▼
-                    ┌───────────────────┐
-                    │  Processing       │
-                    │  Pipeline:        │
-                    │  • Video download │
-                    │  • ASR (Whisper)  │
-                    │  • OCR (PaddleOCR)│
-                    │  • Scene detect   │
-                    │  • Risk scoring   │
-                    │  • Fact-check     │
-                    │    matching (FAISS│
-                    └───────────────────┘
+│                    Backend API (FastAPI)                     │
+│                      http://localhost:8000                   │
+│                                                             │
+│  Endpoints (Lite):                                          │
+│  - POST /analyze-lite → Run metadata heuristics (sync)      │
+│  - GET  /health       → Health check                        │
+│  - GET  /method-card  → Ethics & limitations                │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Deployment
 
-### Railway (Backend)
+### Railway (Backend, Lite)
 
 1. Create Railway account
 2. Connect to this repository
-3. Create services:
+3. Create service:
    - **API Service**: Connect to repo, set root directory to `/api`
-   - **Worker Service**: Same repo, set command to `python worker.py`
-   - **Redis Service**: Add from Railway marketplace
-4. Set environment variables:
+4. Set environment variables (minimal for Lite):
    ```
-   REDIS_URL=<redis_url_from_railway>
-   STORAGE_DIR=/tmp/video_integrity
-   PURGE_AFTER_HOURS=48
    APP_ENV=production
-   ALLOW_DEV_BROWSERLESS=false
    ```
 5. Deploy
 
@@ -156,23 +119,12 @@ npm run dev
    - Environment variable: `VITE_API_URL=<railway_backend_url>`
 5. Deploy
 
-## Key Features
+## Key Features (Lite)
 
-### Video Analysis Pipeline
-
-1. **Input**: YouTube URL or uploaded file
-2. **Processing**:
-   - Download video (YouTube) or process upload
-   - Extract audio (16k mono WAV) for ASR
-   - Extract frames (1 fps) for OCR
-   - Detect scene boundaries
-3. **Analysis**:
-   - Transcribe speech (faster-whisper)
-   - Extract on-screen text (PaddleOCR)
-   - Detect claims and statistics
-   - Compute risk score (0-100)
-   - Match fact-checks (FAISS + sentence-transformers)
-4. **Output**: JSON report with timeline, transcript, risk factors, and sources
+1. Input: URL (YouTube or page)
+2. Fetch page metadata (title, description)
+3. Extract potential statements from metadata
+4. Compute heuristic risk score (0-100) from simple features
 
 ### Risk Scoring (0-100)
 
@@ -185,9 +137,8 @@ npm run dev
 
 ### Legal & Ethics
 
-- ✅ **No automated scraping**: TikTok/Instagram require manual upload
-- ✅ **48h auto-purge**: All media and data deleted after 48 hours
-- ✅ **Data minimization**: Only user-submitted content stored
+- ✅ **No automated scraping** beyond fetching provided URL metadata
+- ✅ **Data minimization**: Only minimal metadata processed
 - ✅ **Transparency**: `/method-card` endpoint explains limits
 - ✅ **False positive warnings**: Heuristic-based, not ML-verified
 

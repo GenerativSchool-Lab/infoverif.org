@@ -114,12 +114,11 @@ curl https://api.your-domain.com/health
 open https://your-frontend.vercel.app
 ```
 
-### 2. Test Full Flow
+### 2. Test Lite Flow
 
 1. Go to frontend URL
-2. Upload a test video or paste YouTube URL
-3. Wait for processing
-4. Verify report displays correctly
+2. Paste a YouTube (or page) URL
+3. Verify the Lightweight Report displays heuristics
 
 ### 3. Monitor Logs
 
@@ -144,7 +143,7 @@ crontab -l
 
 ## Environment Variables Reference
 
-### API Service
+### API Service (Lite)
 
 ```bash
 # Required
@@ -161,12 +160,7 @@ EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
 ### Worker Service
 
-```bash
-# Same as API service
-REDIS_URL=redis://...
-STORAGE_DIR=/tmp/video_integrity
-APP_ENV=production
-```
+Not required in Lite mode.
 
 ### Frontend (Vercel)
 
@@ -263,13 +257,13 @@ railway restart worker
 
 ### Rate Limiting
 
-Add to `main.py`:
+Add to `main.py` (optional):
 
 ```python
 from slowapi import Limiter
 limiter = Limiter(key_func=lambda: request.client.host)
 
-@app.post("/analyze")
+@app.post("/analyze-lite")
 @limiter.limit("10/minute")
 async def analyze(...):
     ...

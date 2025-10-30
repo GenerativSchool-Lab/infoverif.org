@@ -13,7 +13,40 @@ None required (MVP).
 
 ## Endpoints
 
-### POST /analyze
+### POST /analyze-lite
+
+Run lightweight, synchronous metadata analysis (no background jobs).
+
+Request:
+```bash
+curl -X POST http://localhost:8000/analyze-lite \
+  -F "url=https://youtube.com/watch?v=..."
+```
+
+Parameters:
+- url (required): Page or video URL
+- platform (optional): youtube, tiktok, twitter/x (auto-detected if omitted)
+
+Response:
+```json
+{
+  "input": {
+    "url": "https://...",
+    "platform": "youtube",
+    "title": "...",
+    "description": "..."
+  },
+  "claims": [ { "text": "..." } ],
+  "matches": [],
+  "heuristics": {
+    "score": 42,
+    "reasons": [ { "label": "Numbers/statistics mentioned", "weight": 12 } ],
+    "features": { "sensational_terms": 1, "numbers": 4, "unknown_domains": 0 }
+  }
+}
+```
+
+### (Deprecated) /analyze
 
 Submit a video for analysis.
 
@@ -44,7 +77,7 @@ curl -X POST http://localhost:8000/analyze \
 }
 ```
 
-### GET /status/{job_id}
+### (Deprecated) /status/{job_id}
 
 Get analysis job status.
 
@@ -57,7 +90,7 @@ Get analysis job status.
 }
 ```
 
-### GET /report/{job_id}
+### (Deprecated) /report/{job_id}
 
 Get full analysis report.
 
@@ -176,27 +209,9 @@ Get ethics, limitations, and methodology information.
 }
 ```
 
-## Example Workflow
-
-```javascript
-// 1. Submit video
-const response = await fetch('/analyze', {
-  method: 'POST',
-  body: formData
-})
-const { job_id } = await response.json()
-
-// 2. Poll status
-let status = null
-do {
-  await sleep(2000)
-  const res = await fetch(`/status/${job_id}`)
-  status = await res.json()
-} while (status.status === 'running' || status.status === 'queued')
-
-// 3. Get report
-const report = await fetch(`/report/${job_id}`).then(r => r.json())
-console.log('Risk score:', report.risk.score)
+## Example Request (Lite)
+```bash
+curl -X POST "$BASE_URL/analyze-lite" -F "url=https://youtube.com/watch?v=..."
 ```
 
 ## Rate Limits
