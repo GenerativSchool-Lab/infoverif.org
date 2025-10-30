@@ -134,24 +134,32 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     if not content:
         raise ValueError("OpenAI returned empty content")
     
-    # Strip any markdown code blocks if present
+    # Aggressively clean the response
     content = content.strip()
+    
+    # Remove markdown code blocks if present
     if content.startswith("```"):
-        # Remove markdown code blocks
         lines = content.split('\n')
-        # Remove first line (```json or ```)
         if lines[0].startswith("```"):
             lines = lines[1:]
-        # Remove last line (```)
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         content = '\n'.join(lines).strip()
+    
+    # Find the first { and last } to extract just the JSON object
+    first_brace = content.find('{')
+    last_brace = content.rfind('}')
+    
+    if first_brace == -1 or last_brace == -1:
+        raise ValueError(f"No JSON object found in response. Content: {content[:500]}")
+    
+    content = content[first_brace:last_brace+1]
     
     try:
         parsed = json.loads(content)
     except json.JSONDecodeError as e:
         # Log the actual content for debugging
-        raise ValueError(f"JSON parse error: {str(e)}. Raw response (first 500 chars): {content[:500]}")
+        raise ValueError(f"JSON parse error: {str(e)}. Cleaned response: {content[:500]}")
     
     # Validate and set defaults for required fields
     parsed.setdefault("propaganda_score", 0)
