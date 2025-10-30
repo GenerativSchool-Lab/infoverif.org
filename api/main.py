@@ -66,30 +66,35 @@ async def health():
 
 @app.get("/method-card")
 async def method_card():
-    """Return method card explaining ethics, limits, and false positives."""
+    """Return method card with capabilities, roadmap, and principles."""
     card = {
-        "title": "InfoVerif — Methode & Limitierungen",
-        "method": {
-            "overview": "Video-Analyse zur Ermittlung potentieller Falschinformationen",
-            "components": [
-                "ASR (Automatic Speech Recognition) zur Transkription",
-                "OCR zur Erkennung von On-Screen-Text",
-                "Heuristische Risikobewertung",
-                "Matching mit Faktencheck-Datenbank"
-            ]
+        "title": "InfoVerif — Method & Roadmap",
+        "current_capabilities": {
+            "overview": "Lightweight, metadata‑based analysis for fast triage",
+            "items": [
+                "Fetch page metadata (title, description)",
+                "Extract potential statements from metadata",
+                "Compute interpretable heuristic risk score"
+            ],
         },
-        "limits": {
-            "false_positives": "Hohe Rate falsch positiver Ergebnisse möglich",
-            "no_automated_scraping": "TikTok/Instagram erfordern manuelle Uploads",
-            "48h_retention": "Alle Daten werden nach 48 Stunden automatisch gelöscht",
-            "heuristic_only": "Keine ML-verifizierte Klassifizierung"
-        },
-        "ethics": {
-            "data_minimization": "Nur user-submitted content wird gespeichert",
-            "no_tracking": "Keine persistenten User-Profile",
-            "transparency": "Offene Quellcode und Methodendokumentation"
-        },
-        "contact": "Github: github.com/infoverif"
+        "near_term_roadmap": [
+            "Transcript extraction (ASR) and on‑screen text (OCR)",
+            "Text embeddings for semantic retrieval and clustering",
+            "Similarity matching against curated fact‑checks and sources",
+            "Richer feature‑based scoring with transparent reasons",
+        ],
+        "mid_term_enhancements": [
+            "Multimodal cues from frames and thumbnails",
+            "Source/domain context and provenance hints",
+            "Temporal awareness for claim recency and narratives",
+            "Analyst workflows: highlights, notes, collaboration",
+        ],
+        "principles": [
+            "Data minimization and short retention for user‑submitted content",
+            "Transparency via explainable features and rationales",
+            "No tracking or profiling beyond service delivery",
+        ],
+        "contact": "Github: github.com/infoverif",
     }
     return card
 

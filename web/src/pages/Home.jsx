@@ -25,7 +25,7 @@ export default function Home() {
 
       navigate('/report-lite', { state: { report: response.data } })
     } catch (err) {
-      console.error('Error analyzing URL:', err)
+      console.error('Erreur lors de l\'analyse de l\'URL :', err)
       setError(err.response?.data?.detail || err.message)
     } finally {
       setLoading(false)
@@ -38,7 +38,7 @@ export default function Home() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-3xl font-bold text-gray-900">InfoVerif</h1>
-          <p className="text-gray-600 mt-2">Video Integrity Analysis</p>
+          <p className="text-gray-600 mt-2">Analyse d'intégrité des contenus</p>
         </div>
       </header>
 
@@ -46,20 +46,20 @@ export default function Home() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-            Lightweight Analysis
+            Analyse légère
           </h2>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Video URL
+                URL du contenu
               </label>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder="Collez une URL YouTube, X/Twitter, TikTok ou un article"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
@@ -74,15 +74,15 @@ export default function Home() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Analyzing...' : 'Analyze URL'}
+              {loading ? 'Analyse en cours…' : "Analyser l'URL"}
             </button>
           </form>
 
           {/* Info */}
           <div className="mt-8 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
-              ℹ️ Lightweight mode analyzes page metadata only (title/description). 
-              <a href="/method-card" className="underline ml-1">Learn more</a>
+              ℹ️ Le mode léger fonctionne pour la plupart des liens et analyse uniquement les métadonnées de la page (titre/description).
+              <a href="/method-card" className="underline ml-1">En savoir plus</a>
             </p>
           </div>
         </div>
