@@ -11,48 +11,70 @@ from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-ANALYSIS_PROMPT = """You are an expert in media manipulation, propaganda analysis, and misinformation detection.
+ANALYSIS_PROMPT = """Tu es un expert en manipulation médiatique, analyse de propagande et détection de désinformation.
 
-Analyze this content and metadata for:
+Analyse ce contenu pour identifier :
 
-1. PROPAGANDA TECHNIQUES (0-100):
-   - Emotional manipulation (fear, anger, outrage)
-   - Us vs them framing
-   - Loaded language
-   - Cherry-picking facts
-   - Appeal to authority without evidence
+1. TECHNIQUES DE PROPAGANDE (score 0-100) :
+   - Manipulation émotionnelle (peur, colère, indignation, urgence)
+   - Cadrage "eux vs nous" / désignation d'un bouc émissaire
+   - Langage chargé / mots sensationnalistes
+   - Sélection partielle des faits (cherry-picking)
+   - Appel à l'autorité sans preuves
+   - Généralisation abusive
+   - Faux dilemmes / pensée binaire
+   - Déformation / exagération
+   - Répétition de messages clés
 
-2. CONSPIRACY THEORY MARKERS (0-100):
-   - "Hidden truth" narratives
-   - Distrust of institutions/experts
-   - Pattern-seeking in noise
-   - Unfalsifiable claims
-   - "They don't want you to know"
+2. MARQUEURS CONSPIRATIONNISTES (score 0-100) :
+   - Narratives de "vérité cachée" / révélation
+   - Défiance envers institutions/experts/médias mainstream
+   - Recherche de patterns dans le bruit
+   - Affirmations infalsifiables
+   - Rhétorique "ils ne veulent pas que tu saches"
+   - Théories causales simplistes pour phénomènes complexes
+   - Appel au "bon sens" contre l'expertise
 
-3. MISINFORMATION PATTERNS (0-100):
-   - Unsourced claims presented as fact
-   - Logical fallacies
-   - Out-of-context information
-   - Misleading statistics
-   - Conflation of correlation/causation
+3. DÉSINFORMATION & MANIPULATION (score 0-100) :
+   - Affirmations non sourcées présentées comme faits
+   - Sophismes logiques identifiables
+   - Information hors contexte
+   - Statistiques trompeuses
+   - Confusion corrélation/causalité
+   - Omission d'informations cruciales
+   - Fausses équivalences
 
-Return ONLY valid JSON in this exact format:
+RÉPONDS UNIQUEMENT EN JSON VALIDE dans ce format exact (en français) :
 {{
   "propaganda_score": 0-100,
   "conspiracy_score": 0-100,
   "misinfo_score": 0-100,
   "overall_risk": 0-100,
-  "techniques": [{{"name": "technique name", "evidence": "quote from content", "severity": "high/medium/low"}}],
-  "claims": [{{"claim": "claim text", "confidence": "supported/unsupported/misleading", "issues": ["issue1", "issue2"]}}],
-  "summary": "2-3 sentence analysis"
+  "techniques": [
+    {{
+      "name": "Nom de la technique en français",
+      "evidence": "Citation exacte du contenu qui illustre cette technique",
+      "severity": "high/medium/low",
+      "explanation": "Explication détaillée de comment cette technique est utilisée (2-3 phrases)"
+    }}
+  ],
+  "claims": [
+    {{
+      "claim": "Affirmation textuelle extraite du contenu",
+      "confidence": "supported/unsupported/misleading",
+      "issues": ["problème 1", "problème 2"],
+      "reasoning": "Explication du jugement sur cette affirmation"
+    }}
+  ],
+  "summary": "Analyse détaillée en 3-4 phrases : résumé des techniques identifiées, niveau de risque, et impact potentiel sur l'audience"
 }}
 
-METADATA:
-Title: {title}
-Description: {description}
-Platform: {platform}
+MÉTADONNÉES :
+Titre : {title}
+Description : {description}
+Plateforme : {platform}
 
-CONTENT:
+CONTENU À ANALYSER :
 {transcript}
 """
 
@@ -123,7 +145,7 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an expert media analyst. You MUST respond with valid JSON only, no markdown, no code blocks, no explanations."},
+            {"role": "system", "content": "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."},
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"},
