@@ -2,7 +2,7 @@
 import os
 from typing import Optional
 
-from fastapi import FastAPI, Form, HTTPException
+from fastapi import FastAPI, Form, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -111,6 +111,53 @@ async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None
     except Exception as e:
         # Return structured error for easier debugging
         raise HTTPException(status_code=400, detail=f"analyze-lite failed: {str(e)[:200]}")
+
+
+@app.post("/analyze-deep")
+async def analyze_deep(
+    url: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
+    platform: Optional[str] = Form(None)
+):
+    """Deep analysis using Whisper + GPT-4 (transcript + propaganda detection)."""
+    from deep import analyze_url, analyze_file
+    import tempfile
+    from pathlib import Path
+    
+    # Validate input
+    if not url and not file:
+        raise HTTPException(status_code=400, detail="Either 'url' or 'file' is required")
+    
+    if url and file:
+        raise HTTPException(status_code=400, detail="Provide either 'url' or 'file', not both")
+    
+    # Check OpenAI API key
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    
+    try:
+        if url:
+            # URL analysis (YouTube)
+            result = analyze_url(url)
+        else:
+            # File upload analysis
+            # Save uploaded file temporarily
+            with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
+                content = await file.read()
+                tmp.write(content)
+                tmp_path = tmp.name
+            
+            try:
+                result = analyze_file(tmp_path, platform or "unknown")
+            finally:
+                # Cleanup uploaded file
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+        
+        return JSONResponse(content=result)
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"analyze-deep failed: {str(e)[:300]}")
 
 
 if __name__ == "__main__":
