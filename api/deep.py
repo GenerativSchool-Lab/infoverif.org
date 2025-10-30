@@ -111,7 +111,7 @@ def transcribe_audio(audio_path: str) -> str:
 
 
 def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
-    """Analyze content using OpenAI with strict JSON Schema output."""
+    """Analyze content using OpenAI GPT-4 with JSON mode."""
     prompt = ANALYSIS_PROMPT.format(
         title=metadata.get('title', 'N/A'),
         description=metadata.get('description', 'N/A'),
@@ -119,66 +119,14 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
         transcript=transcript[:8000]
     )
 
-    # Correct schema structure for OpenAI json_schema mode
+    # Use json_object mode (compatible with openai 1.12.0)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an expert media analyst. Return ONLY valid JSON matching the schema."},
+            {"role": "system", "content": "You are an expert media analyst. Return ONLY valid JSON matching the schema shown in the user prompt."},
             {"role": "user", "content": prompt}
         ],
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "analysis_result",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "propaganda_score": {"type": "integer"},
-                        "conspiracy_score": {"type": "integer"},
-                        "misinfo_score": {"type": "integer"},
-                        "overall_risk": {"type": "integer"},
-                        "techniques": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {"type": "string"},
-                                    "evidence": {"type": "string"},
-                                    "severity": {"type": "string"}
-                                },
-                                "required": ["name", "evidence", "severity"],
-                                "additionalProperties": False
-                            }
-                        },
-                        "claims": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "claim": {"type": "string"},
-                                    "confidence": {"type": "string"},
-                                    "issues": {"type": "array", "items": {"type": "string"}}
-                                },
-                                "required": ["claim", "confidence", "issues"],
-                                "additionalProperties": False
-                            }
-                        },
-                        "summary": {"type": "string"}
-                    },
-                    "required": [
-                        "propaganda_score",
-                        "conspiracy_score",
-                        "misinfo_score",
-                        "overall_risk",
-                        "techniques",
-                        "claims",
-                        "summary"
-                    ],
-                    "additionalProperties": False
-                }
-            }
-        },
+        response_format={"type": "json_object"},
         temperature=0
     )
 
@@ -186,7 +134,20 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     if not content:
         raise ValueError("OpenAI returned empty content")
     
-    parsed = json.loads(content)
+    try:
+        parsed = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to parse OpenAI response as JSON: {e}. Response: {content[:500]}")
+    
+    # Validate and set defaults for required fields
+    parsed.setdefault("propaganda_score", 0)
+    parsed.setdefault("conspiracy_score", 0)
+    parsed.setdefault("misinfo_score", 0)
+    parsed.setdefault("overall_risk", 0)
+    parsed.setdefault("techniques", [])
+    parsed.setdefault("claims", [])
+    parsed.setdefault("summary", "")
+    
     return parsed
 
 
