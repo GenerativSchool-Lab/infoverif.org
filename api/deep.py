@@ -170,9 +170,9 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
         "strict": True
     }
 
-    resp = client.responses.create(
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
-        input=[
+        messages=[
             {"role": "system", "content": "Return ONLY JSON matching the provided schema. No prose."},
             {"role": "user", "content": prompt}
         ],
@@ -180,14 +180,18 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
         temperature=0
     )
 
-    content_text = getattr(resp, "output_text", None)
-    if not content_text:
-        try:
-            content_text = resp.output[0].content[0].text
-        except Exception:
-            content_text = "{}"
-
-    parsed = json.loads(content_text)
+    content = response.choices[0].message.content or "{}"
+    parsed = json.loads(content)
+    
+    # Ensure all required fields exist with defaults
+    parsed.setdefault("propaganda_score", 0)
+    parsed.setdefault("conspiracy_score", 0)
+    parsed.setdefault("misinfo_score", 0)
+    parsed.setdefault("overall_risk", 0)
+    parsed.setdefault("techniques", [])
+    parsed.setdefault("claims", [])
+    parsed.setdefault("summary", "")
+    
     return parsed
 
 
