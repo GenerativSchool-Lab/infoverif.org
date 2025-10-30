@@ -174,7 +174,7 @@ export default function Home() {
           <div className="border-t border-gray-200 pt-8">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">
-                Projet Open Source du <a href="https://generativschool.com" target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline">Civic Tech AI Lab</a> — GenerativSchool.com
+                Projet Open Source — GenerativSchool.com
               </p>
               <p className="text-xs text-gray-500 mb-4">
                 Contributions bienvenues · Code MIT License
