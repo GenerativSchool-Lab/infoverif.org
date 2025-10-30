@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL
 
 export default function Report() {
   const { jobId } = useParams()
@@ -11,27 +11,36 @@ export default function Report() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    let isCancelled = false
+    let timeoutId
+
     const pollStatus = async () => {
       try {
         const response = await axios.get(`${API_URL}/status/${jobId}`)
+        if (isCancelled) return
         setStatus(response.data)
 
         if (response.data.status === 'done') {
-          // Fetch full report
           const reportResp = await axios.get(`${API_URL}/report/${jobId}`)
+          if (isCancelled) return
           setReport(reportResp.data)
         } else if (response.data.status === 'failed') {
           setError(response.data.message || 'Analysis failed')
         } else {
-          // Continue polling
-          setTimeout(pollStatus, 2000)
+          timeoutId = setTimeout(pollStatus, 2000)
         }
       } catch (err) {
+        if (isCancelled) return
         setError(err.message)
       }
     }
 
     pollStatus()
+
+    return () => {
+      isCancelled = true
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [jobId])
 
   if (error) {

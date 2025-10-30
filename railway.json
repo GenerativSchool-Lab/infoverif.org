@@ -16,6 +16,10 @@
     "ENVIRONMENT": "production"
   },
   "variables": {
+    "INLINE_PROCESS": {
+      "description": "Process jobs inline on API via FastAPI BackgroundTasks (no worker needed)",
+      "default": "true"
+    },
     "REDIS_URL": {
       "description": "Redis connection URL (set automatically by Railway Redis plugin)",
       "required": false

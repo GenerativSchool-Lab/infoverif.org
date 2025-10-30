@@ -1,18 +1,18 @@
-"""Main FastAPI application for InfoVerif video analysis."""
+"""Main FastAPI application (lightweight metadata POC)."""
 import os
-import uuid
 from typing import Optional
-from pathlib import Path
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import redis
+try:
+    import redis  # optional
+except Exception:
+    redis = None
 
-# Lazy import to avoid loading heavy dependencies on startup
-# from tasks import get_job_status, get_job_result
+# Avoid importing heavy task/redis code at startup; import inside endpoints when needed
 
 load_dotenv()
 
@@ -27,133 +27,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Redis connection
-redis_conn = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+# Redis connection (optional)
+redis_conn = None
+try:
+    if redis is not None:
+        redis_conn = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+except Exception:
+    redis_conn = None
 
 
-# Request models
+# Request/response models kept minimal for POC
 class AnalyzeRequest(BaseModel):
-    url: Optional[str] = None
-    platform: Optional[str] = None  # youtube, tiktok, instagram
-    language: str = "fr"
-
-
-# Response models
-class JobResponse(BaseModel):
-    job_id: str
-
-
-class StatusResponse(BaseModel):
-    status: str
-    progress: int
-    message: Optional[str] = None
+    url: str
+    platform: Optional[str] = None  # youtube, tiktok, twitter/x
 
 
 @app.get("/health")
 async def health():
     """Health check endpoint."""
-    health_data = {"status": "ok", "service": "infoverif-api"}
-    
-    # Check Redis connection if available
-    try:
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-        test_conn = redis.from_url(redis_url)
-        test_conn.ping()
-        health_data["redis"] = "connected"
-        health_data["redis_url"] = redis_url.split("@")[-1] if "@" in redis_url else redis_url.split("//")[-1]
-    except Exception as e:
-        health_data["redis"] = "disconnected"
-        health_data["redis_error"] = str(e)[:50]
-    
-    return health_data
-
-
-@app.post("/analyze")
-async def analyze(
-    url: Optional[str] = Form(None),
-    platform: Optional[str] = Form(None),
-    language: str = Form("fr"),
-    file: Optional[UploadFile] = File(None)
-):
-    """
-    Submit a video for analysis.
-    
-    Either provide:
-    - URL for YouTube (public videos only)
-    - File upload for TikTok/Instagram
-    """
-    job_id = str(uuid.uuid4())
-    
-    # Validate input
-    if not url and not file:
-        raise HTTPException(status_code=400, detail="Either URL or file must be provided")
-    
-    # Handle file upload
-    uploaded_file_path = None
-    if file:
-        # Save uploaded file
-        storage_dir = Path(os.getenv("STORAGE_DIR", "/tmp/video_integrity")) / job_id
-        storage_dir.mkdir(parents=True, exist_ok=True)
-        uploaded_file_path = storage_dir / file.filename
-        
-        with open(uploaded_file_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
-    
-    # Auto-detect platform from URL
-    if url and not platform:
-        if "youtube.com" in url or "youtu.be" in url:
-            platform = "youtube"
-        elif "tiktok.com" in url:
-            platform = "tiktok"
-        elif "instagram.com" in url:
-            platform = "instagram"
-        else:
-            platform = "unknown"
-    
-    # Import and enqueue analyze_video
-    from tasks import _get_queue, analyze_video
-    queue = _get_queue()
-    queue.enqueue(
-        analyze_video,
-        job_id, url, platform, language, str(uploaded_file_path) if uploaded_file_path else None,
-        file.filename if file else None
-    )
-    
-    return JobResponse(job_id=job_id)
-
-
-@app.get("/status/{job_id}")
-async def get_status(job_id: str):
-    """Get job status."""
-    try:
-        from tasks import get_job_status
-        status = get_job_status(job_id)
-        if not status:
-            raise HTTPException(status_code=404, detail="Job not found")
-        
-        # Validate and create response
+    data = {"status": "ok", "service": "infoverif-api"}
+    if redis is not None:
         try:
-            return StatusResponse(**status)
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+            test_conn = redis.from_url(redis_url)
+            test_conn.ping()
+            data["redis"] = "connected"
         except Exception as e:
-            # If status data is invalid, return 404 (job not found)
-            print(f"Error validating status response for job {job_id}: {e}")
-            raise HTTPException(status_code=404, detail="Job not found or invalid status data")
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Unexpected error in get_status for job {job_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Error retrieving job status: {str(e)}")
+            data["redis"] = "disconnected"
+            data["redis_error"] = str(e)[:80]
+    return data
 
 
-@app.get("/report/{job_id}")
-async def get_report(job_id: str):
-    """Get full analysis report."""
-    from tasks import get_job_result
-    result = get_job_result(job_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Job not found or not completed")
-    return JSONResponse(content=result)
+# Remove old heavy job/queue endpoints for this POC
+
+
+# (status/report endpoints removed in lightweight POC)
 
 
 @app.get("/method-card")
@@ -184,6 +92,16 @@ async def method_card():
         "contact": "Github: github.com/infoverif"
     }
     return card
+
+
+@app.post("/analyze-lite")
+async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None)):
+    """Lightweight synchronous metadata analysis (no Redis/jobs)."""
+    from .lite import analyze_metadata
+    if not url:
+        raise HTTPException(status_code=400, detail="url is required")
+    output = analyze_metadata(url, platform)
+    return JSONResponse(content=output)
 
 
 if __name__ == "__main__":

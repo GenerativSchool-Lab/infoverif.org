@@ -1,62 +1,190 @@
-# InfoVerif — Video Integrity Analysis MVP
+# InfoVerif — Détection de Propagande et Ingérence Étrangère
 
-Production-deployable MVP that analyzes short videos (YouTube, TikTok, Instagram Reels) and returns transcription, on-screen text, risk score, and related fact-checks.
+**Outil de défense informationnelle** pour identifier et signaler la propagande, l'ingérence étrangère, les manipulations médiatiques, les contenus extrémistes et les deepfakes dans les vidéos courtes (YouTube, TikTok, Instagram Reels).
 
-## Architecture
+## 🎯 Mission
 
-- **Backend**: FastAPI + RQ workers (Python 3.11) on Railway
-- **Frontend**: React (Vite) + Tailwind on Vercel
-- **Storage**: Local FS or S3-compatible (MinIO) with 48h purge
-- **Vector Search**: FAISS (in-memory) for MVP
+InfoVerif est conçu pour **protéger l'information publique** contre :
+- 🚨 **Propagande** et désinformation coordonnée
+- 🌐 **Ingérence étrangère** (comptes, bots, influenceurs orchestrés)
+- 🎭 **Manipulation médiatique** (deepfakes, montages, montage vidéo)
+- ⚠️ **Théories du complot** et fausses narrations
+- ⛔ **Contenu extrémiste** (djihadiste, suprémaciste, etc.)
 
-## Legal & Ethics
+### État Actuel : MVP avec Input Manuel
 
-- **YouTube**: Public URL analysis via YouTube Data API (optional) or direct download
-- **TikTok/Instagram**: User upload only (.mp4); no scraping in production
-- **Auto-purge**: All media and derived data deleted after 48 hours
-- **No persistent storage**: Only user-submitted content stored
-- See `/method-card` for detailed limitations and false positive warnings
+Le système **fonctionne actuellement avec des inputs manuels** :
+- ✅ Analyse de vidéos soumises par l'utilisateur (URL ou upload)
+- ✅ Détection de signaux de manipulation (cuts, texte sensationnaliste)
+- ✅ Transcription audio (ASR) et extraction de texte (OCR)
+- ✅ Scoring de risque heuristique
+- ✅ Matching avec base de fact-checks
 
-## Quick Start (Direct Deployment)
+### Vision : Agent Autonome de Détection
 
-### Prerequisites
-- GitHub account (public repo)
-- Railway account (railway.app)
+**Objectif à long terme** : Transformer InfoVerif en **agent autonome** capable de :
+
+1. **Détection Automatique de Contenu**
+   - Scan automatisé de plateformes (YouTube, TikTok, etc.)
+   - Identification proactive de contenus suspects
+   - Monitoring continu de comptes à risque
+
+2. **Classification Multi-Catégories**
+   - 🎯 **Théories du complot** : Patterns linguistiques, références récurrentes
+   - 🌐 **Ingérence étrangère** : Analyse de réseaux, timing coordonné, provenance suspecte
+   - 🎭 **Deepfakes** : Détection de manipulation audio/vidéo (modèles Vision Transformers)
+   - ⛔ **Contenu extrémiste** : Classification de discours radical (modèles NLP fine-tunés)
+
+3. **Analyse de Réseaux**
+   - Mapping de comptes liés et coordonnés
+   - Détection de bots et fermes de trolls
+   - Analyse de propagation virale
+
+4. **Alertes en Temps Réel**
+   - Dashboard de monitoring pour agences gouvernementales / ONG
+   - API d'alertes pour intégration dans systèmes de sécurité
+   - Reporting automatisé de violations
+
+## 🏗️ Architecture
+
+- **Backend**: FastAPI + RQ workers (Python 3.11) sur Railway
+- **Frontend**: React (Vite) + Tailwind sur Vercel
+- **Storage**: Local FS ou S3-compatible (MinIO) avec purge 48h
+- **Vector Search**: FAISS (in-memory) pour MVP → Pinecone/Weaviate pour production
+- **Queue**: Redis pour jobs asynchrones
+
+## 🔍 Pipeline de Détection Actuel
+
+### 1. Analyse Vidéo Multi-Modale
+
+```
+┌─────────────┐
+│ Input Vidéo │ (URL YouTube ou Upload)
+└──────┬──────┘
+       │
+   ┌───▼────────────────────────────┐
+   │  Traitement Vidéo             │
+   │  • Download/Upload             │
+   │  • Extraction audio (16kHz)   │
+   │  • Extraction frames (1 fps)  │
+   └──────┬─────────────────────────┘
+          │
+   ┌──────▼──────────────────────────┐
+   │  Analyse Parallèle              │
+   │  ┌──────────┬──────────┬─────┐ │
+   │  │ ASR      │ OCR      │Scene│ │
+   │  │ (Whisper)│(PaddleOCR)│Detect│ │
+   │  └────┬─────┴────┬─────┴──┬──┘ │
+   └───────┼──────────┼────────┼────┘
+           │          │        │
+   ┌───────▼───────────▼────────▼─────┐
+   │  Détection Signaux Manipulation │
+   │  • Densité de cuts               │
+   │  • Langage sensationnaliste      │
+   │  • Texte plein écran             │
+   │  • Patterns conspirationnistes   │
+   └───────┬──────────────────────────┘
+           │
+   ┌───────▼──────────────────────────┐
+   │  Matching Fact-Check              │
+   │  • Embeddings (sentence-transform)│
+   │  • Recherche vectorielle (FAISS)  │
+   │  • Sources vérifiées              │
+   └───────┬──────────────────────────┘
+           │
+   ┌───────▼──────────────────────────┐
+   │  Scoring Risque (0-100)           │
+   │  • Heuristique multi-facteurs    │
+   │  • Timeline avec flags           │
+   └──────────────────────────────────┘
+```
+
+### 2. Signaux Détectés
+
+| Signal | Méthode | Valeur Détectrice |
+|--------|---------|-------------------|
+| **Manipulation vidéo** | Densité de cuts | >5 cuts/min = suspect |
+| **Propagande** | Langage sensationnaliste | Termes émotionnels, polarisants |
+| **Théories du complot** | Patterns textuels | Références récurrentes, "on nous cache" |
+| **Deepfake** | (À venir) Vision Transformers | Anomalies temporelles, artefacts |
+| **Ingérence** | (À venir) Analyse réseau | Timing coordonné, provenance suspecte |
+| **Extrémisme** | (À venir) Classification NLP | Discours radical, appels à la violence |
+
+### 3. Modules de Détection
+
+#### Module ASR (Automatic Speech Recognition)
+- **Outil**: `faster-whisper` (Whisper base, CPU)
+- **Fonction**: Transcription audio → texte avec timestamps
+- **Utilisation**: Extraction de discours pour analyse NLP
+- **Évolution**: Whisper Large-v2 sur GPU pour détection d'accent suspect (ingérence)
+
+#### Module OCR (Optical Character Recognition)
+- **Outil**: `PaddleOCR`
+- **Fonction**: Extraction de texte à l'écran (frames vidéo)
+- **Utilisation**: Détection de surimpressions, slogans, fausses citations
+- **Évolution**: Détection de patterns visuels (logos, symboles)
+
+#### Module Détection de Scènes
+- **Outil**: `PySceneDetect`
+- **Fonction**: Identification de coupures et transitions
+- **Utilisation**: Métrique de manipulation vidéo (densité de cuts)
+- **Évolution**: Détection de montage et manipulation temporelle
+
+#### Module Scoring de Risque (Heuristique)
+- **Fonction**: Calcul score 0-100 basé sur multiples facteurs
+- **Facteurs actuels**:
+  - Densité de cuts (0-20 pts)
+  - Langage sensationnaliste (0-20 pts)
+  - Texte plein écran suspect (0-20 pts)
+  - Matching fact-check négatif (0-40 pts)
+- **Évolution TRL 7**: Modèles ML fine-tunés pour scoring précis
+
+#### Module Matching Fact-Check
+- **Outil**: `sentence-transformers` + `FAISS`
+- **Fonction**: Recherche de correspondances avec base fact-checks
+- **Embeddings**: `paraphrase-multilingual-MiniLM-L12-v2`
+- **Évolution**: Base de millions de fact-checks (vs milliers actuels)
+
+## 🚀 Déploiement Rapide
+
+### Prérequis
+- Compte GitHub (repo public)
+- Compte Railway (railway.app)
 - Railway CLI: `npm i -g @railway/cli`
 
-### Deploy to Railway (No Docker)
+### Déploiement Railway
 
 ```bash
-# 1. Push to GitHub
+# 1. Push vers GitHub
 git init
 git add .
 git commit -m "Initial commit"
 git remote add origin https://github.com/YOUR_USERNAME/infoverif-org.git
 git push -u origin main
 
-# 2. Deploy to Railway
+# 2. Déploiement Railway
 railway login
 railway init
 
-# 3. Create services
+# 3. Création services
 railway add --plugin redis
 railway up --service api
 railway up --service worker
 
-# 4. Get your URL
+# 4. Obtenir URL
 railway domain
 ```
 
-**See [RAILWAY_DEPLOY.md](./RAILWAY_DEPLOY.md) for complete instructions.**
+**Voir [RAILWAY_DEPLOY.md](./RAILWAY_DEPLOY.md) pour instructions complètes.**
 
-## Local Development
+## 💻 Développement Local
 
-### Prerequisites
+### Prérequis
 - Python 3.11+
-- Node.js 18+ (for frontend)
-- Redis (or Docker: `docker run -d -p 6379:6379 redis:7-alpine`)
+- Node.js 18+ (pour frontend)
+- Redis (ou Docker: `docker run -d -p 6379:6379 redis:7-alpine`)
 
-### Start Backend
+### Démarrer Backend
 
 ```bash
 cd api
@@ -64,14 +192,14 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### Start Worker (separate terminal)
+### Démarrer Worker (terminal séparé)
 
 ```bash
 cd api
 python worker.py
 ```
 
-### Start Frontend
+### Démarrer Frontend
 
 ```bash
 cd web
@@ -79,168 +207,223 @@ npm install
 npm run dev
 ```
 
-## Deployment
-
-### Railway (Backend)
-1. Connect Railway to this repo
-2. Set environment variables from `.env.example`
-3. Deploy automatically
-
-### Vercel (Frontend)
-1. Connect Vercel to `/web` directory
-2. Set `VITE_API_URL` to Railway backend URL
-3. Deploy
-
-## Directory Structure
+## 📁 Structure du Projet
 
 ```
-/api            # FastAPI, workers, tasks, scoring
+/api            # FastAPI, workers, tâches, scoring
+  /asr.py       # Module transcription audio
+  /ocr.py       # Module reconnaissance texte
+  /scene_detection.py  # Détection de scènes
+  /scoring.py   # Scoring de risque heuristique
+  /factcheck.py # Matching fact-checks
+  /claims.py    # Extraction de claims
+  /video_processing.py  # Traitement vidéo
 /web            # React (Vite), Tailwind UI
-/ops            # Dockerfiles, Railway Procfile, Vercel config, Makefile
-/data           # fact-checks seed JSON
-/scripts        # local dev helpers
+/ops            # Dockerfiles, Railway Procfile, Vercel config
+/data           # Fact-checks seed JSON
+/scripts        # Helpers développement local
 ```
 
-## Environment Variables
+## 🔐 Éthique & Légal
 
-See `.env.example` for required variables.
+### Principes
 
-## Limitations
+- **Purge automatique** : Toutes les données supprimées après 48h
+- **Pas de scraping automatique** : TikTok/Instagram nécessitent upload manuel
+- **Pas de stockage persistant** : Seul le contenu soumis par l'utilisateur est stocké
+- **Transparence** : Code open source, méthodologie documentée
+- **Respect vie privée** : Pas de profils utilisateurs persistants
 
-- **No automated scraping**: TikTok/Instagram require manual upload
-- **Dev browserless**: Only enabled in dev mode (`ALLOW_DEV_BROWSERLESS=true`), disabled in production
-- **48h retention**: All data auto-deleted after 48 hours
-- **False positives**: Risk score is heuristic-based, not ML-verified
-- **Small fact-check index**: MVP uses local seed data, not production database
+### Limitations Actuelles
 
-## Note Technique : Algorithme et Évolution vers TRL 7
+- ⚠️ **False positives** : Scoring basé sur heuristiques, pas ML validé
+- ⚠️ **Index fact-checks limité** : MVP utilise données seed locales
+- ⚠️ **Input manuel** : Pas encore d'agent autonome
+- ⚠️ **Détection deepfake** : Non implémentée (TRL 7)
+- ⚠️ **Analyse réseau** : Non implémentée (TRL 7)
 
-### État Actuel : TRL 5-6 (Technologie Validée)
+Voir `/method-card` pour limitations détaillées et avertissements.
 
-InfoVerif utilise une architecture multi-modale combinant plusieurs algorithmes de traitement vidéo et NLP :
+## 📊 État Technique : TRL 5-6 → Vision TRL 7
 
-#### Pipeline Algorithmique Actuel
+### TRL Actuel : 5-6 (Technologie Validée)
 
-1. **Reconnaissance Vocale (ASR)** - `faster-whisper`
-   - Modèle : Whisper (OpenAI) base, CPU, int8
-   - Fonction : Transcription audio → texte avec timestamps
-   - Performance : ~1-2 min par minute de vidéo (CPU)
+Le système démontre la faisabilité technique mais nécessite **input manuel** et opère en **mode CPU-only** avec contraintes de scalabilité.
 
-2. **Reconnaissance de Texte (OCR)** - `PaddleOCR`
-   - Détection et extraction de texte à l'écran
-   - Analyse frame par frame (1 fps)
-   - Support multilingue (FR, EN)
+### Vision TRL 7 : Agent Autonome de Détection
 
-3. **Détection de Scènes** - `PySceneDetect`
-   - Analyse de changements visuels entre frames
-   - Identification de coupures et transitions
-   - Métrique de densité de cuts (indicateur de manipulation)
+**TRL 7** nécessite transformation en **agent autonome** avec :
 
-4. **Scoring de Risque** (Heuristique)
-   - Densité de cuts (0-20 pts)
-   - Termes sensationnalistes (0-20 pts)
-   - Texte plein écran (0-20 pts)
-   - Matching fact-check (0-40 pts)
-   - **Limitation actuelle** : Basé sur règles, pas d'apprentissage automatique
+#### 1. Détection Automatique Multi-Catégories
 
-5. **Matching Fact-Check** - `sentence-transformers` + `FAISS`
-   - Embeddings : `paraphrase-multilingual-MiniLM-L12-v2`
-   - Recherche vectorielle FAISS (CPU)
-   - Indexation in-memory (limite de scalabilité)
-
-#### Contraintes Techniques Actuelles
-
-- **Compute** : CPU-only (Railway, contraintes budgétaires)
-- **Latence** : 3-5 minutes par vidéo courte (1-3 min)
-- **Scalabilité** : Traitement séquentiel, pas de parallélisation GPU
-- **Modèles** : Versions optimisées CPU (quantifiées int8)
-- **Index FAISS** : En mémoire, taille limitée
-
-### Passage TRL 6 → TRL 7 : Nécessité des Hyperscalers
-
-**TRL 7** requiert une démonstration du prototype dans un environnement opérationnel avec :
-- Charge réelle et patterns d'utilisation production
-- Scalabilité horizontale
-- Performances comparables à la production
-
-#### Pourquoi les Hyperscalers sont Critiques
-
-1. **Accès GPU pour Modèles ML**
-   - **Whisper Large-v2** : 10-30x plus rapide sur GPU (30s vs 5-10 min)
-   - **OCR** : PaddleOCR peut utiliser GPU pour batch processing
-   - **Embeddings** : sentence-transformers 5-10x plus rapide sur GPU
-   - **Bénéfice** : Réduction latence de 5 min → 30-60s par vidéo
-
-2. **Infrastructure Compute Auto-scaling**
-   - Parallélisation : Traiter plusieurs vidéos simultanément
-   - Worker pools : Distribution dynamique selon charge
-   - **AWS/Azure/GCP** : Auto-scaling groups, Kubernetes
-   - **Railway actuel** : Limité à instancing fixe
-
-3. **Stockage et Index Vectoriel à Grande Échelle**
-   - **FAISS in-memory** → **Elasticsearch / Pinecone / Weaviate**
-   - Index fact-checks : De milliers → millions d'entrées
-   - Recherche distribuée : Latence <100ms pour matching
-   - **Actuel** : Limité par RAM disponible (quelques Go)
-
-4. **Modèles ML Production-Grade**
-   - **Whisper Large-v2** (vs base) : +15% précision, mais ~3x plus lent CPU
-   - **Modèles de scoring** : Transformer fine-tuné sur dataset fact-checks
-   - **Modèles de détection** : Vision transformers pour deepfake/manipulation
-   - **Coût** : 10-50x plus de compute que CPU, nécessite GPU clusters
-
-5. **Validations et Tests de Charge**
-   - **TRL 7** : Démonstration à 100-1000 requêtes/jour
-   - Load testing : Simuler pics de trafic (événements médiatiques)
-   - Monitoring : APM, logging distribué, alerting
-   - **Hyperscalers** : Tooling intégré (CloudWatch, Azure Monitor, etc.)
-
-#### Architecture Cible TRL 7
-
-```
-┌─────────────┐
-│   Frontend  │ (Vercel)
-└──────┬──────┘
-       │
-┌──────▼─────────────────────────────────────┐
-│        API Gateway (Load Balancer)          │
-└──────┬──────────────────────────────────────┘
-       │
-   ┌───┴───┐
-   │ API   │ → Queue (Redis Cluster)
-   └───┬───┘
-       │
-   ┌───▼──────────────────────────────────────┐
-   │  Worker Pool (Kubernetes / ECS)         │
-   │  - GPU Nodes (Whisper, OCR, Embeddings) │
-   │  - CPU Nodes (Heuristics, Post-proc)    │
-   │  - Auto-scaling: 2-20 instances          │
-   └───┬──────────────────────────────────────┘
-       │
-   ┌───▼──────────────────────────────────────┐
-   │  Vector DB (Pinecone/Weaviate/ES)        │
-   │  - Millions de fact-checks               │
-   │  - Embeddings persistés                  │
-   │  - Recherche distribuée                  │
-   └──────────────────────────────────────────┘
+```python
+# Vision architecture TRL 7
+{
+  "conspiracy_detection": {
+    "model": "fine-tuned-transformer",
+    "features": ["linguistic_patterns", "reference_clusters", "narrative_analysis"],
+    "precision_target": ">90%"
+  },
+  "foreign_interference": {
+    "model": "network_analysis + NLP",
+    "features": ["account_coordination", "timing_patterns", "provenance_analysis"],
+    "precision_target": ">85%"
+  },
+  "deepfake_detection": {
+    "model": "vision-transformer",
+    "features": ["temporal_consistency", "artifacts", "audio-video_sync"],
+    "precision_target": ">95%"
+  },
+  "extremist_content": {
+    "model": "hate-speech-classifier",
+    "features": ["radical_language", "calls_to_violence", "ideology_markers"],
+    "precision_target": ">92%"
+  }
+}
 ```
 
-#### Estimations Coûts Hyperscalers (TRL 7)
+#### 2. Infrastructure Hyperscaler Nécessaire
 
-- **GPU Workers** : $0.50-2.00/heure (AWS p3.2xlarge, Azure NC6)
-- **Vector DB** : $100-500/mois (Pinecone/Weaviate managed)
-- **Storage** : $50-200/mois (S3/GCS pour vidéos temporaires)
-- **Total** : ~$500-2000/mois pour charge moyenne (vs ~$20-50 Railway actuel)
+**Pourquoi les hyperscalers (AWS/Azure/GCP) sont critiques** :
 
-**Conclusion** : Le passage à TRL 7 nécessite une infrastructure cloud à grande échelle pour :
-- Accès GPU massif (modèles ML production)
-- Scalabilité horizontale (charge réelle)
-- Bases vectorielles distribuées (index fact-checks)
-- Validations opérationnelles (monitoring, alerting)
+1. **GPU Massif pour ML**
+   - Whisper Large-v2 : 10-30x plus rapide sur GPU
+   - Vision Transformers (deepfake) : Nécessite GPU clusters
+   - Modèles de classification : Fine-tuning nécessite GPU
 
-L'architecture actuelle (Railway CPU) est optimale pour **TRL 5-6** (validation conceptuelle), mais insuffisante pour **TRL 7** (démonstration opérationnelle).
+2. **Scalabilité Horizontale**
+   - Auto-scaling : 2-50 instances selon charge
+   - Traitement parallèle : Milliers de vidéos/jour
+   - Kubernetes/ECS pour orchestration
 
-## License
+3. **Bases Vectorielles Distribuées**
+   - Pinecone/Weaviate : Millions de fact-checks
+   - Elasticsearch : Index de comptes suspects
+   - Recherche <100ms pour alertes temps réel
 
-MIT
+4. **Monitoring et Alerting**
+   - APM distribué (CloudWatch, Datadog)
+   - Alertes automatiques pour contenus critiques
+   - Dashboards pour agences gouvernementales
 
+#### 3. Architecture Cible TRL 7
+
+```
+┌────────────────────────────────────────┐
+│  Agent Autonome de Détection          │
+│  • Scan automatique plateformes        │
+│  • Classification multi-catégories   │
+│  • Analyse réseaux comptes            │
+└───────┬────────────────────────────────┘
+        │
+┌───────▼───────────────────────────────┐
+│  API Gateway (Load Balancer)          │
+│  • Rate limiting                      │
+│  • Authentication (API keys)          │
+└───────┬───────────────────────────────┘
+        │
+   ┌────┴────┐
+   │   API   │ → Queue (Redis Cluster)
+   └────┬────┘
+        │
+┌───────▼───────────────────────────────┐
+│  Worker Pool (Kubernetes)             │
+│  ┌─────────────────────────────────┐  │
+│  │ GPU Nodes:                      │  │
+│  │ • Whisper Large-v2              │  │
+│  │ • Vision Transformers (deepfake)│  │
+│  │ • NLP Classifiers               │  │
+│  └─────────────────────────────────┘  │
+│  ┌─────────────────────────────────┐  │
+│  │ CPU Nodes:                      │  │
+│  │ • Network analysis               │  │
+│  │ • Heuristics                    │  │
+│  └─────────────────────────────────┘  │
+│  Auto-scaling: 2-50 instances         │
+└───────┬───────────────────────────────┘
+        │
+┌───────▼───────────────────────────────┐
+│  Vector DB + Graph DB                 │
+│  • Pinecone: Fact-checks (millions)   │
+│  • Neo4j/ArangoDB: Network graphs     │
+│  • Elasticsearch: Account indexing    │
+└───────────────────────────────────────┘
+```
+
+#### 4. Estimations Coûts TRL 7
+
+- **GPU Workers** : $0.50-2.00/heure × 24/7 = $360-1440/mois
+- **Vector DB** : $200-800/mois (Pinecone/Weaviate managed)
+- **Graph DB** : $100-300/mois (Neo4j Cloud)
+- **Storage** : $50-500/mois (S3/GCS pour vidéos + metadata)
+- **Monitoring** : $50-200/mois (CloudWatch, Datadog)
+- **Total** : ~$760-3240/mois pour charge moyenne
+
+*(vs ~$20-50/mois Railway actuel pour TRL 5-6)*
+
+#### 5. Modèles ML à Développer (TRL 7)
+
+1. **Classifier Théories du Complot**
+   - Fine-tune BERT/RoBERTa sur dataset conspirationniste
+   - Features : Patterns linguistiques, références récurrentes
+   - Dataset : r/conspiracy, articles fact-checked, forums
+
+2. **Détecteur Ingérence Étrangère**
+   - Network analysis : Coordinated inauthentic behavior
+   - Timing analysis : Posts synchronisés
+   - Provenance : VPN patterns, geolocation anomalies
+
+3. **Détecteur Deepfake**
+   - Vision Transformer fine-tuné (FaceForensics++, DFDC)
+   - Temporal consistency analysis
+   - Audio-video synchronization checks
+
+4. **Classifier Contenu Extrémiste**
+   - Hate speech classifier (multilingue)
+   - Ideology markers (radicalization signals)
+   - Violence detection (calls to action)
+
+## 🎯 Roadmap TRL 5-6 → TRL 7
+
+### Phase 1 : MVP Actuel (TRL 5-6) ✅
+- [x] Pipeline analyse vidéo manuelle
+- [x] ASR + OCR + Scene detection
+- [x] Scoring heuristique
+- [x] Matching fact-checks (FAISS)
+- [x] Interface web (upload/URL)
+
+### Phase 2 : Infrastructure Scalable (Q1 2024)
+- [ ] Migration vers hyperscaler (AWS/Azure/GCP)
+- [ ] GPU workers pour modèles ML
+- [ ] Vector DB distribuée (Pinecone)
+- [ ] Auto-scaling Kubernetes
+
+### Phase 3 : Agent Autonome Base (Q2 2024)
+- [ ] Scan automatisé YouTube/TikTok (APIs)
+- [ ] Classification automatique (multi-labels)
+- [ ] Dashboard monitoring
+- [ ] API alertes
+
+### Phase 4 : Détection Avancée (Q3 2024)
+- [ ] Modèle deepfake (Vision Transformer)
+- [ ] Analyse réseaux (Graph DB)
+- [ ] Détecteur ingérence (coordination patterns)
+- [ ] Classifier conspiration (NLP fine-tuned)
+
+### Phase 5 : Production TRL 7 (Q4 2024)
+- [ ] Validation opérationnelle à grande échelle
+- [ ] Intégration agences gouvernementales
+- [ ] Monitoring 24/7 avec alertes
+- [ ] Documentation complète
+
+## 📝 Variables d'Environnement
+
+Voir `.env.example` pour variables requises.
+
+## 📄 License
+
+MIT - Outil open source pour défense informationnelle
+
+---
+
+**InfoVerif** : Protéger l'information publique contre propagande, ingérence étrangère et manipulation médiatique.
