@@ -58,10 +58,21 @@ export default function ReportDeep() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Techniques détectées</h2>
                 <div className="space-y-4">
                   {report.techniques.map((t, i) => (
-                    <div key={i} className="border-l-4 border-blue-500 pl-4">
-                      <div className="text-gray-900 font-medium">{t.name}</div>
-                      {t.evidence && <div className="text-gray-700 mt-1">« {t.evidence} »</div>}
-                      {t.severity && <div className="text-xs text-gray-500 mt-1">Sévérité: {t.severity}</div>}
+                    <div key={i} className="border-l-4 border-blue-500 pl-4 pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-gray-900 font-medium">{t.name}</div>
+                        {t.severity && (
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            t.severity === 'high' ? 'bg-red-100 text-red-800' :
+                            t.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {t.severity === 'high' ? 'Élevé' : t.severity === 'medium' ? 'Moyen' : 'Faible'}
+                          </span>
+                        )}
+                      </div>
+                      {t.evidence && <div className="text-gray-700 mt-2 italic">« {t.evidence} »</div>}
+                      {t.explanation && <div className="text-gray-600 text-sm mt-2">{t.explanation}</div>}
                     </div>
                   ))}
                 </div>
@@ -70,14 +81,33 @@ export default function ReportDeep() {
 
             {Array.isArray(report.claims) && report.claims.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Claims</h2>
-                <div className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Affirmations analysées</h2>
+                <div className="space-y-4">
                   {report.claims.map((c, i) => (
-                    <div key={i} className="p-3 bg-gray-50 rounded">
-                      <div className="text-gray-800">{c.claim}</div>
-                      <div className="text-xs text-gray-500 mt-1">Confiance: {c.confidence}</div>
+                    <div key={i} className="p-4 bg-gray-50 rounded border-l-4 border-purple-500">
+                      <div className="text-gray-800 font-medium">{c.claim}</div>
+                      {c.confidence && (
+                        <div className="mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            c.confidence === 'supported' ? 'bg-green-100 text-green-800' :
+                            c.confidence === 'unsupported' ? 'bg-red-100 text-red-800' :
+                            'bg-orange-100 text-orange-800'
+                          }`}>
+                            {c.confidence === 'supported' ? 'Supportée' : 
+                             c.confidence === 'unsupported' ? 'Non supportée' : 
+                             'Trompeuse'}
+                          </span>
+                        </div>
+                      )}
                       {Array.isArray(c.issues) && c.issues.length > 0 && (
-                        <div className="text-xs text-gray-500">Issues: {c.issues.join(', ')}</div>
+                        <div className="text-sm text-gray-600 mt-2">
+                          <span className="font-medium">Problèmes :</span> {c.issues.join(', ')}
+                        </div>
+                      )}
+                      {c.reasoning && (
+                        <div className="text-sm text-gray-600 mt-2">
+                          <span className="font-medium">Raisonnement :</span> {c.reasoning}
+                        </div>
                       )}
                     </div>
                   ))}

@@ -1,429 +1,349 @@
-# InfoVerif — Détection de Propagande et Ingérence Étrangère
+# InfoVerif.org 🛡️
 
-**Outil de défense informationnelle** pour identifier et signaler la propagande, l'ingérence étrangère, les manipulations médiatiques, les contenus extrémistes et les deepfakes dans les vidéos courtes (YouTube, TikTok, Instagram Reels).
+**Analyse de propagande, désinformation et manipulation médiatique basée sur l'IA**
 
-## 🎯 Mission
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Open Source](https://img.shields.io/badge/Open%20Source-❤-green.svg)](https://github.com/GenerativSchool-Lab/infoverif.org)
 
-InfoVerif est conçu pour **protéger l'information publique** contre :
-- 🚨 **Propagande** et désinformation coordonnée
-- 🌐 **Ingérence étrangère** (comptes, bots, influenceurs orchestrés)
-- 🎭 **Manipulation médiatique** (deepfakes, montages, montage vidéo)
-- ⚠️ **Théories du complot** et fausses narrations
-- ⛔ **Contenu extrémiste** (djihadiste, suprémaciste, etc.)
+---
 
-### État Actuel : MVP avec Input Manuel
+## 📢 À Propos
 
-Le système **fonctionne actuellement avec des inputs manuels** :
-- ✅ Analyse de vidéos soumises par l'utilisateur (URL ou upload)
-- ✅ Détection de signaux de manipulation (cuts, texte sensationnaliste)
-- ✅ Transcription audio (ASR) et extraction de texte (OCR)
-- ✅ Scoring de risque heuristique
-- ✅ Matching avec base de fact-checks
+**InfoVerif** est un projet **open source** développé par le **[Civic Tech AI Lab](https://generativschool.com)** de GenerativSchool. Notre mission est de démocratiser l'accès aux outils d'analyse de contenu médiatique pour identifier la propagande, les théories du complot et la désinformation.
 
-### Vision : Agent Autonome de Détection
+### 🎯 Mission
+Fournir un outil **transparent, éducatif et accessible** pour :
+- 🔍 Analyser les techniques de manipulation médiatique
+- 🧠 Détecter les marqueurs de propagande et de conspiration
+- 📊 Évaluer le risque de désinformation dans les contenus
+- 🎓 Éduquer le public sur les mécanismes de manipulation
 
-**Objectif à long terme** : Transformer InfoVerif en **agent autonome** capable de :
+### 🌟 Valeurs
+- **Open Source** : Code public, méthodologie transparente
+- **Éthique** : Pas de stockage permanent, respect de la vie privée
+- **Éducation** : Explications détaillées des techniques détectées
+- **Collaboration** : Contributions bienvenues de la communauté
 
-1. **Détection Automatique de Contenu**
-   - Scan automatisé de plateformes (YouTube, TikTok, etc.)
-   - Identification proactive de contenus suspects
-   - Monitoring continu de comptes à risque
+---
 
-2. **Classification Multi-Catégories**
-   - 🎯 **Théories du complot** : Patterns linguistiques, références récurrentes
-   - 🌐 **Ingérence étrangère** : Analyse de réseaux, timing coordonné, provenance suspecte
-   - 🎭 **Deepfakes** : Détection de manipulation audio/vidéo (modèles Vision Transformers)
-   - ⛔ **Contenu extrémiste** : Classification de discours radical (modèles NLP fine-tunés)
+## 🚀 Fonctionnalités (MVP)
 
-3. **Analyse de Réseaux**
-   - Mapping de comptes liés et coordonnés
-   - Détection de bots et fermes de trolls
-   - Analyse de propagation virale
+### ✅ Actuellement Disponible
 
-4. **Alertes en Temps Réel**
-   - Dashboard de monitoring pour agences gouvernementales / ONG
-   - API d'alertes pour intégration dans systèmes de sécurité
-   - Reporting automatisé de violations
+**Analyse multi-formats** :
+- 📝 **Texte** : Analyse directe de posts, articles, messages
+- 🎥 **Vidéo** : Upload + transcription (Whisper) + analyse sémantique
+- 📸 **Image** : Screenshots de posts sociaux + extraction texte (Vision API) + analyse
 
-## 🏗️ Architecture
+**Détection avancée** :
+- 🎭 **Techniques de propagande** (9+ catégories)
+  - Manipulation émotionnelle
+  - Cadrage "eux vs nous"
+  - Appel à l'autorité sans preuves
+  - Généralisation abusive
+  - Faux dilemmes
+  - Et plus...
 
-- **Backend**: FastAPI + RQ workers (Python 3.11) sur Railway
-- **Frontend**: React (Vite) + Tailwind sur Vercel
-- **Storage**: Local FS ou S3-compatible (MinIO) avec purge 48h
-- **Vector Search**: FAISS (in-memory) pour MVP → Pinecone/Weaviate pour production
-- **Queue**: Redis pour jobs asynchrones
+- 🔮 **Marqueurs conspirationnistes** (7+ indicateurs)
+  - Narratives de "vérité cachée"
+  - Défiance envers institutions/experts
+  - Rhétorique "ils ne veulent pas que tu saches"
+  - Théories causales simplistes
+  - Et plus...
 
-## 🔍 Pipeline de Détection Actuel
+- ❌ **Patterns de désinformation** (7+ types)
+  - Affirmations non sourcées
+  - Sophismes logiques
+  - Statistiques trompeuses
+  - Information hors contexte
+  - Et plus...
 
-### 1. Analyse Vidéo Multi-Modale
+**Analyse détaillée en français** :
+- Scores de risque (0-100) pour propagande, conspiration, désinformation
+- Citations exactes du contenu analysé
+- Explications détaillées de chaque technique identifiée
+- Raisonnement sur la fiabilité des affirmations
+- Résumé de l'impact potentiel sur l'audience
 
-```
-┌─────────────┐
-│ Input Vidéo │ (URL YouTube ou Upload)
-└──────┬──────┘
-       │
-   ┌───▼────────────────────────────┐
-   │  Traitement Vidéo             │
-   │  • Download/Upload             │
-   │  • Extraction audio (16kHz)   │
-   │  • Extraction frames (1 fps)  │
-   └──────┬─────────────────────────┘
-          │
-   ┌──────▼──────────────────────────┐
-   │  Analyse Parallèle              │
-   │  ┌──────────┬──────────┬─────┐ │
-   │  │ ASR      │ OCR      │Scene│ │
-   │  │ (Whisper)│(PaddleOCR)│Detect│ │
-   │  └────┬─────┴────┬─────┴──┬──┘ │
-   └───────┼──────────┼────────┼────┘
-           │          │        │
-   ┌───────▼───────────▼────────▼─────┐
-   │  Détection Signaux Manipulation │
-   │  • Densité de cuts               │
-   │  • Langage sensationnaliste      │
-   │  • Texte plein écran             │
-   │  • Patterns conspirationnistes   │
-   └───────┬──────────────────────────┘
-           │
-   ┌───────▼──────────────────────────┐
-   │  Matching Fact-Check              │
-   │  • Embeddings (sentence-transform)│
-   │  • Recherche vectorielle (FAISS)  │
-   │  • Sources vérifiées              │
-   └───────┬──────────────────────────┘
-           │
-   ┌───────▼──────────────────────────┐
-   │  Scoring Risque (0-100)           │
-   │  • Heuristique multi-facteurs    │
-   │  • Timeline avec flags           │
-   └──────────────────────────────────┘
-```
+---
 
-### 2. Signaux Détectés
+## 🛠️ Stack Technique
 
-| Signal | Méthode | Valeur Détectrice |
-|--------|---------|-------------------|
-| **Manipulation vidéo** | Densité de cuts | >5 cuts/min = suspect |
-| **Propagande** | Langage sensationnaliste | Termes émotionnels, polarisants |
-| **Théories du complot** | Patterns textuels | Références récurrentes, "on nous cache" |
-| **Deepfake** | (À venir) Vision Transformers | Anomalies temporelles, artefacts |
-| **Ingérence** | (À venir) Analyse réseau | Timing coordonné, provenance suspecte |
-| **Extrémisme** | (À venir) Classification NLP | Discours radical, appels à la violence |
+### Backend
+- **FastAPI** : API REST performante
+- **OpenAI GPT-4o-mini** : Analyse sémantique et détection de patterns
+- **Whisper API** : Transcription audio pour vidéos
+- **Vision API** : Extraction de texte depuis screenshots
+- **FFmpeg** : Traitement audio/vidéo
+- **Railway** : Déploiement backend
 
-### 3. Modules de Détection
+### Frontend
+- **React + Vite** : Interface utilisateur moderne
+- **Tailwind CSS** : Design system
+- **Vercel** : Déploiement frontend
 
-#### Module ASR (Automatic Speech Recognition)
-- **Outil**: `faster-whisper` (Whisper base, CPU)
-- **Fonction**: Transcription audio → texte avec timestamps
-- **Utilisation**: Extraction de discours pour analyse NLP
-- **Évolution**: Whisper Large-v2 sur GPU pour détection d'accent suspect (ingérence)
+---
 
-#### Module OCR (Optical Character Recognition)
-- **Outil**: `PaddleOCR`
-- **Fonction**: Extraction de texte à l'écran (frames vidéo)
-- **Utilisation**: Détection de surimpressions, slogans, fausses citations
-- **Évolution**: Détection de patterns visuels (logos, symboles)
+## 📈 Roadmap
 
-#### Module Détection de Scènes
-- **Outil**: `PySceneDetect`
-- **Fonction**: Identification de coupures et transitions
-- **Utilisation**: Métrique de manipulation vidéo (densité de cuts)
-- **Évolution**: Détection de montage et manipulation temporelle
+### 🎯 Phase 1 : MVP Fonctionnel ✅ (Actuel)
+- [x] Analyse texte/vidéo/image
+- [x] Détection de 9+ techniques de propagande
+- [x] Analyse en français avec explications détaillées
+- [x] Interface utilisateur intuitive
+- [x] Déploiement production
 
-#### Module Scoring de Risque (Heuristique)
-- **Fonction**: Calcul score 0-100 basé sur multiples facteurs
-- **Facteurs actuels**:
-  - Densité de cuts (0-20 pts)
-  - Langage sensationnaliste (0-20 pts)
-  - Texte plein écran suspect (0-20 pts)
-  - Matching fact-check négatif (0-40 pts)
-- **Évolution TRL 7**: Modèles ML fine-tunés pour scoring précis
+### 🔬 Phase 2 : Fine-tuning & Modèles Spécialisés (Q2 2025)
+**Objectif** : Améliorer précision et spécialisation
 
-#### Module Matching Fact-Check
-- **Outil**: `sentence-transformers` + `FAISS`
-- **Fonction**: Recherche de correspondances avec base fact-checks
-- **Embeddings**: `paraphrase-multilingual-MiniLM-L12-v2`
-- **Évolution**: Base de millions de fact-checks (vs milliers actuels)
+- [ ] **Fine-tuning de modèles dédiés**
+  - Modèle spécialisé détection de propagande (BERT/RoBERTa)
+  - Classifier de théories du complot entraîné sur corpus annoté
+  - Détecteur de sophismes logiques (fallacy detection)
 
-## 🚀 Déploiement Rapide
+- [ ] **Base de données d'entraînement**
+  - Constitution d'un dataset annoté (10K+ exemples)
+  - Taxonomie de techniques de manipulation (100+ variantes)
+  - Corpus multilingue (français, anglais, arabe)
 
-### Prérequis
-- Compte GitHub (repo public)
-- Compte Railway (railway.app)
-- Railway CLI: `npm i -g @railway/cli`
+- [ ] **Embeddings sémantiques**
+  - Vector database pour patterns de manipulation connus
+  - Recherche sémantique de techniques similaires
+  - Clustering de narratives conspirationnistes récurrentes
 
-### Déploiement Railway
+### 🤖 Phase 3 : Agent Autonome & Monitoring (Q3 2025)
+**Objectif** : Détection proactive et analyse de réseaux
+
+- [ ] **Scan automatisé de plateformes**
+  - Monitoring YouTube, TikTok, Twitter (via APIs)
+  - Détection proactive de contenus suspects
+  - Alertes en temps réel
+
+- [ ] **Analyse de réseaux**
+  - Graph database (Neo4j) pour mapping de comptes liés
+  - Détection de coordinated inauthentic behavior
+  - Analyse de propagation virale
+
+- [ ] **Dashboard analytics**
+  - Visualisation de tendances
+  - Tracking de narratives dans le temps
+  - API pour chercheurs et fact-checkers
+
+### 🎭 Phase 4 : Détection Multimodale Avancée (Q4 2025)
+**Objectif** : Deepfakes, manipulation vidéo, ingérence
+
+- [ ] **Détection de deepfakes**
+  - Vision Transformers pour analyse temporelle
+  - Détection d'artefacts audio/vidéo
+  - Vérification synchronisation audio-visuelle
+
+- [ ] **Analyse avancée de contenu vidéo**
+  - Détection de montage manipulatoire
+  - Analyse de densité de cuts et transitions
+  - Identification de logos, symboles, QR codes
+
+- [ ] **Détecteur d'ingérence étrangère**
+  - Analyse de patterns de timing coordonnés
+  - Détection de fermes de trolls
+  - Provenance géographique suspecte
+
+### 🌍 Phase 5 : Plateforme Communautaire (2026)
+**Objectif** : Écosystème collaboratif
+
+- [ ] **Contributions communautaires**
+  - Annotations collaboratives de contenus
+  - Taxonomie ouverte de techniques de manipulation
+  - API publique pour intégrations tierces
+
+- [ ] **Ressources éducatives**
+  - Bibliothèque de cas d'étude annotés
+  - Tutoriels sur les techniques de manipulation
+  - Formation à la littératie médiatique
+
+- [ ] **Partenariats institutionnels**
+  - Intégration avec fact-checkers (AFP, Reuters, Snopes)
+  - Collaborations universitaires (datasets, recherche)
+  - Outils pour journalistes et éducateurs
+
+---
+
+## 🤝 Contribuer
+
+Nous accueillons **toutes les contributions** ! Que vous soyez développeur, chercheur, fact-checker ou simplement intéressé par la lutte contre la désinformation.
+
+### 🌟 Comment Contribuer
+
+1. **Code & Features**
+   - Fork le repo
+   - Créez une branche (`git checkout -b feature/AmazingFeature`)
+   - Committez vos changements (`git commit -m 'Add AmazingFeature'`)
+   - Push vers la branche (`git push origin feature/AmazingFeature`)
+   - Ouvrez une Pull Request
+
+2. **Données & Annotations**
+   - Proposez des datasets annotés de propagande/désinformation
+   - Contribuez à la taxonomie de techniques de manipulation
+   - Signalez des faux positifs/négatifs
+
+3. **Documentation & Traductions**
+   - Améliorez la documentation
+   - Traduisez l'interface (anglais, arabe, etc.)
+   - Créez des tutoriels et guides
+
+4. **Recherche & Partenariats**
+   - Proposez des collaborations académiques
+   - Partagez des papers et méthodologies
+   - Contactez-nous pour des intégrations
+
+### 📧 Contact
+- **Email** : [generativschool.com](mailto:contact@generativschool.com)
+- **GitHub Issues** : [github.com/GenerativSchool-Lab/infoverif.org/issues](https://github.com/GenerativSchool-Lab/infoverif.org/issues)
+
+
+---
+
+## 🚀 Installation & Déploiement
+
+### Développement Local
 
 ```bash
-# 1. Push vers GitHub
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/infoverif-org.git
-git push -u origin main
-
-# 2. Déploiement Railway
-railway login
-railway init
-
-# 3. Création services
-railway add --plugin redis
-railway up --service api
-railway up --service worker
-
-# 4. Obtenir URL
-railway domain
-```
-
-**Voir [RAILWAY_DEPLOY.md](./RAILWAY_DEPLOY.md) pour instructions complètes.**
-
-## 💻 Développement Local
-
-### Prérequis
-- Python 3.11+
-- Node.js 18+ (pour frontend)
-- Redis (ou Docker: `docker run -d -p 6379:6379 redis:7-alpine`)
-
-### Démarrer Backend
-
-```bash
+# Backend
 cd api
-pip install -r requirements.txt
+pip install -r requirements-lite.txt
 uvicorn main:app --reload
-```
 
-### Démarrer Worker (terminal séparé)
-
-```bash
-cd api
-python worker.py
-```
-
-### Démarrer Frontend
-
-```bash
+# Frontend
 cd web
 npm install
 npm run dev
 ```
 
-## 📁 Structure du Projet
+### Variables d'Environnement
 
-```
-/api            # FastAPI, workers, tâches, scoring
-  /asr.py       # Module transcription audio
-  /ocr.py       # Module reconnaissance texte
-  /scene_detection.py  # Détection de scènes
-  /scoring.py   # Scoring de risque heuristique
-  /factcheck.py # Matching fact-checks
-  /claims.py    # Extraction de claims
-  /video_processing.py  # Traitement vidéo
-/web            # React (Vite), Tailwind UI
-/ops            # Dockerfiles, Railway Procfile, Vercel config
-/data           # Fact-checks seed JSON
-/scripts        # Helpers développement local
+Créez un fichier `.env` dans `/api` :
+
+```bash
+OPENAI_API_KEY=sk-...
+PORT=8000
 ```
 
-## 🔐 Éthique & Légal
+### Déploiement Production
 
-### Principes
-
-- **Purge automatique** : Toutes les données supprimées après 48h
-- **Pas de scraping automatique** : TikTok/Instagram nécessitent upload manuel
-- **Pas de stockage persistant** : Seul le contenu soumis par l'utilisateur est stocké
-- **Transparence** : Code open source, méthodologie documentée
-- **Respect vie privée** : Pas de profils utilisateurs persistants
-
-### Limitations Actuelles
-
-- ⚠️ **False positives** : Scoring basé sur heuristiques, pas ML validé
-- ⚠️ **Index fact-checks limité** : MVP utilise données seed locales
-- ⚠️ **Input manuel** : Pas encore d'agent autonome
-- ⚠️ **Détection deepfake** : Non implémentée (TRL 7)
-- ⚠️ **Analyse réseau** : Non implémentée (TRL 7)
-
-Voir `/method-card` pour limitations détaillées et avertissements.
-
-## 📊 État Technique : TRL 5-6 → Vision TRL 7
-
-### TRL Actuel : 5-6 (Technologie Validée)
-
-Le système démontre la faisabilité technique mais nécessite **input manuel** et opère en **mode CPU-only** avec contraintes de scalabilité.
-
-### Vision TRL 7 : Agent Autonome de Détection
-
-**TRL 7** nécessite transformation en **agent autonome** avec :
-
-#### 1. Détection Automatique Multi-Catégories
-
-```python
-# Vision architecture TRL 7
-{
-  "conspiracy_detection": {
-    "model": "fine-tuned-transformer",
-    "features": ["linguistic_patterns", "reference_clusters", "narrative_analysis"],
-    "precision_target": ">90%"
-  },
-  "foreign_interference": {
-    "model": "network_analysis + NLP",
-    "features": ["account_coordination", "timing_patterns", "provenance_analysis"],
-    "precision_target": ">85%"
-  },
-  "deepfake_detection": {
-    "model": "vision-transformer",
-    "features": ["temporal_consistency", "artifacts", "audio-video_sync"],
-    "precision_target": ">95%"
-  },
-  "extremist_content": {
-    "model": "hate-speech-classifier",
-    "features": ["radical_language", "calls_to_violence", "ideology_markers"],
-    "precision_target": ">92%"
-  }
-}
+**Backend (Railway)** :
+```bash
+git push origin main  # Auto-deploy activé
 ```
 
-#### 2. Infrastructure Hyperscaler Nécessaire
-
-**Pourquoi les hyperscalers (AWS/Azure/GCP) sont critiques** :
-
-1. **GPU Massif pour ML**
-   - Whisper Large-v2 : 10-30x plus rapide sur GPU
-   - Vision Transformers (deepfake) : Nécessite GPU clusters
-   - Modèles de classification : Fine-tuning nécessite GPU
-
-2. **Scalabilité Horizontale**
-   - Auto-scaling : 2-50 instances selon charge
-   - Traitement parallèle : Milliers de vidéos/jour
-   - Kubernetes/ECS pour orchestration
-
-3. **Bases Vectorielles Distribuées**
-   - Pinecone/Weaviate : Millions de fact-checks
-   - Elasticsearch : Index de comptes suspects
-   - Recherche <100ms pour alertes temps réel
-
-4. **Monitoring et Alerting**
-   - APM distribué (CloudWatch, Datadog)
-   - Alertes automatiques pour contenus critiques
-   - Dashboards pour agences gouvernementales
-
-#### 3. Architecture Cible TRL 7
-
+**Frontend (Vercel)** :
+```bash
+cd web
+vercel --prod
 ```
-┌────────────────────────────────────────┐
-│  Agent Autonome de Détection          │
-│  • Scan automatique plateformes        │
-│  • Classification multi-catégories   │
-│  • Analyse réseaux comptes            │
-└───────┬────────────────────────────────┘
-        │
-┌───────▼───────────────────────────────┐
-│  API Gateway (Load Balancer)          │
-│  • Rate limiting                      │
-│  • Authentication (API keys)          │
-└───────┬───────────────────────────────┘
-        │
-   ┌────┴────┐
-   │   API   │ → Queue (Redis Cluster)
-   └────┬────┘
-        │
-┌───────▼───────────────────────────────┐
-│  Worker Pool (Kubernetes)             │
-│  ┌─────────────────────────────────┐  │
-│  │ GPU Nodes:                      │  │
-│  │ • Whisper Large-v2              │  │
-│  │ • Vision Transformers (deepfake)│  │
-│  │ • NLP Classifiers               │  │
-│  └─────────────────────────────────┘  │
-│  ┌─────────────────────────────────┐  │
-│  │ CPU Nodes:                      │  │
-│  │ • Network analysis               │  │
-│  │ • Heuristics                    │  │
-│  └─────────────────────────────────┘  │
-│  Auto-scaling: 2-50 instances         │
-└───────┬───────────────────────────────┘
-        │
-┌───────▼───────────────────────────────┐
-│  Vector DB + Graph DB                 │
-│  • Pinecone: Fact-checks (millions)   │
-│  • Neo4j/ArangoDB: Network graphs     │
-│  • Elasticsearch: Account indexing    │
-└───────────────────────────────────────┘
-```
-
-#### 4. Estimations Coûts TRL 7
-
-- **GPU Workers** : $0.50-2.00/heure × 24/7 = $360-1440/mois
-- **Vector DB** : $200-800/mois (Pinecone/Weaviate managed)
-- **Graph DB** : $100-300/mois (Neo4j Cloud)
-- **Storage** : $50-500/mois (S3/GCS pour vidéos + metadata)
-- **Monitoring** : $50-200/mois (CloudWatch, Datadog)
-- **Total** : ~$760-3240/mois pour charge moyenne
-
-*(vs ~$20-50/mois Railway actuel pour TRL 5-6)*
-
-#### 5. Modèles ML à Développer (TRL 7)
-
-1. **Classifier Théories du Complot**
-   - Fine-tune BERT/RoBERTa sur dataset conspirationniste
-   - Features : Patterns linguistiques, références récurrentes
-   - Dataset : r/conspiracy, articles fact-checked, forums
-
-2. **Détecteur Ingérence Étrangère**
-   - Network analysis : Coordinated inauthentic behavior
-   - Timing analysis : Posts synchronisés
-   - Provenance : VPN patterns, geolocation anomalies
-
-3. **Détecteur Deepfake**
-   - Vision Transformer fine-tuné (FaceForensics++, DFDC)
-   - Temporal consistency analysis
-   - Audio-video synchronization checks
-
-4. **Classifier Contenu Extrémiste**
-   - Hate speech classifier (multilingue)
-   - Ideology markers (radicalization signals)
-   - Violence detection (calls to action)
-
-## 🎯 Roadmap TRL 5-6 → TRL 7
-
-### Phase 1 : MVP Actuel (TRL 5-6) ✅
-- [x] Pipeline analyse vidéo manuelle
-- [x] ASR + OCR + Scene detection
-- [x] Scoring heuristique
-- [x] Matching fact-checks (FAISS)
-- [x] Interface web (upload/URL)
-
-### Phase 2 : Infrastructure Scalable (Q1 2024)
-- [ ] Migration vers hyperscaler (AWS/Azure/GCP)
-- [ ] GPU workers pour modèles ML
-- [ ] Vector DB distribuée (Pinecone)
-- [ ] Auto-scaling Kubernetes
-
-### Phase 3 : Agent Autonome Base (Q2 2024)
-- [ ] Scan automatisé YouTube/TikTok (APIs)
-- [ ] Classification automatique (multi-labels)
-- [ ] Dashboard monitoring
-- [ ] API alertes
-
-### Phase 4 : Détection Avancée (Q3 2024)
-- [ ] Modèle deepfake (Vision Transformer)
-- [ ] Analyse réseaux (Graph DB)
-- [ ] Détecteur ingérence (coordination patterns)
-- [ ] Classifier conspiration (NLP fine-tuned)
-
-### Phase 5 : Production TRL 7 (Q4 2024)
-- [ ] Validation opérationnelle à grande échelle
-- [ ] Intégration agences gouvernementales
-- [ ] Monitoring 24/7 avec alertes
-- [ ] Documentation complète
-
-## 📝 Variables d'Environnement
-
-Voir `.env.example` pour variables requises.
-
-## 📄 License
-
-MIT - Outil open source pour défense informationnelle
 
 ---
 
-**InfoVerif** : Protéger l'information publique contre propagande, ingérence étrangère et manipulation médiatique.
+## 📊 Architecture Technique
+
+```
+┌─────────────────────────────────────────────┐
+│            Frontend (React)                 │
+│  ┌──────────┬──────────┬──────────────┐    │
+│  │  Text    │  Video   │  Screenshot  │    │
+│  │  Input   │  Upload  │  Upload      │    │
+│  └────┬─────┴────┬─────┴──────┬───────┘    │
+└───────┼──────────┼────────────┼────────────┘
+        │          │            │
+┌───────▼──────────▼────────────▼────────────┐
+│         FastAPI Backend                     │
+│  ┌─────────────────────────────────────┐   │
+│  │  /analyze-text                      │   │
+│  │  /analyze-video (Whisper)           │   │
+│  │  /analyze-image (Vision API)        │   │
+│  └─────────────┬───────────────────────┘   │
+└────────────────┼───────────────────────────┘
+                 │
+┌────────────────▼───────────────────────────┐
+│      OpenAI GPT-4o-mini Analysis           │
+│  • 9+ propaganda techniques                │
+│  • 7+ conspiracy markers                   │
+│  • 7+ misinfo patterns                     │
+│  • Evidence extraction                     │
+│  • Detailed explanations (FR)              │
+└────────────────┬───────────────────────────┘
+                 │
+┌────────────────▼───────────────────────────┐
+│          JSON Response                      │
+│  {                                          │
+│    propaganda_score: 0-100,                 │
+│    conspiracy_score: 0-100,                 │
+│    misinfo_score: 0-100,                    │
+│    techniques: [{name, evidence, ...}],     │
+│    claims: [{claim, confidence, ...}],      │
+│    summary: "..."                           │
+│  }                                          │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 🔬 Méthodologie
+
+### Taxonomie des Techniques de Propagande
+
+Notre analyse s'appuie sur des recherches académiques en communication, psychologie sociale et études médiatiques :
+
+1. **Manipulation émotionnelle** : Appel à la peur, colère, indignation
+2. **Cadrage "eux vs nous"** : Désignation de boucs émissaires, polarisation
+3. **Langage chargé** : Mots sensationnalistes, déshumanisation
+4. **Sélection partielle** : Cherry-picking, omission d'informations
+5. **Appel à l'autorité sans preuves** : Citations hors contexte, faux experts
+6. **Généralisation abusive** : Stéréotypes, sur-simplification
+7. **Faux dilemmes** : Pensée binaire, élimination de nuances
+8. **Déformation/exagération** : Catastrophisme, amplification
+9. **Répétition** : Martèlement de messages clés
+
+### Limitations & Avertissements
+
+⚠️ **InfoVerif est un outil d'aide à l'analyse, pas un verdict absolu**
+
+- Les scores sont des **indicateurs**, pas des preuves définitives
+- Le contexte culturel, l'humour et la satire peuvent créer des faux positifs
+- L'outil ne remplace pas le jugement critique humain
+- Les explications sont générées par IA et peuvent contenir des erreurs
+
+➡️ **Utilisez InfoVerif comme un point de départ pour approfondir votre analyse critique**
+
+---
+
+## 📜 License
+
+**MIT License** - Voir [LICENSE](./LICENSE)
+
+Ce projet est **open source** et **gratuit**. Vous êtes libre de :
+- ✅ Utiliser le code à des fins commerciales
+- ✅ Modifier et adapter le code
+- ✅ Distribuer le code original ou modifié
+- ✅ Utiliser le code à des fins privées
+
+Sous condition de :
+- 📄 Inclure la license et le copyright original
+- 📄 Indiquer les modifications apportées
+
+---
+
+## 🙏 Remerciements
+
+Développé avec ❤️ par le **Civic Tech AI Lab** de [GenerativSchool.com](https://generativschool.com)
+
+**Technologies utilisées** :
+- [OpenAI](https://openai.com) - GPT-4, Whisper, Vision APIs
+- [React](https://react.dev) - Framework frontend
+- [FastAPI](https://fastapi.tiangolo.com) - Framework backend
+- [Railway](https://railway.app) - Hébergement backend
+- [Vercel](https://vercel.com) - Hébergement frontend
+
+---
+
+**🛡️ InfoVerif** : Pour une information libre, transparente et critique.
+
+_Un projet du Civic Tech AI Lab - [GenerativSchool.com](https://generativschool.com)_

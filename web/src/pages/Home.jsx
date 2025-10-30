@@ -50,8 +50,9 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">InfoVerif</h1>
-          <p className="text-gray-600 mt-2">Analyse d'intégrité des contenus</p>
+          <h1 className="text-3xl font-bold text-gray-900">🛡️ InfoVerif.org</h1>
+          <p className="text-gray-600 mt-2">Analyse de propagande, désinformation & manipulation médiatique</p>
+          <p className="text-xs text-gray-500 mt-1">Powered by OpenAI GPT-4 · Open Source</p>
         </div>
       </header>
 
@@ -90,26 +91,58 @@ export default function Home() {
             {activeTab === 'video' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Téléverser une vidéo</label>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
-                  className="w-full"
-                />
-                <p className="text-xs text-gray-500 mt-1">Taille conseillée ≤ 60 Mo.</p>
+                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition-colors cursor-pointer bg-gray-50">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="text-center">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {file ? (
+                      <p className="mt-2 text-sm text-gray-700 font-medium">{file.name}</p>
+                    ) : (
+                      <>
+                        <p className="mt-2 text-sm text-gray-700">
+                          <span className="font-medium text-blue-600">Cliquez pour téléverser</span> ou glissez-déposez
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">MP4, MOV, AVI jusqu'à 60 Mo</p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
             {activeTab === 'image' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Téléverser une capture (PNG/JPG)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
-                  className="w-full"
-                />
-                <p className="text-xs text-gray-500 mt-1">Capture de posts (Twitter/X, TikTok, etc.).</p>
+                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition-colors cursor-pointer bg-gray-50">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="text-center">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6 6h.01M6 20h36a2 2 0 012 2v20a2 2 0 01-2 2H6a2 2 0 01-2-2V22a2 2 0 012-2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {file ? (
+                      <p className="mt-2 text-sm text-gray-700 font-medium">{file.name}</p>
+                    ) : (
+                      <>
+                        <p className="mt-2 text-sm text-gray-700">
+                          <span className="font-medium text-blue-600">Cliquez pour téléverser</span> ou glissez-déposez
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">PNG, JPG, WEBP · Capture de posts (Twitter/X, TikTok, etc.)</p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -137,10 +170,30 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-12 text-center text-gray-600 text-sm">
-        <a href="/method-card" className="text-blue-600 hover:underline">
-          Method & Limitations
-        </a>
+      <footer className="mt-12 pb-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-gray-200 pt-8">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-2">
+                Projet Open Source du <a href="https://generativschool.com" target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline">Civic Tech AI Lab</a> — GenerativSchool.com
+              </p>
+              <p className="text-xs text-gray-500 mb-4">
+                Contributions bienvenues · Code MIT License
+              </p>
+              <div className="flex justify-center gap-6 text-sm">
+                <a href="/method-card" className="text-blue-600 hover:underline">
+                  Méthode & Roadmap
+                </a>
+                <a href="https://github.com/GenerativSchool-Lab/infoverif.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  GitHub
+                </a>
+                <a href="https://generativschool.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  À propos
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   )

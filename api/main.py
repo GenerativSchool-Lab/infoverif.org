@@ -113,53 +113,122 @@ async def test_openai():
 
 @app.get("/method-card")
 async def method_card():
-    """Return method card highlighting algorithms and roadmap (tool-agnostic)."""
+    """Return method card highlighting algorithms and roadmap."""
     card = {
-        "title": "InfoVerif — Méthode & Feuille de route",
-        "goal": "Décortiquer la propagande et les techniques de communication via des scores explicables.",
+        "title": "InfoVerif.org — Méthode & Feuille de Route",
+        "subtitle": "Projet Open Source du Civic Tech AI Lab — GenerativSchool.com",
+        "goal": "Démocratiser l'analyse de propagande, désinformation et manipulation médiatique via l'IA",
+        
         "current_capabilities": {
-            "overview": "Analyse avancée par défaut (transcription + analyse sémantique)",
-            "formulas": {
-                "propaganda_score": "P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle",
-                "overall_risk": "R = f(P, C, M) ∈ [0,100]",
-                "variables": {
-                    "P": "score de propagande (0–100)",
-                    "C": "score de conspiration (0–100)",
-                    "M": "score de désinformation (0–100)"
-                }
+            "overview": "MVP Fonctionnel — Analyse GPT-4 multi-formats avec explications détaillées",
+            "formats": {
+                "text": "Analyse directe de texte (posts, articles, messages)",
+                "video": "Upload + transcription Whisper + analyse sémantique",
+                "image": "Screenshot + extraction Vision API + analyse"
             },
-            "explainability": [
-                "techniques détectées avec preuves (extraits)",
-                "déclarations évaluées avec niveau de confiance"
-            ],
-            "fallback_lite": {
-                "overview": "Mode léger de secours (métadonnées uniquement)",
-                "risk_score": "S = min(100, 5·T + 3·N + 10·D)",
-                "variables": {
-                    "T": "termes sensationnalistes",
-                    "N": "mentions chiffrées/statistiques",
-                    "D": "domaines inconnus/suspects"
-                }
+            "detection": {
+                "propaganda_techniques": "9+ catégories (manipulation émotionnelle, cadrage, langage chargé, etc.)",
+                "conspiracy_markers": "7+ indicateurs (vérité cachée, défiance institutions, rhétorique complotiste)",
+                "misinfo_patterns": "7+ types (sophismes, stats trompeuses, affirmations non sourcées)"
+            },
+            "output": {
+                "scores": "propaganda_score, conspiracy_score, misinfo_score, overall_risk (0-100)",
+                "techniques": "Nom, citation exacte, sévérité, explication détaillée (2-3 phrases)",
+                "claims": "Affirmation, niveau de confiance, problèmes identifiés, raisonnement",
+                "summary": "Analyse en 3-4 phrases de l'impact sur l'audience"
+            },
+            "language": "Français (avec explications pédagogiques)"
+        },
+        
+        "roadmap": {
+            "phase_2_q2_2025": {
+                "title": "Fine-tuning & Modèles Spécialisés",
+                "objectives": [
+                    "Fine-tuning BERT/RoBERTa sur corpus de propagande annoté",
+                    "Classifier de théories du complot (dataset 10K+ exemples)",
+                    "Détecteur de sophismes logiques (fallacy detection)",
+                    "Vector database pour patterns de manipulation connus",
+                    "Embeddings sémantiques pour clustering de narratives",
+                    "Taxonomie de 100+ variantes de techniques"
+                ]
+            },
+            "phase_3_q3_2025": {
+                "title": "Agent Autonome & Monitoring",
+                "objectives": [
+                    "Scan automatisé YouTube/TikTok/Twitter via APIs",
+                    "Détection proactive de contenus suspects",
+                    "Analyse de réseaux (Graph DB pour comptes liés)",
+                    "Détection de coordinated inauthentic behavior",
+                    "Dashboard analytics avec visualisation de tendances",
+                    "Alertes en temps réel pour chercheurs/fact-checkers",
+                    "API publique pour intégrations tierces"
+                ]
+            },
+            "phase_4_q4_2025": {
+                "title": "Détection Multimodale Avancée",
+                "objectives": [
+                    "Détection de deepfakes (Vision Transformers)",
+                    "Analyse temporelle de cohérence audio-vidéo",
+                    "Détection de montage manipulatoire (cuts, transitions)",
+                    "Détecteur d'ingérence étrangère (timing, provenance)",
+                    "Identification de fermes de trolls",
+                    "Analyse de logos, symboles, QR codes"
+                ]
+            },
+            "phase_5_2026": {
+                "title": "Plateforme Communautaire",
+                "objectives": [
+                    "Annotations collaboratives de contenus",
+                    "Taxonomie ouverte de techniques de manipulation",
+                    "Bibliothèque de cas d'étude annotés",
+                    "Formation à la littératie médiatique",
+                    "Partenariats fact-checkers (AFP, Reuters, Snopes)",
+                    "Collaborations universitaires (datasets, recherche)",
+                    "Outils pour journalistes et éducateurs"
+                ]
             }
         },
-        "near_term_roadmap": [
-            "Segmentation de contenu (phrases/slogans/chiffres) à partir de transcriptions et texte à l’écran",
-            "Représentations sémantiques pour regrouper et rapprocher les idées (similarité cosine)",
-            "Appariement sémantique avec vérifications/archives pour relier à des narratifs connus",
-            "Score de propagande P = w₁·émotion + w₂·cadre_{eux/nous} + w₃·charge_lexicale + w₄·sélection_partielle (poids expliqués)",
+        
+        "open_source": {
+            "license": "MIT",
+            "repository": "github.com/GenerativSchool-Lab/infoverif.org",
+            "contributions": {
+                "code": "Pull requests bienvenues (features, bug fixes, optimizations)",
+                "data": "Datasets annotés, taxonomies, corpus multilingues",
+                "research": "Collaborations académiques, papers, méthodologies",
+                "translation": "Interface multilingue (anglais, arabe, etc.)",
+                "education": "Tutoriels, guides, ressources pédagogiques"
+            },
+            "contact": {
+                "organization": "Civic Tech AI Lab — GenerativSchool.com",
+                "email": "contact@generativschool.com",
+                "github": "github.com/GenerativSchool-Lab/infoverif.org",
+                "twitter": "@GenerativSchool"
+            }
+        },
+        
+        "principles": {
+            "transparency": "Code open source, méthodologie documentée, explications détaillées",
+            "privacy": "Pas de stockage permanent, pas de profilage utilisateur",
+            "education": "Outil pédagogique pour comprendre la manipulation médiatique",
+            "collaboration": "Communauté ouverte, contributions bienvenues",
+            "ethics": "Pas d'utilisation pour censure ou surveillance"
+        },
+        
+        "limitations": [
+            "⚠️ Outil d'aide à l'analyse, pas un verdict absolu",
+            "⚠️ Les scores sont des indicateurs, pas des preuves définitives",
+            "⚠️ Contexte culturel, humour et satire peuvent créer des faux positifs",
+            "⚠️ Ne remplace pas le jugement critique humain",
+            "⚠️ Explications générées par IA peuvent contenir des erreurs"
         ],
-        "mid_term_enhancements": [
-            "Structure rhétorique (accumulation, faux dilemme, glissement sémantique, appels d’autorité)",
-            "Trajectoires narratives (épisodes récurrents, dérive narrative dans le temps)",
-            "Contexte des sources (réputation, réseaux de citation et domaines)",
-            "Outils d’analyse (extraits clés, justifications, annotations collaboratives)",
-        ],
-        "principles": [
-            "Minimisation des données et rétention courte",
-            "Transparence par scores/formules et justifications",
-            "Pas de pistage ni de profilage non nécessaire",
-        ],
-        "contact": "Github: github.com/infoverif",
+        
+        "tech_stack": {
+            "backend": "FastAPI + OpenAI GPT-4o-mini/Whisper/Vision + FFmpeg",
+            "frontend": "React + Vite + Tailwind CSS",
+            "deployment": "Railway (backend) + Vercel (frontend)",
+            "future": "Fine-tuned models, Vector DB, Graph DB, GPU clusters"
+        }
     }
     return card
 
