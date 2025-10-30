@@ -1,11 +1,10 @@
 """Deep analysis module using Whisper + GPT-4 for propaganda/misinfo detection."""
 import os
 import json
+import base64
 import tempfile
-import subprocess
 from pathlib import Path
 from typing import Dict, Optional
-import yt_dlp
 import ffmpeg
 from openai import OpenAI
 
@@ -58,39 +57,7 @@ TRANSCRIPT:
 """
 
 
-def get_youtube_transcript(url: str) -> Optional[str]:
-    """Try to extract YouTube auto-captions using yt-dlp."""
-    try:
-        ydl_opts = {
-            'skip_download': True,
-            'writeautomaticsub': True,
-            'subtitlesformat': 'vtt',
-            'quiet': True,
-            'no_warnings': True,
-        }
-        
-        with tempfile.TemporaryDirectory() as tmpdir:
-            ydl_opts['outtmpl'] = str(Path(tmpdir) / 'video')
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=False)
-                
-                # Try to get subtitles
-                if info.get('automatic_captions'):
-                    # Download subtitles
-                    ydl.download([url])
-                    
-                    # Find .vtt file
-                    vtt_files = list(Path(tmpdir).glob('*.vtt'))
-                    if vtt_files:
-                        # Parse VTT and extract text
-                        text = parse_vtt(vtt_files[0])
-                        return text
-        
-        return None
-    except Exception as e:
-        print(f"Error getting YouTube transcript: {e}")
-        return None
+# URL-based flows removed; we rely on uploads (text/video/image)
 
 
 def parse_vtt(vtt_path: Path) -> str:
@@ -111,27 +78,7 @@ def parse_vtt(vtt_path: Path) -> str:
     return ' '.join(text_lines)
 
 
-def download_youtube_audio(url: str) -> str:
-    """Download audio from YouTube video using yt-dlp."""
-    tmpdir = tempfile.mkdtemp()
-    output_path = str(Path(tmpdir) / 'audio.mp3')
-    
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': output_path.replace('.mp3', ''),
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '128',
-        }],
-        'quiet': True,
-        'no_warnings': True,
-    }
-    
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    
-    return output_path
+# Removed: YouTube download; we accept uploads only
 
 
 def extract_audio_from_file(video_path: str) -> str:
@@ -164,63 +111,87 @@ def transcribe_audio(audio_path: str) -> str:
 
 
 def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
-    """Analyze transcript using GPT-4 for propaganda/misinfo detection."""
+    """Analyze transcript using OpenAI with strict JSON Schema output."""
     prompt = ANALYSIS_PROMPT.format(
         title=metadata.get('title', 'N/A'),
         description=metadata.get('description', 'N/A'),
         platform=metadata.get('platform', 'unknown'),
-        transcript=transcript[:8000]  # Limit to ~2k tokens
+        transcript=transcript[:8000]
     )
-    
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are an expert media analyst. Return only valid JSON."},
+
+    schema = {
+        "name": "AnalysisResult",
+        "schema": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "propaganda_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "conspiracy_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "misinfo_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "overall_risk": {"type": "integer", "minimum": 0, "maximum": 100},
+                "techniques": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "name": {"type": "string"},
+                            "evidence": {"type": "string"},
+                            "severity": {"type": "string", "enum": ["high", "medium", "low"]}
+                        },
+                        "required": ["name"]
+                    }
+                },
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "claim": {"type": "string"},
+                            "confidence": {"type": "string", "enum": ["supported", "unsupported", "misleading"]},
+                            "issues": {"type": "array", "items": {"type": "string"}}
+                        },
+                        "required": ["claim"]
+                    }
+                },
+                "summary": {"type": "string"}
+            },
+            "required": [
+                "propaganda_score",
+                "conspiracy_score",
+                "misinfo_score",
+                "overall_risk",
+                "techniques",
+                "claims",
+                "summary"
+            ]
+        },
+        "strict": True
+    }
+
+    resp = client.responses.create(
+        model="gpt-4o-mini",
+        input=[
+            {"role": "system", "content": "Return ONLY JSON matching the provided schema. No prose."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.3,
-        response_format={"type": "json_object"}
+        response_format={"type": "json_schema", "json_schema": schema},
+        temperature=0
     )
-    
-    result = json.loads(response.choices[0].message.content)
-    return result
 
-
-def analyze_url(url: str) -> Dict:
-    """Full analysis pipeline for URL (YouTube)."""
-    # Detect platform
-    platform = "youtube" if "youtube.com" in url or "youtu.be" in url else "unknown"
-    
-    # Get metadata
-    ydl_opts = {'quiet': True, 'no_warnings': True}
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        metadata = {
-            'platform': platform,
-            'title': info.get('title'),
-            'description': info.get('description', '')[:500],
-            'url': url
-        }
-    
-    # Try captions first
-    transcript = get_youtube_transcript(url)
-    
-    # Fallback to Whisper if no captions
-    if not transcript:
-        audio_path = download_youtube_audio(url)
+    content_text = getattr(resp, "output_text", None)
+    if not content_text:
         try:
-            transcript = transcribe_audio(audio_path)
-        finally:
-            # Cleanup
-            if os.path.exists(audio_path):
-                os.remove(audio_path)
-    
-    # Analyze with GPT-4
-    analysis = analyze_with_gpt4(transcript, metadata)
-    analysis['input'] = metadata
-    analysis['transcript_excerpt'] = transcript[:500] + '...' if len(transcript) > 500 else transcript
-    
-    return analysis
+            content_text = resp.output[0].content[0].text
+        except Exception:
+            content_text = "{}"
+
+    parsed = json.loads(content_text)
+    return parsed
+
+
+# Removed: URL analysis; use file or text/image inputs instead
 
 
 def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
@@ -249,4 +220,60 @@ def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
         # Cleanup
         if os.path.exists(audio_path):
             os.remove(audio_path)
+
+
+def analyze_text(text: str, platform: str = "text") -> Dict:
+    """Analyze plain text directly with GPT-4 using the same schema."""
+    metadata = {
+        'platform': platform,
+        'title': 'Submitted text',
+        'description': (text[:200] + '...') if len(text) > 200 else text,
+        'url': None,
+    }
+    transcript = text
+    analysis = analyze_with_gpt4(transcript, metadata)
+    analysis['input'] = metadata
+    analysis['transcript_excerpt'] = transcript[:500] + '...' if len(transcript) > 500 else transcript
+    return analysis
+
+
+def analyze_image(image_bytes: bytes, platform: str = "image") -> Dict:
+    """Extract text-like content from a screenshot using OpenAI vision, then analyze with GPT-4."""
+    # Encode image to base64 for inline message
+    b64 = base64.b64encode(image_bytes).decode('utf-8')
+
+    extract_prompt = (
+        "You will receive a social post screenshot. Extract the visible text verbatim, "
+        "including the author handle (if present), post text, on-image captions, and visible numeric claims. "
+        "Return plain text only."
+    )
+
+    vision = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You extract text from images."},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": extract_prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+                ]
+            }
+        ],
+        temperature=0
+    )
+    extracted = vision.choices[0].message.content or ""
+
+    metadata = {
+        'platform': platform,
+        'title': 'Uploaded screenshot',
+        'description': extracted[:200] + '...' if len(extracted) > 200 else extracted,
+        'url': None,
+    }
+
+    # Reuse the same analysis pipeline
+    analysis = analyze_with_gpt4(extracted, metadata)
+    analysis['input'] = metadata
+    analysis['transcript_excerpt'] = extracted[:500] + '...' if len(extracted) > 500 else extracted
+    return analysis
 

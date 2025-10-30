@@ -134,53 +134,57 @@ async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None
         raise HTTPException(status_code=400, detail=f"analyze-lite failed: {str(e)[:200]}")
 
 
-@app.post("/analyze-deep")
-async def analyze_deep(
-    url: Optional[str] = Form(None),
-    file: Optional[UploadFile] = File(None),
-    platform: Optional[str] = Form(None)
-):
-    """Deep analysis using Whisper + GPT-4 (transcript + propaganda detection)."""
+@app.post("/analyze-text")
+async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] = Form("text")):
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
-    from deep import analyze_url, analyze_file
-    import tempfile
-    from pathlib import Path
-    
-    # Validate input
-    if not url and not file:
-        raise HTTPException(status_code=400, detail="Either 'url' or 'file' is required")
-    
-    if url and file:
-        raise HTTPException(status_code=400, detail="Provide either 'url' or 'file', not both")
-    
-    # Check OpenAI API key
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
-    
     try:
-        if url:
-            # URL analysis (YouTube)
-            result = analyze_url(url)
-        else:
-            # File upload analysis
-            # Save uploaded file temporarily
-            with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
-                content = await file.read()
-                tmp.write(content)
-                tmp_path = tmp.name
-            
-            try:
-                result = analyze_file(tmp_path, platform or "unknown")
-            finally:
-                # Cleanup uploaded file
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
-        
+        from deep import analyze_text
+        result = analyze_text(text, platform or "text")
         return JSONResponse(content=result)
-    
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"analyze-deep failed: {str(e)[:300]}")
+        raise HTTPException(status_code=400, detail=f"analyze-text failed: {str(e)[:300]}")
+
+
+@app.post("/analyze-video")
+async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("video")):
+    if not DEEP_ANALYSIS_ENABLED:
+        raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    try:
+        from deep import analyze_file
+        import tempfile
+        from pathlib import Path
+        with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        try:
+            result = analyze_file(tmp_path, platform or "video")
+            return JSONResponse(content=result)
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"analyze-video failed: {str(e)[:300]}")
+
+
+@app.post("/analyze-image")
+async def analyze_image_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("image")):
+    if not DEEP_ANALYSIS_ENABLED:
+        raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    try:
+        from deep import analyze_image
+        content = await file.read()
+        result = analyze_image(content, platform or "image")
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"analyze-image failed: {str(e)[:300]}")
 
 
 if __name__ == "__main__":
