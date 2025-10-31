@@ -26,7 +26,7 @@ export default function ReportDeep() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link to="/" className="text-gray-400 hover:text-white transition-colors">← Retour</Link>
           <h1 className="text-3xl font-bold text-white mt-2">Analyse approfondie</h1>
-          <p className="text-gray-400">Propagande, conspiration, désinformation</p>
+          <p className="text-gray-400">Techniques de persuasion, manipulation émotionnelle et désinformation</p>
         </div>
       </header>
 
@@ -36,10 +36,10 @@ export default function ReportDeep() {
             <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
               <h2 className="text-xl font-semibold text-white mb-4">Scores</h2>
               {[
-                ['Score global', scores.overall, 'bg-white'],
-                ['Propagande', scores.propaganda, 'bg-white'],
-                ['Conspiration', scores.conspiracy, 'bg-white'],
-                ['Désinformation', scores.misinfo, 'bg-white']
+                ['Indice d\'influence', scores.overall, 'bg-white'],
+                ['Intensité persuasive', scores.propaganda, 'bg-white'],
+                ['Narratif spéculatif', scores.conspiracy, 'bg-white'],
+                ['Fiabilité factuelle', scores.misinfo, 'bg-white']
               ].map(([label, value, color], idx) => (
                 <div key={idx} className="mb-4">
                   <div className="flex justify-between text-sm text-gray-300 mb-1">

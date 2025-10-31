@@ -51,7 +51,7 @@ export default function Home() {
       <header className="bg-black border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-3xl font-bold text-white">🛡️ InfoVerif.org</h1>
-          <p className="text-gray-400 mt-2">Analyse de propagande, désinformation & manipulation médiatique</p>
+          <p className="text-gray-400 mt-2">Analyse des techniques de persuasion, propagande, manipulation émotionnelle et désinformation</p>
         </div>
       </header>
 

@@ -117,7 +117,7 @@ async def method_card():
     card = {
         "title": "InfoVerif.org — Méthode & Feuille de Route",
         "subtitle": "Projet Open Source du Civic Tech AI Lab — GenerativSchool.com",
-        "goal": "Démocratiser l'analyse de propagande, désinformation et manipulation médiatique via l'IA",
+        "goal": "Démocratiser l'analyse des techniques de persuasion, propagande, manipulation émotionnelle et désinformation via l'IA",
         
         "current_capabilities": {
             "overview": "MVP Fonctionnel — Analyse GPT-4 multi-formats avec explications détaillées",
@@ -127,15 +127,16 @@ async def method_card():
                 "image": "Screenshot + extraction Vision API + analyse"
             },
             "detection": {
-                "propaganda_techniques": "9+ catégories (manipulation émotionnelle, cadrage, langage chargé, etc.)",
-                "conspiracy_markers": "7+ indicateurs (vérité cachée, défiance institutions, rhétorique complotiste)",
-                "misinfo_patterns": "7+ types (sophismes, stats trompeuses, affirmations non sourcées)"
+                "persuasive_intensity": "9+ catégories (manipulation émotionnelle, cadrage, langage chargé, appel à l'autorité, etc.)",
+                "speculative_narrative": "7+ indicateurs (vérité cachée, défiance institutions, rhétorique complotiste, causalité simpliste)",
+                "factual_reliability": "7+ types (sophismes, stats trompeuses, affirmations non sourcées, cherry-picking)"
             },
             "output": {
-                "scores": "propaganda_score, conspiracy_score, misinfo_score, overall_risk (0-100)",
+                "scores": "Indice d'influence (overall), Intensité persuasive, Narratif spéculatif, Fiabilité factuelle (0-100)",
                 "techniques": "Nom, citation exacte, sévérité, explication détaillée (2-3 phrases)",
                 "claims": "Affirmation, niveau de confiance, problèmes identifiés, raisonnement",
-                "summary": "Analyse en 3-4 phrases de l'impact sur l'audience"
+                "summary": "Analyse en 3-4 phrases de l'impact sur l'audience",
+                "note_terminology": "Frontend affiche des termes académiques nuancés ; backend conserve les variables techniques (propaganda_score, conspiracy_score, misinfo_score, overall_risk)"
             },
             "language": "Français (avec explications pédagogiques)"
         },
@@ -144,22 +145,22 @@ async def method_card():
             "phase_2_q2_2026": {
                 "title": "Fine-tuning & Modèles Spécialisés",
                 "objectives": [
-                    "Fine-tuning BERT/RoBERTa sur corpus de propagande annoté",
-                    "Classifier de théories du complot (dataset 10K+ exemples)",
-                    "Détecteur de sophismes logiques (fallacy detection)",
-                    "Vector database pour patterns de manipulation connus",
-                    "Embeddings sémantiques pour clustering de narratives",
-                    "Taxonomie de 100+ variantes de techniques"
+                    "Fine-tuning BERT/RoBERTa sur corpus annoté (techniques de persuasion, manipulation)",
+                    "Classifier de narratifs spéculatifs et complotistes (dataset 10K+ exemples)",
+                    "Détecteur de sophismes logiques et biais cognitifs (fallacy detection)",
+                    "Vector database pour patterns rhétoriques connus",
+                    "Embeddings sémantiques pour clustering de narratives et propagation d'influence",
+                    "Taxonomie de 100+ variantes de techniques persuasives"
                 ]
             },
             "phase_3_q3_2026": {
-                "title": "Agent Autonome & Monitoring",
+                "title": "Agent Autonome & Monitoring des Narratifs",
                 "objectives": [
                     "Scan automatisé YouTube/TikTok/Twitter via APIs",
-                    "Détection proactive de contenus suspects",
-                    "Analyse de réseaux (Graph DB pour comptes liés)",
-                    "Détection de coordinated inauthentic behavior",
-                    "Dashboard analytics avec visualisation de tendances",
+                    "Détection proactive de contenus à haut indice d'influence",
+                    "Analyse de réseaux (Graph DB pour comptes liés et propagation de narratifs)",
+                    "Détection de comportements coordonnés inautentiques",
+                    "Dashboard analytics avec visualisation de tendances persuasives",
                     "Alertes en temps réel pour chercheurs/fact-checkers",
                     "API publique pour intégrations tierces"
                 ]
@@ -176,15 +177,15 @@ async def method_card():
                 ]
             },
             "phase_5_2026": {
-                "title": "Plateforme Communautaire",
+                "title": "Plateforme Communautaire & Éducation",
                 "objectives": [
                     "Annotations collaboratives de contenus",
-                    "Taxonomie ouverte de techniques de manipulation",
-                    "Bibliothèque de cas d'étude annotés",
-                    "Formation à la littératie médiatique",
+                    "Taxonomie ouverte de techniques persuasives et manipulatoires",
+                    "Bibliothèque de cas d'étude annotés avec explications pédagogiques",
+                    "Formation à la littératie médiatique et esprit critique",
                     "Partenariats fact-checkers (AFP, Reuters, Snopes)",
-                    "Collaborations universitaires (datasets, recherche)",
-                    "Outils pour journalistes et éducateurs"
+                    "Collaborations universitaires (datasets, méthodologies de recherche)",
+                    "Outils pour journalistes, éducateurs et chercheurs"
                 ]
             }
         },
