@@ -171,11 +171,36 @@ def download_audio_from_url(url: str) -> str:
             info = ydl.extract_info(url, download=True)
             
             # Get the final audio file path
+            # yt-dlp with FFmpegExtractAudio creates the file, we need to find it
             video_id = info.get('id', 'video')
-            audio_path = os.path.join(temp_dir, f"{video_id}.mp3")
             
-            if not os.path.exists(audio_path):
-                raise Exception(f"Audio file not found after download: {audio_path}")
+            # Try multiple possible extensions and paths
+            possible_paths = [
+                os.path.join(temp_dir, f"{video_id}.mp3"),
+                os.path.join(temp_dir, f"{video_id}.m4a"),
+                os.path.join(temp_dir, f"{video_id}.webm"),
+                os.path.join(temp_dir, f"{video_id}.opus"),
+            ]
+            
+            # Also check for the exact path yt-dlp might have used
+            if 'requested_downloads' in info and len(info['requested_downloads']) > 0:
+                downloaded_file = info['requested_downloads'][0].get('filepath')
+                if downloaded_file:
+                    # Replace extension with .mp3 (post-processed file)
+                    base = os.path.splitext(downloaded_file)[0]
+                    possible_paths.insert(0, f"{base}.mp3")
+            
+            # Find the actual audio file
+            audio_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    audio_path = path
+                    break
+            
+            if not audio_path:
+                # List files in temp dir for debugging
+                temp_files = [f for f in os.listdir(temp_dir) if video_id in f]
+                raise Exception(f"Audio file not found after download. Expected one of: {possible_paths}. Found in temp: {temp_files}")
             
             print(f"✅ Audio downloaded: {audio_path} ({os.path.getsize(audio_path) / 1024 / 1024:.2f} MB)")
             return audio_path
