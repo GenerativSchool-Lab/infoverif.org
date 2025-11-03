@@ -124,6 +124,10 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle extension icon click (backup if setPanelBehavior doesn't work)
 chrome.action.onClicked.addListener((tab) => {
   debugLog('BACKGROUND', 'Extension icon clicked');
+  
+  // Clear badge
+  chrome.action.setBadgeText({ text: '', tabId: tab.id });
+  
   chrome.sidePanel.open({ windowId: tab.windowId })
     .catch(err => debugLog('BACKGROUND', 'Could not open panel:', err.message));
 });
@@ -200,12 +204,18 @@ async function handleAnalyzeRequest(message, sender) {
       cacheAnalysis(report.analysis_id, report);
     }
     
-    await openSidePanel(sender.tab?.id);
-    await sendReportToPanel(report, headers);
+    // Store report in session storage (for cache)
+    await storageSet({ currentReport: report }, 'session');
     
     updateRateLimit(sender.tab?.id);
     
-    return { success: true, analysisId: report.analysis_id };
+    // Return report directly to content script (for floating panel)
+    return { 
+      success: true, 
+      report: report,
+      headers: headers,
+      analysis_id: report.analysis_id 
+    };
     
   } catch (error) {
     errorLog('BACKGROUND', 'Analyze request failed:', error);
@@ -339,17 +349,26 @@ async function openSidePanel(tabId) {
     // Try to open side panel (requires user gesture from content script click)
     await chrome.sidePanel.open({ windowId: tab.windowId });
     debugLog('BACKGROUND', `Side panel opened for window ${tab.windowId}`);
-  } catch (error) {
-    // Fallback: enable panel for manual opening
-    debugLog('BACKGROUND', 'Could not auto-open panel:', error.message);
     
+    // Clear badge after opening
+    chrome.action.setBadgeText({ text: '', tabId });
+  } catch (error) {
+    // MV3 limitation: sidePanel.open() often fails even with user gesture
+    // when called via message passing. Show badge notification instead.
+    debugLog('BACKGROUND', 'Auto-open failed (expected MV3 behavior):', error.message);
+    
+    // Set badge to notify user
+    chrome.action.setBadgeText({ text: '1', tabId });
+    chrome.action.setBadgeBackgroundColor({ color: '#4CAF50', tabId });
+    
+    // Enable panel for click
     try {
       if (tabId) {
         await chrome.sidePanel.setOptions({
           tabId,
           enabled: true
         });
-        debugLog('BACKGROUND', 'Side panel enabled for tab (user must click icon)');
+        debugLog('BACKGROUND', 'Badge set - user can click icon to open panel');
       }
     } catch (fallbackError) {
       debugLog('BACKGROUND', 'Side panel API error:', fallbackError.message);

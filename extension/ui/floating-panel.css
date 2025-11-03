@@ -1,0 +1,605 @@
+/**
+ * InfoVerif Floating Panel Styles
+ * Injected into page DOM, floats above content
+ */
+
+/* ============================================================================
+   PANEL CONTAINER
+   ============================================================================ */
+
+.infoverif-panel {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 420px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 120px);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  z-index: 2147483647; /* Max z-index to float above everything */
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  animation: infoverif-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  resize: both;
+  overflow: hidden;
+}
+
+@keyframes infoverif-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.infoverif-panel.minimized {
+  width: 280px;
+  height: 56px;
+  overflow: hidden;
+}
+
+.infoverif-panel.minimized .infoverif-panel-content {
+  display: none;
+}
+
+.infoverif-panel.minimized .infoverif-resize-handle {
+  display: none;
+}
+
+/* ============================================================================
+   PANEL HEADER (Draggable)
+   ============================================================================ */
+
+.infoverif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  color: #ffffff;
+  cursor: move;
+  user-select: none;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+
+.infoverif-panel-header:active {
+  cursor: grabbing;
+}
+
+.infoverif-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.infoverif-logo {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.infoverif-title-text {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.infoverif-subtitle {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoverif-panel-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.infoverif-control-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.infoverif-control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.infoverif-control-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================================
+   PANEL CONTENT
+   ============================================================================ */
+
+.infoverif-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.infoverif-panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.infoverif-panel-content::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.infoverif-panel-content::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 4px;
+}
+
+.infoverif-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+/* ============================================================================
+   PANEL STATES
+   ============================================================================ */
+
+.infoverif-panel-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #666666;
+}
+
+.infoverif-empty-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  opacity: 0.3;
+}
+
+.infoverif-panel-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.infoverif-panel-state p {
+  margin: 0;
+  font-size: 14px;
+  color: #666666;
+}
+
+.infoverif-spinner-large {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #0066ff;
+  border-radius: 50%;
+  animation: infoverif-spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes infoverif-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   SECTIONS
+   ============================================================================ */
+
+.infoverif-section {
+  margin-bottom: 20px;
+}
+
+.infoverif-section:last-child {
+  margin-bottom: 0;
+}
+
+.infoverif-section-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================================================================
+   SCORES
+   ============================================================================ */
+
+.infoverif-score-item {
+  margin-bottom: 12px;
+}
+
+.infoverif-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.infoverif-score-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.infoverif-score-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0066ff;
+}
+
+.infoverif-score-bar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.infoverif-score-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+
+.infoverif-score-fill.low {
+  background: linear-gradient(90deg, #00cc66, #00aa55);
+}
+
+.infoverif-score-fill.medium {
+  background: linear-gradient(90deg, #ffaa00, #ff8800);
+}
+
+.infoverif-score-fill.high {
+  background: linear-gradient(90deg, #ff4444, #cc0000);
+}
+
+/* ============================================================================
+   TECHNIQUES
+   ============================================================================ */
+
+.infoverif-technique-card {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.infoverif-technique-card:hover {
+  border-color: #0066ff;
+  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.1);
+}
+
+.infoverif-technique-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.infoverif-technique-title {
+  flex: 1;
+}
+
+.infoverif-technique-code {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #0066ff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.infoverif-technique-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 2px 0;
+}
+
+.infoverif-technique-family {
+  font-size: 11px;
+  color: #666666;
+  margin: 0;
+}
+
+.infoverif-severity-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.infoverif-severity-badge.high {
+  background: #ffe0e0;
+  color: #cc0000;
+}
+
+.infoverif-severity-badge.medium {
+  background: #fff3e0;
+  color: #ff8800;
+}
+
+.infoverif-severity-badge.low {
+  background: #e0f7e0;
+  color: #00aa55;
+}
+
+.infoverif-technique-evidence {
+  background: #ffffff;
+  border-left: 3px solid #0066ff;
+  padding: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #555555;
+  border-radius: 0 4px 4px 0;
+}
+
+.infoverif-technique-explanation {
+  font-size: 12px;
+  color: #666666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================================================
+   CLAIMS
+   ============================================================================ */
+
+.infoverif-claim-card {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.infoverif-claim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.infoverif-claim-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+  margin: 0 0 8px 0;
+}
+
+.infoverif-confidence-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.infoverif-confidence-badge.supported {
+  background: #e0f7e0;
+  color: #00aa55;
+}
+
+.infoverif-confidence-badge.unsupported {
+  background: #fff3e0;
+  color: #ff8800;
+}
+
+.infoverif-confidence-badge.misleading {
+  background: #ffe0e0;
+  color: #cc0000;
+}
+
+.infoverif-claim-reasoning {
+  font-size: 12px;
+  color: #666666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================================================
+   SUMMARY
+   ============================================================================ */
+
+.infoverif-summary-text {
+  font-size: 13px;
+  color: #333333;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+
+.infoverif-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.infoverif-action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.infoverif-action-btn:hover {
+  background: #e8e8e8;
+  border-color: #0066ff;
+  color: #0066ff;
+}
+
+.infoverif-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================================
+   RESIZE HANDLE
+   ============================================================================ */
+
+.infoverif-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.infoverif-panel:hover .infoverif-resize-handle {
+  opacity: 0.3;
+}
+
+.infoverif-resize-handle::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid #999999;
+  border-bottom: 2px solid #999999;
+}
+
+/* ============================================================================
+   DARK MODE (respect user preference)
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .infoverif-panel {
+    background: #1a1a1a;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .infoverif-panel-content {
+    background: #1a1a1a;
+  }
+
+  .infoverif-section-title,
+  .infoverif-score-label,
+  .infoverif-technique-name,
+  .infoverif-claim-text,
+  .infoverif-summary-text {
+    color: #e0e0e0;
+  }
+
+  .infoverif-technique-card,
+  .infoverif-claim-card {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+  }
+
+  .infoverif-technique-card:hover,
+  .infoverif-claim-card:hover {
+    border-color: #0066ff;
+  }
+
+  .infoverif-technique-evidence {
+    background: #2a2a2a;
+  }
+
+  .infoverif-action-btn {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .infoverif-action-btn:hover {
+    background: #3a3a3a;
+    border-color: #0066ff;
+    color: #0066ff;
+  }
+
+  .infoverif-panel-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+  }
+
+  .infoverif-panel-content::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE (Mobile)
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .infoverif-panel {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+.infoverif-control-btn:focus,
+.infoverif-action-btn:focus {
+  outline: 3px solid #0066ff;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .infoverif-panel,
+  .infoverif-technique-card,
+  .infoverif-action-btn,
+  .infoverif-score-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .infoverif-spinner-large {
+    animation-duration: 2s;
+  }
+}
+

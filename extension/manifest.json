@@ -17,16 +17,11 @@
   "background": {
     "service_worker": "background-bundle.js"
   },
-  
-  "side_panel": {
-    "default_path": "ui/panel.html"
-  },
-  
+
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "sidePanel",
     "contextMenus"
   ],
   
@@ -60,10 +55,13 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "ui/panel.html", 
+        "ui/floating-panel.html",
+        "ui/floating-panel.js",
+        "ui/floating-panel.css",
+        "ui/panel.html",
         "ui/panel.js",
         "ui/panel.css",
-        "styles/*.css", 
+        "styles/*.css",
         "icons/*.png",
         "shared/*.js",
         "lib/*.js"

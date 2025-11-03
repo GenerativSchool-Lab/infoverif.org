@@ -258,6 +258,29 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, us
     # Add embedding hints metadata if available (M2.2)
     if similar_techniques:
         parsed["embedding_hints"] = similar_techniques
+        
+        # Enrich techniques with high-confidence embeddings not detected by GPT
+        # (only add if GPT missed them and similarity > 0.5)
+        gpt_codes = {tech.get("dima_code", "") for tech in parsed["techniques"]}
+        
+        for emb_tech in similar_techniques:
+            code = emb_tech.get("code", "")
+            similarity = emb_tech.get("similarity", 0)
+            
+            # Add if: not already detected by GPT AND high similarity
+            if code and code not in gpt_codes and similarity >= 0.5:
+                # Create technique entry from embedding
+                enriched_technique = {
+                    "dima_code": code,
+                    "dima_family": emb_tech.get("family", ""),
+                    "name": emb_tech.get("name", ""),
+                    "evidence": "(Détecté par analyse sémantique - correspondance thématique forte)",
+                    "severity": "medium" if similarity >= 0.6 else "low",
+                    "explanation": f"Technique détectée par similarité sémantique (score: {similarity:.2f}). Le contenu présente des marqueurs linguistiques correspondant à cette technique de manipulation.",
+                    "source": "embedding"  # Mark as embedding-detected
+                }
+                parsed["techniques"].append(enriched_technique)
+                print(f"✨ Enriched with embedding technique: {code} (similarity: {similarity:.2f})")
     
     return parsed
 

@@ -1,0 +1,76 @@
+<!-- InfoVerif Floating Panel (Injected into page DOM) -->
+<div id="infoverif-floating-panel" class="infoverif-panel">
+  <!-- Panel Header (Draggable) -->
+  <div class="infoverif-panel-header" id="infoverif-panel-header">
+    <div class="infoverif-panel-title">
+      <span class="infoverif-logo">🛡️</span>
+      <span class="infoverif-title-text">InfoVerif</span>
+      <span class="infoverif-subtitle">Analyse DIMA</span>
+    </div>
+    <div class="infoverif-panel-controls">
+      <button id="infoverif-minimize-btn" class="infoverif-control-btn" title="Minimiser">−</button>
+      <button id="infoverif-close-btn" class="infoverif-control-btn" title="Fermer">×</button>
+    </div>
+  </div>
+
+  <!-- Panel Content -->
+  <div class="infoverif-panel-content" id="infoverif-panel-content">
+    <!-- Loading State -->
+    <div id="infoverif-panel-loading" class="infoverif-panel-state" style="display: none;">
+      <div class="infoverif-spinner-large"></div>
+      <p>Analyse en cours...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="infoverif-panel-empty" class="infoverif-panel-state">
+      <p class="infoverif-empty-icon">🛡️</p>
+      <h3>Aucune analyse</h3>
+      <p>Survolez un post et cliquez "Analyser avec InfoVerif"</p>
+    </div>
+
+    <!-- Report Content -->
+    <div id="infoverif-panel-report" style="display: none;">
+      <!-- Scores Section -->
+      <section class="infoverif-section">
+        <h3 class="infoverif-section-title">📊 Scores d'analyse</h3>
+        <div id="infoverif-scores-container"></div>
+      </section>
+
+      <!-- Techniques Section -->
+      <section class="infoverif-section">
+        <h3 class="infoverif-section-title">
+          🎯 Techniques DIMA (<span id="infoverif-techniques-count">0</span>)
+        </h3>
+        <div id="infoverif-techniques-container"></div>
+      </section>
+
+      <!-- Claims Section -->
+      <section class="infoverif-section">
+        <h3 class="infoverif-section-title">
+          ✓ Affirmations (<span id="infoverif-claims-count">0</span>)
+        </h3>
+        <div id="infoverif-claims-container"></div>
+      </section>
+
+      <!-- Summary Section -->
+      <section class="infoverif-section">
+        <h3 class="infoverif-section-title">📝 Synthèse</h3>
+        <div id="infoverif-summary-container"></div>
+      </section>
+
+      <!-- Actions -->
+      <section class="infoverif-section infoverif-actions">
+        <button id="infoverif-copy-json-btn" class="infoverif-action-btn">
+          📋 Copier JSON
+        </button>
+        <button id="infoverif-copy-summary-btn" class="infoverif-action-btn">
+          📄 Copier synthèse
+        </button>
+      </section>
+    </div>
+  </div>
+
+  <!-- Resize Handle -->
+  <div class="infoverif-resize-handle" id="infoverif-resize-handle"></div>
+</div>
+

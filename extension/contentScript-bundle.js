@@ -187,6 +187,57 @@ function createAnalyzeRequest(mode, platform, data, metadata) {
 let currentPlatform = null;
 let highlightedElements = new Set();
 let activeOverlay = null;
+let analyzedCache = new Map(); // permalink -> { timestamp, analysis_id }
+let floatingPanelInjected = false;
+
+// ============================================================================
+// FLOATING PANEL INJECTION
+// ============================================================================
+
+async function injectFloatingPanel() {
+  if (floatingPanelInjected) {
+    debugLog('CONTENT_SCRIPT', 'Panel already injected');
+    return;
+  }
+  
+  try {
+    // Fetch panel HTML
+    const panelHTML = await fetch(chrome.runtime.getURL('ui/floating-panel.html')).then(r => r.text());
+    
+    // Inject CSS
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = chrome.runtime.getURL('ui/floating-panel.css');
+    document.head.appendChild(cssLink);
+    
+    // Inject HTML
+    const container = document.createElement('div');
+    container.innerHTML = panelHTML;
+    document.body.appendChild(container.firstElementChild);
+    
+    // Inject JS
+    const script = document.createElement('script');
+    script.src = chrome.runtime.getURL('ui/floating-panel.js');
+    document.body.appendChild(script);
+    
+    floatingPanelInjected = true;
+    debugLog('CONTENT_SCRIPT', 'Floating panel injected successfully');
+  } catch (error) {
+    console.error('[InfoVerif] Failed to inject panel:', error);
+  }
+}
+
+function showPanelLoading() {
+  window.postMessage({ type: 'INFOVERIF_SHOW_LOADING' }, '*');
+}
+
+function showPanelReport(report) {
+  window.postMessage({ type: 'INFOVERIF_SHOW_REPORT', report }, '*');
+}
+
+function showPanelError(error) {
+  window.postMessage({ type: 'INFOVERIF_SHOW_ERROR', error }, '*');
+}
 
 // ============================================================================
 // INITIALIZATION
@@ -337,7 +388,26 @@ function createAnalyzeOverlay(element, platform) {
   
   const button = document.createElement('button');
   button.className = 'infoverif-analyze-btn';
-  button.textContent = 'Analyser avec InfoVerif';
+  
+  // Check if already analyzed
+  let isAnalyzed = false;
+  if (platform === PLATFORMS.TWITTER) {
+    const extracted = extractTwitterData(element);
+    const permalink = extracted.metadata?.permalink;
+    const cached = analyzedCache.get(permalink);
+    const CACHE_TTL = 5 * 60 * 1000;
+    
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+      isAnalyzed = true;
+    }
+  }
+  
+  if (isAnalyzed) {
+    button.innerHTML = '✓ Déjà analysé • Cliquez pour rouvrir';
+    button.classList.add('analyzed');
+  } else {
+    button.textContent = 'Analyser avec InfoVerif';
+  }
   
   button.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -356,37 +426,65 @@ function createAnalyzeOverlay(element, platform) {
 async function handleAnalyzeClick(element, platform) {
   debugLog('CONTENT_SCRIPT', `Analyze clicked for ${platform}`);
   
-  showLoadingOverlay(element);
-  
   try {
+    // Inject panel if not already done
+    await injectFloatingPanel();
+    
     let data, metadata;
     
     if (platform === PLATFORMS.TWITTER) {
       const extracted = extractTwitterData(element);
       data = { text: extracted.text };
       metadata = extracted.metadata;
+      
+      // Check cache first
+      const permalink = metadata.permalink;
+      const cached = analyzedCache.get(permalink);
+      const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+      
+      if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+        debugLog('CONTENT_SCRIPT', 'Using cached analysis');
+        
+        // Show cached report from storage
+        const { currentReport } = await chrome.storage.session.get('currentReport');
+        if (currentReport) {
+          showPanelReport(currentReport);
+        }
+        
+        showSuccessOverlay(element);
+        return;
+      }
     }
+    
+    showLoadingOverlay(element);
+    showPanelLoading();
     
     const message = createAnalyzeRequest('text', platform, data, metadata);
     const response = await chrome.runtime.sendMessage(message);
     
-    if (response.success) {
-      debugLog('CONTENT_SCRIPT', 'Analysis request sent successfully');
+    if (response.success && response.report) {
+      debugLog('CONTENT_SCRIPT', 'Analysis complete, showing report');
       
-      // Request background to open side panel
-      // (sidePanel API must be called from background, not content script)
-      chrome.runtime.sendMessage({ 
-        type: 'OPEN_PANEL'
-      }).catch(err => {
-        debugLog('CONTENT_SCRIPT', 'Could not request panel open:', err.message);
-      });
+      // Cache the analysis
+      if (metadata?.permalink) {
+        analyzedCache.set(metadata.permalink, {
+          timestamp: Date.now(),
+          analysis_id: response.analysis_id
+        });
+      }
+      
+      // Show report in floating panel
+      showPanelReport(response.report);
       
       showSuccessOverlay(element);
     } else {
+      showPanelError(response.message || 'Erreur lors de l\'analyse');
       showErrorOverlay(element, response.message);
     }
   } catch (error) {
     console.error('[InfoVerif] Analyze error:', error);
+    
+    showPanelError(error.message);
     
     // Check if extension context was invalidated (extension reloaded)
     if (error.message.includes('Extension context invalidated')) {

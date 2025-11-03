@@ -70,6 +70,17 @@
   box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
 }
 
+.infoverif-analyze-btn.analyzed {
+  background: #00cc66;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 204, 102, 0.3);
+}
+
+.infoverif-analyze-btn.analyzed:hover {
+  background: #00aa55;
+  box-shadow: 0 4px 12px rgba(0, 204, 102, 0.4);
+}
+
 /* ============================================================================
    LOADING STATE
    ============================================================================ */
