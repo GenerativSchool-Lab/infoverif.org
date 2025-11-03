@@ -157,15 +157,27 @@ function renderReport(report) {
   document.getElementById('infoverif-panel-empty').style.display = 'none';
   document.getElementById('infoverif-panel-report').style.display = 'block';
   
-  console.log('[InfoVerif Panel] Rendering scores:', report.scores);
-  console.log('[InfoVerif Panel] Rendering techniques:', report.techniques);
-  console.log('[InfoVerif Panel] Rendering claims:', report.claims);
-  console.log('[InfoVerif Panel] Rendering summary:', report.summary);
+  // Handle both structures: {scores: {...}} and {propaganda_score: ...}
+  const scores = report.scores || {
+    propaganda_score: report.propaganda_score || 0,
+    conspiracy_score: report.conspiracy_score || 0,
+    misinfo_score: report.misinfo_score || 0,
+    overall_risk: report.overall_risk || 0
+  };
   
-  renderScores(report.scores);
-  renderTechniques(report.techniques);
-  renderClaims(report.claims);
-  renderSummary(report.summary);
+  const techniques = report.techniques || [];
+  const claims = report.claims || [];
+  const summary = report.summary || 'Aucun résumé disponible.';
+  
+  console.log('[InfoVerif Panel] Rendering scores:', scores);
+  console.log('[InfoVerif Panel] Rendering techniques:', techniques.length, 'techniques');
+  console.log('[InfoVerif Panel] Rendering claims:', claims.length, 'claims');
+  console.log('[InfoVerif Panel] Rendering summary length:', summary.length);
+  
+  renderScores(scores);
+  renderTechniques(techniques);
+  renderClaims(claims);
+  renderSummary(summary);
   
   showPanel();
   
