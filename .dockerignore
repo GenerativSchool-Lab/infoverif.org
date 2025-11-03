@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+ENV/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+.nuxt/
+dist/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Env files (will be set via Railway)
+.env
+.env.local
+
+# Temp files
+*.log
+tmp/
+temp/
+
+# Data (don't include in image)
+data/dima_embeddings.npy
+data/dima_examples/
+
+# Documentation
+docs/
+*.md
+LICENSE
+README.md
+
+# Scripts
+scripts/
+
