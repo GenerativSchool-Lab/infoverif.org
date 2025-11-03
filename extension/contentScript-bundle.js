@@ -372,6 +372,16 @@ async function handleAnalyzeClick(element, platform) {
     
     if (response.success) {
       debugLog('CONTENT_SCRIPT', 'Analysis request sent successfully');
+      
+      // Open side panel automatically (requires user gesture, which we have from the click)
+      try {
+        await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+        debugLog('CONTENT_SCRIPT', 'Side panel opened automatically');
+      } catch (panelError) {
+        // Fallback: show message to user
+        debugLog('CONTENT_SCRIPT', 'Could not auto-open panel:', panelError.message);
+      }
+      
       showSuccessOverlay(element);
     } else {
       showErrorOverlay(element, response.message);
@@ -412,15 +422,35 @@ async function handleYouTubeAnalyze() {
     
     if (response.success) {
       debugLog('CONTENT_SCRIPT', 'YouTube analysis request sent');
-      if (button) {
-        button.textContent = '✓ Cliquez sur 🛡️';
-        setTimeout(() => {
-          button.disabled = false;
-          button.innerHTML = `
-            <span class="infoverif-icon">🛡️</span>
-            <span class="infoverif-text">Analyser avec InfoVerif</span>
-          `;
-        }, 3000);
+      
+      // Open side panel automatically
+      try {
+        await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+        debugLog('CONTENT_SCRIPT', 'Side panel opened automatically');
+        
+        if (button) {
+          button.textContent = '✓ Analyse en cours';
+          setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = `
+              <span class="infoverif-icon">🛡️</span>
+              <span class="infoverif-text">Analyser avec InfoVerif</span>
+            `;
+          }, 3000);
+        }
+      } catch (panelError) {
+        debugLog('CONTENT_SCRIPT', 'Could not auto-open panel:', panelError.message);
+        
+        if (button) {
+          button.textContent = '✓ Cliquez sur 🛡️';
+          setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = `
+              <span class="infoverif-icon">🛡️</span>
+              <span class="infoverif-text">Analyser avec InfoVerif</span>
+            `;
+          }, 3000);
+        }
       }
     } else {
       if (button) {
@@ -462,14 +492,14 @@ function showSuccessOverlay(element) {
   if (activeOverlay) {
     activeOverlay.innerHTML = `
       <div class="infoverif-success">
-        <span>✓ Analyse demandée</span>
-        <small>Cliquez sur l'icône 🛡️ InfoVerif</small>
+        <span>✓ Analyse en cours</span>
+        <small>Consultez le panneau →</small>
       </div>
     `;
     
     setTimeout(() => {
       hidePostHighlight(element);
-    }, 3000);
+    }, 2000);
   }
 }
 
