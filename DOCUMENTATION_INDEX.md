@@ -4,6 +4,52 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ---
 
+## 🎯 DIMA M2.2 Documentation (Nouveau !)
+
+### 🚀 **Semantic Embeddings Layer — Production Deployment Complete**
+
+**Milestone 2.2** intègre 130 techniques DIMA (M82 Project) avec analyse vectorielle FAISS + GPT-4o-mini.
+
+#### Documents clés :
+
+1. **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** (1807 lignes)
+   - RFC-style design document complet
+   - Architecture hybride (embeddings + prompts)
+   - Alignment tables (DIMA ↔ InfoVerif)
+   - M1, M2.1, M2.2 status (tous ✅ COMPLETED)
+   - Formules de scoring, exemples JSON
+   - Risques et mitigation
+
+2. **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** (455 lignes) ⭐ NEW
+   - Rapport de production complet
+   - Métriques de performance (latency, cost, accuracy)
+   - Architecture diagram (Text → FAISS → GPT-4)
+   - Comparaison M2.1 vs M2.2 (+50% detection)
+   - Deployment journey (15 tentatives documentées)
+   - Technical implementation (code samples)
+   - Production health status
+   - Lessons learned pour futurs ML deployments
+
+3. **[DIMA_M2.2_Embeddings_Plan.md](./docs/DIMA_M2.2_Embeddings_Plan.md)** (540 lignes)
+   - Plan original M2.2 (pré-implémentation)
+   - Railway Pro plan resource allocation
+   - Embedding model selection rationale
+   - Cost estimates vs actual
+   - Implementation timeline (3 semaines → 1 jour!)
+
+4. **[CHANGELOG.md](./CHANGELOG.md)** — Sections M2.1 & M2.2 (190 lignes)
+   - Summary user-facing des milestones
+   - JSON schema enhancements
+   - Performance metrics condensés
+   - Production test results
+
+**Temps de lecture total** : 2-3 heures (documentation complète)  
+**Audience** : Architectes AI, ML Engineers, Chercheurs
+
+**Status** : ✅ M2.2 LIVE in production (Nov 3, 2025)
+
+---
+
 ## 🚀 Par Objectif
 
 ### Je veux **essayer rapidement** l'application
