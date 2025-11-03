@@ -81,5 +81,5 @@ zip -r infoverif-extension-v1.0.0.zip . -x "*.git*" -x ".DS_Store"
 
 ---
 
-**Créé** : Janvier 2026
+**Créé** : Novembre 2025
 

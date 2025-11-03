@@ -15,17 +15,17 @@
    # Select: /path/to/infoverif.org/extension
    ```
 
-2. **Test on Twitter**:
-   - Navigate to https://twitter.com
-   - Click extension icon
-   - Click on a tweet → "Analyze with InfoVerif" button appears
-   - Click "Analyze" → Side panel opens with report
+2. **Test on Twitter/X**:
+   - Navigate to https://twitter.com or https://x.com
+   - Hover over a tweet → "Analyze with InfoVerif" button appears
+   - Click "Analyze" → Floating panel opens with report
+   - Works for text tweets and tweets with videos
 
-3. **Test on YouTube**:
-   - Navigate to https://youtube.com/watch?v=VIDEO_ID
-   - Click extension icon
-   - Video is detected → "Analyze video" button appears
-   - Click "Analyze" → Side panel opens with report
+3. **Test on TikTok**:
+   - Navigate to https://tiktok.com
+   - Fixed "Analyze with InfoVerif" button appears (bottom-left)
+   - Click "Analyze" → Floating panel opens with report
+   - Works on all page types (video, feed, search)
 
 ## Architecture
 
@@ -69,13 +69,12 @@ http://localhost:8000
 # Update shared/constants.js with correct API_URL
 ```
 
-## Supported Platforms (Alpha)
+## Supported Platforms
 
-- ✅ Twitter/X
-- ✅ YouTube
-- ⏳ TikTok (Phase 2)
-- ⏳ Instagram (Phase 2)
-- ⏳ Facebook (Phase 2)
+- ✅ **Twitter/X** : Hover detection, text + video analysis
+- ✅ **TikTok** : Fixed button, universal detection (all page types)
+
+**Note** : Other platforms (YouTube, Instagram, Facebook) can be analyzed via the [web application](https://infoverif.org).
 
 ## Privacy
 

@@ -363,5 +363,5 @@ Les contributions sont bienvenues ! Voir [CONTRIBUTING.md](https://github.com/Ge
 ---
 
 **Version** : 1.0.0  
-**Dernière mise à jour** : Janvier 2026
+**Dernière mise à jour** : Novembre 2025
 

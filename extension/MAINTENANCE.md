@@ -247,5 +247,5 @@ git remote add origin https://github.com/GenerativSchool-Lab/infoverif-extension
 
 ---
 
-**Dernière mise à jour** : Janvier 2026
+**Dernière mise à jour** : Novembre 2025
 

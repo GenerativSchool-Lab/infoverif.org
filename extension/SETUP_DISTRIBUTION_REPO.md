@@ -177,5 +177,5 @@ Voir checklist dans `extension/MAINTENANCE.md`
 
 ---
 
-**Créé** : Janvier 2026
+**Créé** : Novembre 2025
 
