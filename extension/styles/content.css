@@ -1,0 +1,291 @@
+/**
+ * InfoVerif Extension - Content Script Styles
+ * 
+ * Styles for:
+ * - Post highlight overlay
+ * - Analyze button
+ * - Loading/success/error states
+ * - YouTube floating button
+ */
+
+/* ============================================================================
+   HIGHLIGHT OVERLAY
+   ============================================================================ */
+
+.infoverif-highlight {
+  position: relative;
+  outline: 2px solid #0066ff !important;
+  outline-offset: 2px;
+  border-radius: 8px;
+  transition: outline 0.2s ease;
+}
+
+.infoverif-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+  animation: infoverif-fadein 0.2s ease;
+}
+
+@keyframes infoverif-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   ANALYZE BUTTON
+   ============================================================================ */
+
+.infoverif-analyze-btn {
+  padding: 8px 16px;
+  background: #0066ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
+  transition: all 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.infoverif-analyze-btn:hover {
+  background: #0052cc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+}
+
+.infoverif-analyze-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.infoverif-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 2px solid #0066ff;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.infoverif-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e0e0e0;
+  border-top-color: #0066ff;
+  border-radius: 50%;
+  animation: infoverif-spin 0.8s linear infinite;
+}
+
+@keyframes infoverif-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   SUCCESS STATE
+   ============================================================================ */
+
+.infoverif-success {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 2px solid #00cc66;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #00cc66;
+  box-shadow: 0 2px 8px rgba(0, 204, 102, 0.2);
+}
+
+.infoverif-success small {
+  font-size: 11px;
+  color: #666666;
+  font-weight: 400;
+}
+
+/* ============================================================================
+   ERROR STATE
+   ============================================================================ */
+
+.infoverif-error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 2px solid #ff4444;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ff4444;
+  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
+}
+
+.infoverif-retry-btn {
+  padding: 4px 12px;
+  background: #ff4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.infoverif-retry-btn:hover {
+  background: #cc0000;
+}
+
+/* ============================================================================
+   YOUTUBE FLOATING BUTTON
+   ============================================================================ */
+
+.infoverif-youtube-analyze-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #0066ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 102, 255, 0.4);
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: infoverif-slidein 0.4s ease;
+}
+
+@keyframes infoverif-slidein {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.infoverif-youtube-analyze-btn:hover {
+  background: #0052cc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
+}
+
+.infoverif-youtube-analyze-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
+}
+
+.infoverif-youtube-analyze-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.infoverif-youtube-analyze-btn .infoverif-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.infoverif-youtube-analyze-btn .infoverif-text {
+  line-height: 1;
+}
+
+/* ============================================================================
+   DARK MODE (optional, auto-detect)
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .infoverif-loading,
+  .infoverif-success,
+  .infoverif-error {
+    background: #1a1a1a;
+  }
+  
+  .infoverif-success small {
+    color: #aaaaaa;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+.infoverif-analyze-btn:focus,
+.infoverif-retry-btn:focus,
+.infoverif-youtube-analyze-btn:focus {
+  outline: 3px solid #0066ff;
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .infoverif-highlight,
+  .infoverif-overlay,
+  .infoverif-analyze-btn,
+  .infoverif-youtube-analyze-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .infoverif-spinner {
+    animation-duration: 2s;  /* Slower spin */
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE (mobile)
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .infoverif-youtube-analyze-btn {
+    bottom: 60px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .infoverif-overlay {
+    top: 4px;
+    right: 4px;
+  }
+  
+  .infoverif-analyze-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
