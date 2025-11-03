@@ -45,12 +45,10 @@ Thumbs.db
 tmp/
 temp/
 
-# Data (don't include in image)
+# Data (embeddings generated on-the-fly, examples needed)
 data/dima_embeddings.npy
-data/dima_examples/
 
-# Documentation
-docs/
+# Documentation (except DIMA mapping and examples!)
 *.md
 LICENSE
 README.md
