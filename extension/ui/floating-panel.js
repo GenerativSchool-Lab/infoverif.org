@@ -143,11 +143,24 @@ function showError(message) {
 }
 
 function renderReport(report) {
+  console.log('[InfoVerif Panel] renderReport called with:', report);
+  
+  if (!report) {
+    console.error('[InfoVerif Panel] No report provided!');
+    showError('Rapport vide ou invalide');
+    return;
+  }
+  
   currentReport = report;
   
   document.getElementById('infoverif-panel-loading').style.display = 'none';
   document.getElementById('infoverif-panel-empty').style.display = 'none';
   document.getElementById('infoverif-panel-report').style.display = 'block';
+  
+  console.log('[InfoVerif Panel] Rendering scores:', report.scores);
+  console.log('[InfoVerif Panel] Rendering techniques:', report.techniques);
+  console.log('[InfoVerif Panel] Rendering claims:', report.claims);
+  console.log('[InfoVerif Panel] Rendering summary:', report.summary);
   
   renderScores(report.scores);
   renderTechniques(report.techniques);
@@ -156,7 +169,7 @@ function renderReport(report) {
   
   showPanel();
   
-  console.log('[InfoVerif Panel] Report rendered');
+  console.log('[InfoVerif Panel] Report rendered successfully');
 }
 
 function renderScores(scores) {
@@ -306,11 +319,16 @@ window.addEventListener('message', (event) => {
   
   const message = event.data;
   
+  console.log('[InfoVerif Panel] Received message:', message);
+  
   if (message.type === 'INFOVERIF_SHOW_LOADING') {
+    console.log('[InfoVerif Panel] Showing loading...');
     showLoading();
   } else if (message.type === 'INFOVERIF_SHOW_REPORT') {
+    console.log('[InfoVerif Panel] Rendering report:', message.report);
     renderReport(message.report);
   } else if (message.type === 'INFOVERIF_SHOW_ERROR') {
+    console.log('[InfoVerif Panel] Showing error:', message.error);
     showError(message.error);
   }
 });
