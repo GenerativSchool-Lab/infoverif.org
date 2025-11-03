@@ -378,7 +378,15 @@ async function handleAnalyzeClick(element, platform) {
     }
   } catch (error) {
     console.error('[InfoVerif] Analyze error:', error);
-    showErrorOverlay(element, 'Une erreur est survenue');
+    
+    // Check if extension context was invalidated (extension reloaded)
+    if (error.message.includes('Extension context invalidated')) {
+      showErrorOverlay(element, 'Extension rechargée - Rafraîchissez la page (F5)');
+    } else if (error.message.includes('message port closed')) {
+      showErrorOverlay(element, 'Connexion perdue - Rafraîchissez la page (F5)');
+    } else {
+      showErrorOverlay(element, 'Une erreur est survenue');
+    }
   }
 }
 
@@ -405,14 +413,14 @@ async function handleYouTubeAnalyze() {
     if (response.success) {
       debugLog('CONTENT_SCRIPT', 'YouTube analysis request sent');
       if (button) {
-        button.textContent = '✓ Analyse demandée';
+        button.textContent = '✓ Cliquez sur 🛡️';
         setTimeout(() => {
           button.disabled = false;
           button.innerHTML = `
             <span class="infoverif-icon">🛡️</span>
             <span class="infoverif-text">Analyser avec InfoVerif</span>
           `;
-        }, 2000);
+        }, 3000);
       }
     } else {
       if (button) {
@@ -423,7 +431,13 @@ async function handleYouTubeAnalyze() {
   } catch (error) {
     console.error('[InfoVerif] YouTube analyze error:', error);
     if (button) {
-      button.textContent = '✗ Erreur';
+      // Check for context invalidation
+      if (error.message.includes('Extension context invalidated') || 
+          error.message.includes('message port closed')) {
+        button.textContent = '✗ Rafraîchissez (F5)';
+      } else {
+        button.textContent = '✗ Erreur';
+      }
       button.disabled = false;
     }
   }
