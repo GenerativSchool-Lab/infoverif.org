@@ -44,7 +44,12 @@ function initFloatingPanel() {
 function showPanel() {
   const panel = document.getElementById('infoverif-floating-panel');
   if (panel) {
+    console.log('[InfoVerif Panel] Showing panel');
     panel.style.display = 'flex';
+    panel.style.visibility = 'visible'; // Ensure visibility
+    panel.style.opacity = '1'; // Ensure opacity
+  } else {
+    console.error('[InfoVerif Panel] Panel element not found!');
   }
 }
 
@@ -125,10 +130,11 @@ function stopDrag() {
 // ============================================================================
 
 function showLoading() {
+  console.log('[InfoVerif Panel] Showing loading state');
   document.getElementById('infoverif-panel-empty').style.display = 'none';
   document.getElementById('infoverif-panel-report').style.display = 'none';
   document.getElementById('infoverif-panel-loading').style.display = 'flex';
-  showPanel();
+  showPanel(); // Ensure panel is visible
 }
 
 function showError(message) {
@@ -153,6 +159,8 @@ function renderReport(report) {
   
   currentReport = report;
   
+  // CRITICAL: Hide all states first, then show report
+  console.log('[InfoVerif Panel] Hiding loading and empty states');
   document.getElementById('infoverif-panel-loading').style.display = 'none';
   document.getElementById('infoverif-panel-empty').style.display = 'none';
   document.getElementById('infoverif-panel-report').style.display = 'block';
@@ -218,6 +226,11 @@ function renderScores(scores) {
 function renderTechniques(techniques) {
   const container = document.getElementById('infoverif-techniques-container');
   const countEl = document.getElementById('infoverif-techniques-count');
+  
+  if (!container || !countEl) {
+    console.error('[InfoVerif Panel] Techniques container or count element not found!');
+    return;
+  }
   
   container.innerHTML = '';
   countEl.textContent = techniques ? techniques.length : 0;
@@ -350,13 +363,20 @@ window.addEventListener('message', (event) => {
 // ============================================================================
 
 // Wait for panel to be injected into DOM
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initFloatingPanel);
-} else {
-  // DOMContentLoaded already fired, but panel might not be injected yet
-  // Use setTimeout to wait for injection
-  setTimeout(initFloatingPanel, 100);
+function waitForPanelAndInit() {
+  const panel = document.getElementById('infoverif-floating-panel');
+  if (panel) {
+    console.log('[InfoVerif Panel] Panel found in DOM, initializing...');
+    initFloatingPanel();
+  } else {
+    console.log('[InfoVerif Panel] Panel not yet in DOM, waiting...');
+    // Check again in 50ms
+    setTimeout(waitForPanelAndInit, 50);
+  }
 }
 
-console.log('[InfoVerif Panel] Script loaded');
+// Start waiting for panel
+waitForPanelAndInit();
+
+console.log('[InfoVerif Panel] Script loaded, waiting for panel injection');
 
