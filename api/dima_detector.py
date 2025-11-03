@@ -11,12 +11,23 @@ from typing import Dict, List, Optional
 # M2.2: Semantic Embeddings (optional imports)
 try:
     import numpy as np
+    print(f"✅ numpy imported: {np.__version__}")
+except ImportError as e:
+    print(f"❌ numpy import failed: {e}")
+
+try:
     import faiss
+    print(f"✅ faiss imported")
+except ImportError as e:
+    print(f"❌ faiss import failed: {e}")
+
+try:
     from sentence_transformers import SentenceTransformer
+    print(f"✅ sentence-transformers imported")
     EMBEDDINGS_AVAILABLE = True
-except ImportError:
+except ImportError as e:
+    print(f"❌ sentence-transformers import failed: {e}")
     EMBEDDINGS_AVAILABLE = False
-    print("⚠️  Embeddings libraries not available (sentence-transformers, faiss-cpu)")
 
 
 class DIMADetector:
