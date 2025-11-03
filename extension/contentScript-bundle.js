@@ -11,6 +11,10 @@
 const PLATFORMS = {
   TWITTER: 'twitter',
   YOUTUBE: 'youtube',
+  TIKTOK: 'tiktok',
+  INSTAGRAM: 'instagram',
+  FACEBOOK: 'facebook',
+  LINKEDIN: 'linkedin',
   GENERIC: 'generic'
 };
 
@@ -25,6 +29,10 @@ function detectPlatform(url) {
     const hostname = new URL(url).hostname.replace('www.', '');
     if (hostname.includes('twitter.com') || hostname.includes('x.com')) return PLATFORMS.TWITTER;
     if (hostname.includes('youtube.com')) return PLATFORMS.YOUTUBE;
+    if (hostname.includes('tiktok.com')) return PLATFORMS.TIKTOK;
+    if (hostname.includes('instagram.com')) return PLATFORMS.INSTAGRAM;
+    if (hostname.includes('facebook.com')) return PLATFORMS.FACEBOOK;
+    if (hostname.includes('linkedin.com')) return PLATFORMS.LINKEDIN;
     return PLATFORMS.GENERIC;
   } catch {
     return PLATFORMS.GENERIC;
@@ -72,6 +80,85 @@ const YOUTUBE_SELECTORS = {
   metadata: {
     title: 'h1.ytd-watch-metadata yt-formatted-string',
     channel: 'ytd-channel-name a'
+  }
+};
+
+const TIKTOK_SELECTORS = {
+  videoContainer: {
+    primary: 'div[data-e2e="browse-video"]',
+    fallback: 'div[class*="DivVideoContainer"]'
+  },
+  textContent: {
+    primary: 'h1[data-e2e="browse-video-desc"]',
+    fallback: 'div[class*="SpanText"]'
+  },
+  author: {
+    username: 'a[data-e2e="browse-username"]',
+    fallback: 'span[data-e2e="browse-username"]'
+  },
+  video: {
+    element: 'video'
+  }
+};
+
+const INSTAGRAM_SELECTORS = {
+  postContainer: {
+    primary: 'article[role="presentation"]',
+    fallback: 'div[class*="_ab6k"]'
+  },
+  textContent: {
+    primary: 'h1._ap3a._aaco._aacu._aacx._aad6._aade',
+    fallback: 'div._a9zs > h1'
+  },
+  author: {
+    username: 'header a[role="link"]',
+    fallback: 'a[class*="_acan"]'
+  },
+  media: {
+    video: 'video',
+    image: 'img[class*="_aagt"]'
+  },
+  reels: {
+    container: 'div[class*="x1ned7t2"]',
+    video: 'video'
+  }
+};
+
+const FACEBOOK_SELECTORS = {
+  postContainer: {
+    primary: 'div[data-pagelet*="FeedUnit"]',
+    fallback: 'div[role="article"]'
+  },
+  textContent: {
+    primary: 'div[data-ad-comet-preview="message"]',
+    fallback: 'div[data-ad-preview="message"]'
+  },
+  author: {
+    name: 'h2 a[role="link"]',
+    fallback: 'strong a'
+  },
+  media: {
+    video: 'video',
+    image: 'img[data-visualcompletion="media-vc-image"]'
+  }
+};
+
+const LINKEDIN_SELECTORS = {
+  postContainer: {
+    primary: 'div[data-id*="urn:li:activity"]',
+    fallback: 'div.feed-shared-update-v2'
+  },
+  textContent: {
+    primary: 'div.feed-shared-update-v2__description',
+    fallback: 'span.break-words'
+  },
+  author: {
+    name: 'span.feed-shared-actor__name',
+    profile: 'a.feed-shared-actor__container-link'
+  },
+  media: {
+    video: 'video',
+    image: 'img[class*="ivm-view-attr__img"]'
   }
 };
 
@@ -141,6 +228,116 @@ function extractYouTubeData() {
       channel,
       permalink: url,
       platform: 'youtube'
+    }
+  };
+}
+
+function extractTikTokData(container) {
+  const textEl = container.querySelector(TIKTOK_SELECTORS.textContent.primary) ||
+                 container.querySelector(TIKTOK_SELECTORS.textContent.fallback);
+  const text = textEl ? textEl.textContent.trim() : '';
+  
+  const authorEl = container.querySelector(TIKTOK_SELECTORS.author.username) ||
+                   container.querySelector(TIKTOK_SELECTORS.author.fallback);
+  const author = authorEl ? authorEl.textContent.trim() : 'Unknown';
+  
+  const url = window.location.href;
+  const hasVideo = !!container.querySelector(TIKTOK_SELECTORS.video.element);
+  
+  return {
+    text,
+    hasVideo,
+    videoUrl: hasVideo ? url : null,
+    metadata: {
+      author,
+      permalink: url,
+      platform: 'tiktok',
+      hasVideo
+    }
+  };
+}
+
+function extractInstagramData(article) {
+  const textEl = article.querySelector(INSTAGRAM_SELECTORS.textContent.primary) ||
+                 article.querySelector(INSTAGRAM_SELECTORS.textContent.fallback);
+  const text = textEl ? textEl.textContent.trim() : '';
+  
+  const authorEl = article.querySelector(INSTAGRAM_SELECTORS.author.username) ||
+                   article.querySelector(INSTAGRAM_SELECTORS.author.fallback);
+  const author = authorEl ? authorEl.textContent.trim().replace('@', '') : 'unknown';
+  
+  const permalink = window.location.href;
+  
+  // Check for video (post or reel)
+  const hasVideo = !!(
+    article.querySelector(INSTAGRAM_SELECTORS.media.video) ||
+    document.querySelector(INSTAGRAM_SELECTORS.reels.video)
+  );
+  const videoUrl = hasVideo ? permalink : null;
+  
+  return {
+    text,
+    hasVideo,
+    videoUrl,
+    metadata: {
+      author,
+      permalink,
+      platform: 'instagram',
+      hasVideo
+    }
+  };
+}
+
+function extractFacebookData(article) {
+  const textEl = article.querySelector(FACEBOOK_SELECTORS.textContent.primary) ||
+                 article.querySelector(FACEBOOK_SELECTORS.textContent.fallback);
+  const text = textEl ? textEl.textContent.trim() : '';
+  
+  const authorEl = article.querySelector(FACEBOOK_SELECTORS.author.name) ||
+                   article.querySelector(FACEBOOK_SELECTORS.author.fallback);
+  const author = authorEl ? authorEl.textContent.trim() : 'unknown';
+  
+  // Facebook doesn't have stable permalinks, use current URL
+  const permalink = window.location.href;
+  
+  const hasVideo = !!article.querySelector(FACEBOOK_SELECTORS.media.video);
+  const videoUrl = hasVideo ? permalink : null;
+  
+  return {
+    text,
+    hasVideo,
+    videoUrl,
+    metadata: {
+      author,
+      permalink,
+      platform: 'facebook',
+      hasVideo
+    }
+  };
+}
+
+function extractLinkedInData(article) {
+  const textEl = article.querySelector(LINKEDIN_SELECTORS.textContent.primary) ||
+                 article.querySelector(LINKEDIN_SELECTORS.textContent.fallback);
+  const text = textEl ? textEl.textContent.trim() : '';
+  
+  const authorEl = article.querySelector(LINKEDIN_SELECTORS.author.name);
+  const author = authorEl ? authorEl.textContent.trim() : 'unknown';
+  
+  const permalink = window.location.href;
+  
+  const hasVideo = !!article.querySelector(LINKEDIN_SELECTORS.media.video);
+  const videoUrl = hasVideo ? permalink : null;
+  
+  return {
+    text,
+    hasVideo,
+    videoUrl,
+    metadata: {
+      author,
+      permalink,
+      platform: 'linkedin',
+      hasVideo
     }
   };
 }
@@ -290,6 +487,14 @@ async function startDetection() {
       await detectTwitterPosts();
     } else if (currentPlatform === PLATFORMS.YOUTUBE) {
       await detectYouTubeVideo();
+    } else if (currentPlatform === PLATFORMS.TIKTOK) {
+      await detectTikTokVideo();
+    } else if (currentPlatform === PLATFORMS.INSTAGRAM) {
+      await detectInstagramPosts();
+    } else if (currentPlatform === PLATFORMS.FACEBOOK) {
+      await detectFacebookPosts();
+    } else if (currentPlatform === PLATFORMS.LINKEDIN) {
+      await detectLinkedInPosts();
     }
   } catch (error) {
     console.error('[InfoVerif] Detection error:', error);
@@ -415,6 +620,214 @@ function showYouTubeAnalyzeButton() {
 }
 
 // ============================================================================
+// TIKTOK DETECTION
+// ============================================================================
+
+async function detectTikTokVideo() {
+  debugLog('CONTENT_SCRIPT', 'Waiting for TikTok video...');
+  
+  try {
+    await waitForElement(TIKTOK_SELECTORS.videoContainer.primary, 10000);
+    showTikTokAnalyzeButton();
+    debugLog('CONTENT_SCRIPT', 'TikTok video detected');
+  } catch (error) {
+    console.warn('[InfoVerif] TikTok video not found:', error);
+  }
+}
+
+function showTikTokAnalyzeButton() {
+  if (document.getElementById('infoverif-tiktok-button')) return;
+  
+  const button = document.createElement('button');
+  button.id = 'infoverif-tiktok-button';
+  button.className = 'infoverif-youtube-analyze-btn'; // Reuse YouTube button style
+  button.innerHTML = `
+    <span class="infoverif-icon">🛡️</span>
+    <span class="infoverif-text">Analyser avec InfoVerif</span>
+  `;
+  
+  button.addEventListener('click', () => handleTikTokAnalyze());
+  document.body.appendChild(button);
+}
+
+async function handleTikTokAnalyze() {
+  debugLog('CONTENT_SCRIPT', 'Analyze clicked for TikTok');
+  
+  const button = document.getElementById('infoverif-tiktok-button');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Analyse en cours...';
+  }
+  
+  try {
+    await injectFloatingPanel();
+    
+    const container = document.querySelector(TIKTOK_SELECTORS.videoContainer.primary) ||
+                      document.querySelector(TIKTOK_SELECTORS.videoContainer.fallback);
+    const extracted = extractTikTokData(container || document.body);
+    
+    showPanelLoading();
+    
+    const mode = extracted.hasVideo ? 'video' : 'text';
+    const data = extracted.hasVideo ? { url: extracted.videoUrl } : { text: extracted.text };
+    if (extracted.hasVideo && extracted.text) {
+      extracted.metadata.postText = extracted.text;
+    }
+    
+    const message = createAnalyzeRequest(mode, PLATFORMS.TIKTOK, data, extracted.metadata);
+    const response = await chrome.runtime.sendMessage(message);
+    
+    if (response.success && response.report) {
+      showPanelReport(response.report);
+      if (button) button.textContent = '✓ Analysé';
+    } else {
+      showPanelError(response.message || 'Erreur');
+      if (button) button.textContent = '✗ Erreur';
+    }
+  } catch (error) {
+    console.error('[InfoVerif] TikTok analyze error:', error);
+    showPanelError(error.message);
+    if (button) button.textContent = '✗ Erreur';
+  } finally {
+    if (button) {
+      setTimeout(() => {
+        button.disabled = false;
+        button.innerHTML = `<span class="infoverif-icon">🛡️</span><span class="infoverif-text">Analyser avec InfoVerif</span>`;
+      }, 2000);
+    }
+  }
+}
+
+// ============================================================================
+// INSTAGRAM DETECTION
+// ============================================================================
+
+async function detectInstagramPosts() {
+  debugLog('CONTENT_SCRIPT', 'Waiting for Instagram posts...');
+  
+  try {
+    await waitForElement(INSTAGRAM_SELECTORS.postContainer.primary, 10000);
+    scanInstagramPosts();
+    observeNewInstagramPosts();
+    debugLog('CONTENT_SCRIPT', 'Instagram detection active');
+  } catch (error) {
+    console.warn('[InfoVerif] Instagram posts not found:', error);
+  }
+}
+
+function scanInstagramPosts() {
+  const posts = document.querySelectorAll(INSTAGRAM_SELECTORS.postContainer.primary);
+  
+  posts.forEach(post => {
+    if (highlightedElements.has(post)) return;
+    
+    post.addEventListener('mouseenter', () => showPostHighlight(post, 'instagram'));
+    post.addEventListener('mouseleave', () => hidePostHighlight(post));
+    
+    highlightedElements.add(post);
+  });
+  
+  debugLog('CONTENT_SCRIPT', `Found ${posts.length} Instagram posts`);
+}
+
+function observeNewInstagramPosts() {
+  const observer = new MutationObserver(debounce(() => {
+    scanInstagramPosts();
+  }, 500));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+// ============================================================================
+// FACEBOOK DETECTION
+// ============================================================================
+
+async function detectFacebookPosts() {
+  debugLog('CONTENT_SCRIPT', 'Waiting for Facebook posts...');
+  
+  try {
+    await waitForElement(FACEBOOK_SELECTORS.postContainer.primary, 10000);
+    scanFacebookPosts();
+    observeNewFacebookPosts();
+    debugLog('CONTENT_SCRIPT', 'Facebook detection active');
+  } catch (error) {
+    console.warn('[InfoVerif] Facebook posts not found:', error);
+  }
+}
+
+function scanFacebookPosts() {
+  const posts = document.querySelectorAll(FACEBOOK_SELECTORS.postContainer.primary);
+  
+  posts.forEach(post => {
+    if (highlightedElements.has(post)) return;
+    
+    post.addEventListener('mouseenter', () => showPostHighlight(post, 'facebook'));
+    post.addEventListener('mouseleave', () => hidePostHighlight(post));
+    
+    highlightedElements.add(post);
+  });
+  
+  debugLog('CONTENT_SCRIPT', `Found ${posts.length} Facebook posts`);
+}
+
+function observeNewFacebookPosts() {
+  const observer = new MutationObserver(debounce(() => {
+    scanFacebookPosts();
+  }, 500));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+// ============================================================================
+// LINKEDIN DETECTION
+// ============================================================================
+
+async function detectLinkedInPosts() {
+  debugLog('CONTENT_SCRIPT', 'Waiting for LinkedIn posts...');
+  
+  try {
+    await waitForElement(LINKEDIN_SELECTORS.postContainer.primary, 10000);
+    scanLinkedInPosts();
+    observeNewLinkedInPosts();
+    debugLog('CONTENT_SCRIPT', 'LinkedIn detection active');
+  } catch (error) {
+    console.warn('[InfoVerif] LinkedIn posts not found:', error);
+  }
+}
+
+function scanLinkedInPosts() {
+  const posts = document.querySelectorAll(LINKEDIN_SELECTORS.postContainer.primary);
+  
+  posts.forEach(post => {
+    if (highlightedElements.has(post)) return;
+    
+    post.addEventListener('mouseenter', () => showPostHighlight(post, 'linkedin'));
+    post.addEventListener('mouseleave', () => hidePostHighlight(post));
+    
+    highlightedElements.add(post);
+  });
+  
+  debugLog('CONTENT_SCRIPT', `Found ${posts.length} LinkedIn posts`);
+}
+
+function observeNewLinkedInPosts() {
+  const observer = new MutationObserver(debounce(() => {
+    scanLinkedInPosts();
+  }, 500));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+// ============================================================================
 // HIGHLIGHT & OVERLAY
 // ============================================================================
 
@@ -490,41 +903,54 @@ async function handleAnalyzeClick(element, platform) {
     
     let data, metadata, mode;
     
+    // Extract data based on platform
+    let extracted;
     if (platform === PLATFORMS.TWITTER) {
-      const extracted = extractTwitterData(element);
-      metadata = extracted.metadata;
+      extracted = extractTwitterData(element);
+    } else if (platform === PLATFORMS.INSTAGRAM) {
+      extracted = extractInstagramData(element);
+    } else if (platform === PLATFORMS.FACEBOOK) {
+      extracted = extractFacebookData(element);
+    } else if (platform === PLATFORMS.LINKEDIN) {
+      extracted = extractLinkedInData(element);
+    } else {
+      throw new Error(`Unsupported platform: ${platform}`);
+    }
+    
+    metadata = extracted.metadata;
+    
+    // Check cache first
+    const permalink = metadata.permalink;
+    const cached = analyzedCache.get(permalink);
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+    
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+      debugLog('CONTENT_SCRIPT', 'Using cached analysis');
       
-      // Check cache first
-      const permalink = metadata.permalink;
-      const cached = analyzedCache.get(permalink);
-      const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-      
-      if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-        debugLog('CONTENT_SCRIPT', 'Using cached analysis');
-        
-        // Show cached report from storage
-        const { currentReport } = await chrome.storage.session.get('currentReport');
-        if (currentReport) {
-          showPanelReport(currentReport);
-        }
-        
-        showSuccessOverlay(element);
-        return;
+      // Show cached report from storage
+      const { currentReport } = await chrome.storage.session.get('currentReport');
+      if (currentReport) {
+        showPanelReport(currentReport);
       }
       
-      // Determine mode: video or text
-      if (extracted.hasVideo && extracted.videoUrl) {
-        mode = 'video';
-        data = { url: extracted.videoUrl };
-        
-        // MULTIMODAL: Include post text with video for fusion analysis
-        metadata.postText = extracted.text; // Add text to metadata
-        
-        debugLog('CONTENT_SCRIPT', `Video detected! URL: ${extracted.videoUrl}, Text: ${extracted.text.substring(0, 50)}...`);
-      } else {
-        mode = 'text';
-        data = { text: extracted.text };
+      showSuccessOverlay(element);
+      return;
+    }
+    
+    // Determine mode: video or text
+    if (extracted.hasVideo && extracted.videoUrl) {
+      mode = 'video';
+      data = { url: extracted.videoUrl };
+      
+      // MULTIMODAL: Include post text with video for fusion analysis
+      if (extracted.text) {
+        metadata.postText = extracted.text;
       }
+      
+      debugLog('CONTENT_SCRIPT', `Video detected! URL: ${extracted.videoUrl}, Text: ${extracted.text ? extracted.text.substring(0, 50) + '...' : 'no text'}`);
+    } else {
+      mode = 'text';
+      data = { text: extracted.text };
     }
     
     showLoadingOverlay(element);
