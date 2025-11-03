@@ -475,6 +475,11 @@ git push origin feature/ma-super-feature
 
 ### Améliorations Techniques (Court Terme)
 
+- [ ] **Migration OpenAI → Mistral** : Remplacer les services OpenAI par Mistral AI
+  - [ ] **Voxtral** : Remplacer Whisper API pour transcription audio/vidéo
+  - [ ] **Pixtral** : Remplacer Vision API pour extraction texte depuis images (OCR)
+  - [ ] **Mistral Large/Large 3** : Remplacer GPT-4o-mini pour analyse sémantique
+  - [ ] **Évaluation comparative** : Benchmark performance, coût, qualité avant migration
 - [ ] **Redis caching** : Cache des résultats d'embeddings (réduire coûts API)
 - [ ] **WebSocket streaming** : Mises à jour temps réel de l'analyse
 - [ ] **Confidence calibration** : Intervalles de confiance pour scores

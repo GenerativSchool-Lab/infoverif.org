@@ -600,10 +600,15 @@ if (analyzingPosts.get(permalink) === 'loading') {
 
 ### 6.1 High Priority
 
-1. **YouTube Extension Support**: Resolve button visibility/clickability
-2. **Redis Integration**: Cache analysis results (reduce OpenAI API calls)
-3. **Confidence Calibration**: Add uncertainty estimates to scores
-4. **WebSocket Streaming**: Real-time analysis progress
+1. **Migration OpenAI → Mistral AI**: Replace OpenAI services with Mistral equivalents
+   - **Voxtral**: Replace Whisper API for audio/video transcription
+   - **Pixtral**: Replace Vision API for OCR/text extraction from images
+   - **Mistral Large/Large 3**: Replace GPT-4o-mini for semantic analysis
+   - **Comparative Evaluation**: Benchmark performance, cost, quality before migration
+2. **YouTube Extension Support**: Resolve button visibility/clickability
+3. **Redis Integration**: Cache analysis results (reduce API calls)
+4. **Confidence Calibration**: Add uncertainty estimates to scores
+5. **WebSocket Streaming**: Real-time analysis progress
 
 ### 6.2 Medium Priority
 
