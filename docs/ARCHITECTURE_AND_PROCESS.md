@@ -1,8 +1,8 @@
 # InfoVerif.org — Architecture, Implementation Process & Lessons Learned
 
 **Version**: 2.0  
-**Date**: January 2026  
-**Authors**: Civic Tech AI Lab — GenerativSchool  
+**Date**: November 3, 2025  
+**Authors**: Soufiane Lemqari (Main Architect & Developer), Civic Tech AI Lab — GenerativSchool  
 **Status**: Production System Documentation  
 **Audience**: PhD-level academic & engineering documentation
 
@@ -657,7 +657,8 @@ if (analyzingPosts.get(permalink) === 'loading') {
 ---
 
 **Document Status**: ✅ Production System Documentation  
-**Last Updated**: January 2026  
+**Last Updated**: November 3, 2025  
+**Main Author**: Soufiane Lemqari  
 **Maintainers**: Civic Tech AI Lab — GenerativSchool
 
 ---

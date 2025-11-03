@@ -6,7 +6,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ## 🎓 Documentation Académique (PhD-Grade)
 
-### ⭐ **ARCHITECTURE_AND_PROCESS.md** — NOUVEAU (Janvier 2026)
+### ⭐ **ARCHITECTURE_AND_PROCESS.md** — NOUVEAU (3 novembre 2025)
 
 **Documentation complète de niveau académique** sur l'architecture, les processus d'implémentation, et les lessons learned.
 
@@ -88,7 +88,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ### Je veux **comprendre le projet** dans son ensemble
 
-➡️ **[README.md](./README.md)** (refactorisé Janvier 2026)
+➡️ **[README.md](./README.md)** (refactorisé 3 novembre 2025)
 - Mission, valeurs et objectif du projet
 - Architecture système (webapp + extension Chrome)
 - Fonctionnalités en production (multimodal analysis, DIMA 130 techniques)
@@ -503,7 +503,7 @@ curl -X POST http://localhost:8000/analyze-image \
 
 ## 🔄 Mise à Jour de la Documentation
 
-**Dernière mise à jour** : Janvier 2026 (v2.0.0)
+**Dernière mise à jour** : 3 novembre 2025 (v2.0.0)
 
 ### Changements Récents
 

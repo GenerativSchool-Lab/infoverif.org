@@ -556,8 +556,9 @@ git push origin feature/ma-super-feature
 
 ### Équipe
 
-Développé avec ❤️ par :
-- **Civic Tech AI Lab** ([GenerativSchool.com](https://generativschool.com)) - Organisation
+**Créé et développé par** :
+- **Soufiane Lemqari** — Architecte principal, développeur full-stack, intégration DIMA
+- **Civic Tech AI Lab** ([GenerativSchool.com](https://generativschool.com)) — Organisation
 - **Contributeurs open source** : Voir [GitHub Contributors](https://github.com/GenerativSchool-Lab/infoverif.org/graphs/contributors)
 
 ### Technologies & Partenaires
@@ -621,7 +622,7 @@ Merci à tous les contributeurs, testeurs, et supporters du projet ! 🙏
 ---
 
 **Version** : 2.0.0 (Production)  
-**Dernière mise à jour** : Janvier 2026  
+**Dernière mise à jour** : 3 novembre 2025  
 **License** : MIT  
 **Contact** : contact@generativschool.com  
 **Documentation** : [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
