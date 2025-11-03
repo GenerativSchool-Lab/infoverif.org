@@ -67,13 +67,14 @@ echo ""
 
 # Push subtree
 # This pushes only the extension/ directory to the main branch of the target repo
-git subtree push --prefix="$EXTENSION_DIR" extension-dist main --squash || {
+# Note: --squash combines all commits into one for cleaner history
+git subtree push --prefix="$EXTENSION_DIR" extension-dist main --squash 2>&1 | tee /tmp/subtree_push.log || {
     # If push fails, try split first
     echo -e "${YELLOW}⚠️  Push direct échoué, tentative avec split...${NC}"
     
-    # Split the subtree
+    # Split the subtree (without squash for split, we'll squash on push)
     echo -e "${BLUE}🔄 Split du subtree...${NC}"
-    git subtree split --prefix="$EXTENSION_DIR" --branch extension-split --squash || {
+    git subtree split --prefix="$EXTENSION_DIR" --branch extension-split || {
         echo -e "${RED}❌ Erreur lors du split${NC}"
         exit 1
     }
