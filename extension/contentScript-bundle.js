@@ -449,13 +449,13 @@ function showSuccessOverlay(element) {
     activeOverlay.innerHTML = `
       <div class="infoverif-success">
         <span>✓ Analyse demandée</span>
-        <small>Le panneau va s'ouvrir</small>
+        <small>Cliquez sur l'icône 🛡️ InfoVerif</small>
       </div>
     `;
     
     setTimeout(() => {
       hidePostHighlight(element);
-    }, 2000);
+    }, 3000);
   }
 }
 
