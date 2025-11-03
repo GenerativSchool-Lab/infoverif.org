@@ -16,7 +16,6 @@ const MESSAGE_TYPES = {
   REPORT_READY: 'REPORT_READY',
   REPORT_ERROR: 'REPORT_ERROR',
   CHAT_REQUEST: 'CHAT_REQUEST',
-  OPEN_PANEL: 'OPEN_PANEL',
   PING: 'PING',
   PONG: 'PONG'
 };
@@ -115,21 +114,14 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: 'https://infoverif.org' });
   }
-  
-  // Set default behavior: open side panel when extension icon is clicked
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
-    .catch(err => debugLog('BACKGROUND', 'Side panel behavior note:', err.message));
 });
 
-// Handle extension icon click (backup if setPanelBehavior doesn't work)
+// Handle extension icon click - clear badge
 chrome.action.onClicked.addListener((tab) => {
   debugLog('BACKGROUND', 'Extension icon clicked');
   
-  // Clear badge
+  // Clear badge (if any)
   chrome.action.setBadgeText({ text: '', tabId: tab.id });
-  
-  chrome.sidePanel.open({ windowId: tab.windowId })
-    .catch(err => debugLog('BACKGROUND', 'Could not open panel:', err.message));
 });
 
 // ============================================================================
@@ -151,10 +143,6 @@ async function handleMessage(message, sender) {
     
     if (isMessageType(message, MESSAGE_TYPES.CHAT_REQUEST)) {
       return await handleChatRequest(message, sender);
-    }
-    
-    if (isMessageType(message, MESSAGE_TYPES.OPEN_PANEL)) {
-      return await handleOpenPanel(sender.tab?.id);
     }
     
     if (isMessageType(message, MESSAGE_TYPES.PING)) {
@@ -333,69 +321,11 @@ async function handleChatRequest(message, sender) {
 }
 
 // ============================================================================
-// SIDE PANEL MANAGEMENT
+// STORAGE HELPERS (for legacy compatibility)
 // ============================================================================
 
-async function openSidePanel(tabId) {
-  try {
-    if (!tabId) {
-      debugLog('BACKGROUND', 'No tabId provided to openSidePanel');
-      return;
-    }
-    
-    // Get tab info to extract windowId
-    const tab = await chrome.tabs.get(tabId);
-    
-    // Try to open side panel (requires user gesture from content script click)
-    await chrome.sidePanel.open({ windowId: tab.windowId });
-    debugLog('BACKGROUND', `Side panel opened for window ${tab.windowId}`);
-    
-    // Clear badge after opening
-    chrome.action.setBadgeText({ text: '', tabId });
-  } catch (error) {
-    // MV3 limitation: sidePanel.open() often fails even with user gesture
-    // when called via message passing. Show badge notification instead.
-    debugLog('BACKGROUND', 'Auto-open failed (expected MV3 behavior):', error.message);
-    
-    // Set badge to notify user
-    chrome.action.setBadgeText({ text: '1', tabId });
-    chrome.action.setBadgeBackgroundColor({ color: '#4CAF50', tabId });
-    
-    // Enable panel for click
-    try {
-      if (tabId) {
-        await chrome.sidePanel.setOptions({
-          tabId,
-          enabled: true
-        });
-        debugLog('BACKGROUND', 'Badge set - user can click icon to open panel');
-      }
-    } catch (fallbackError) {
-      debugLog('BACKGROUND', 'Side panel API error:', fallbackError.message);
-    }
-  }
-}
-
-async function handleOpenPanel(tabId) {
-  await openSidePanel(tabId);
-  return { success: true };
-}
-
-async function sendReportToPanel(report, headers) {
-  const message = createReportReady(report, headers);
-  await storageSet({ latestReport: message }, 'session');
-  debugLog('BACKGROUND', 'Report sent to panel');
-}
-
-async function sendErrorToPanel(errorResponse) {
-  const message = createReportError(
-    errorResponse.error,
-    errorResponse.message,
-    errorResponse.retryAfterSeconds
-  );
-  await storageSet({ latestReport: message }, 'session');
-  debugLog('BACKGROUND', 'Error sent to panel');
-}
+// Note: These functions are kept for backward compatibility
+// The floating panel now receives reports directly via response messages
 
 // ============================================================================
 // UTILITIES

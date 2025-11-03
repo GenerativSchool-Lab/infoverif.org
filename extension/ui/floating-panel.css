@@ -14,9 +14,9 @@
   width: 420px;
   max-width: calc(100vw - 40px);
   max-height: calc(100vh - 120px);
-  background: #ffffff;
+  background: #000000;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
   z-index: 2147483647; /* Max z-index to float above everything */
   display: flex;
   flex-direction: column;
@@ -24,6 +24,7 @@
   animation: infoverif-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   resize: both;
   overflow: hidden;
+  color: #ffffff;
 }
 
 @keyframes infoverif-slide-in {
@@ -60,11 +61,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  background: #1a1a1a;
   color: #ffffff;
   cursor: move;
   user-select: none;
   border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #333333;
   flex-shrink: 0;
 }
 
@@ -108,8 +110,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: #333333;
+  border: 1px solid #444444;
   border-radius: 6px;
   color: #ffffff;
   font-size: 20px;
@@ -120,7 +122,8 @@
 }
 
 .infoverif-control-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #444444;
+  border-color: #ffffff;
   transform: scale(1.05);
 }
 
@@ -137,7 +140,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
-  background: #ffffff;
+  background: #000000;
 }
 
 .infoverif-panel-content::-webkit-scrollbar {
@@ -145,16 +148,16 @@
 }
 
 .infoverif-panel-content::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: #1a1a1a;
 }
 
 .infoverif-panel-content::-webkit-scrollbar-thumb {
-  background: #cccccc;
+  background: #444444;
   border-radius: 4px;
 }
 
 .infoverif-panel-content::-webkit-scrollbar-thumb:hover {
-  background: #999999;
+  background: #666666;
 }
 
 /* ============================================================================
@@ -181,20 +184,20 @@
   margin: 0 0 8px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333333;
+  color: #ffffff;
 }
 
 .infoverif-panel-state p {
   margin: 0;
   font-size: 14px;
-  color: #666666;
+  color: #cccccc;
 }
 
 .infoverif-spinner-large {
   width: 40px;
   height: 40px;
-  border: 4px solid #e0e0e0;
-  border-top-color: #0066ff;
+  border: 4px solid #333333;
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: infoverif-spin 0.8s linear infinite;
   margin-bottom: 16px;
@@ -222,7 +225,7 @@
   margin: 0 0 12px 0;
   font-size: 14px;
   font-weight: 600;
-  color: #333333;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -246,18 +249,19 @@
 .infoverif-score-label {
   font-size: 13px;
   font-weight: 500;
-  color: #333333;
+  color: #ffffff;
 }
 
 .infoverif-score-value {
   font-size: 13px;
   font-weight: 700;
-  color: #0066ff;
+  color: #ffffff;
 }
 
 .infoverif-score-bar {
   height: 6px;
-  background: #e0e0e0;
+  background: #1a1a1a;
+  border: 1px solid #333333;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -269,15 +273,15 @@
 }
 
 .infoverif-score-fill.low {
-  background: linear-gradient(90deg, #00cc66, #00aa55);
+  background: #666666;
 }
 
 .infoverif-score-fill.medium {
-  background: linear-gradient(90deg, #ffaa00, #ff8800);
+  background: #aaaaaa;
 }
 
 .infoverif-score-fill.high {
-  background: linear-gradient(90deg, #ff4444, #cc0000);
+  background: #ffffff;
 }
 
 /* ============================================================================
@@ -285,8 +289,8 @@
    ============================================================================ */
 
 .infoverif-technique-card {
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border: 1px solid #333333;
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
@@ -294,8 +298,8 @@
 }
 
 .infoverif-technique-card:hover {
-  border-color: #0066ff;
-  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.1);
+  border-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
 }
 
 .infoverif-technique-header {
@@ -312,8 +316,8 @@
 .infoverif-technique-code {
   display: inline-block;
   padding: 2px 6px;
-  background: #0066ff;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   font-size: 10px;
   font-weight: 700;
   border-radius: 4px;
@@ -323,13 +327,13 @@
 .infoverif-technique-name {
   font-size: 13px;
   font-weight: 600;
-  color: #333333;
+  color: #ffffff;
   margin: 0 0 2px 0;
 }
 
 .infoverif-technique-family {
   font-size: 11px;
-  color: #666666;
+  color: #aaaaaa;
   margin: 0;
 }
 
@@ -343,34 +347,37 @@
 }
 
 .infoverif-severity-badge.high {
-  background: #ffe0e0;
-  color: #cc0000;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
 }
 
 .infoverif-severity-badge.medium {
-  background: #fff3e0;
-  color: #ff8800;
+  background: #666666;
+  color: #ffffff;
+  border: 1px solid #666666;
 }
 
 .infoverif-severity-badge.low {
-  background: #e0f7e0;
-  color: #00aa55;
+  background: #333333;
+  color: #ffffff;
+  border: 1px solid #444444;
 }
 
 .infoverif-technique-evidence {
-  background: #ffffff;
-  border-left: 3px solid #0066ff;
+  background: #0a0a0a;
+  border-left: 3px solid #ffffff;
   padding: 8px;
   margin: 8px 0;
   font-size: 12px;
   font-style: italic;
-  color: #555555;
+  color: #cccccc;
   border-radius: 0 4px 4px 0;
 }
 
 .infoverif-technique-explanation {
   font-size: 12px;
-  color: #666666;
+  color: #cccccc;
   line-height: 1.5;
   margin: 0;
 }
@@ -380,8 +387,8 @@
    ============================================================================ */
 
 .infoverif-claim-card {
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border: 1px solid #333333;
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
@@ -397,7 +404,7 @@
 .infoverif-claim-text {
   font-size: 13px;
   font-weight: 500;
-  color: #333333;
+  color: #ffffff;
   margin: 0 0 8px 0;
 }
 
@@ -411,23 +418,26 @@
 }
 
 .infoverif-confidence-badge.supported {
-  background: #e0f7e0;
-  color: #00aa55;
+  background: #333333;
+  color: #ffffff;
+  border: 1px solid #444444;
 }
 
 .infoverif-confidence-badge.unsupported {
-  background: #fff3e0;
-  color: #ff8800;
+  background: #666666;
+  color: #ffffff;
+  border: 1px solid #666666;
 }
 
 .infoverif-confidence-badge.misleading {
-  background: #ffe0e0;
-  color: #cc0000;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
 }
 
 .infoverif-claim-reasoning {
   font-size: 12px;
-  color: #666666;
+  color: #cccccc;
   line-height: 1.5;
   margin: 0;
 }
@@ -438,7 +448,7 @@
 
 .infoverif-summary-text {
   font-size: 13px;
-  color: #333333;
+  color: #ffffff;
   line-height: 1.6;
   margin: 0;
 }
@@ -451,26 +461,26 @@
   display: flex;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #333333;
 }
 
 .infoverif-action-btn {
   flex: 1;
   padding: 10px 16px;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border: 1px solid #444444;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #333333;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .infoverif-action-btn:hover {
-  background: #e8e8e8;
-  border-color: #0066ff;
-  color: #0066ff;
+  background: #333333;
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .infoverif-action-btn:active {
@@ -508,62 +518,8 @@
 }
 
 /* ============================================================================
-   DARK MODE (respect user preference)
+   NOTE: Panel uses black & white theme by default (no separate dark mode)
    ============================================================================ */
-
-@media (prefers-color-scheme: dark) {
-  .infoverif-panel {
-    background: #1a1a1a;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-
-  .infoverif-panel-content {
-    background: #1a1a1a;
-  }
-
-  .infoverif-section-title,
-  .infoverif-score-label,
-  .infoverif-technique-name,
-  .infoverif-claim-text,
-  .infoverif-summary-text {
-    color: #e0e0e0;
-  }
-
-  .infoverif-technique-card,
-  .infoverif-claim-card {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-  }
-
-  .infoverif-technique-card:hover,
-  .infoverif-claim-card:hover {
-    border-color: #0066ff;
-  }
-
-  .infoverif-technique-evidence {
-    background: #2a2a2a;
-  }
-
-  .infoverif-action-btn {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-    color: #e0e0e0;
-  }
-
-  .infoverif-action-btn:hover {
-    background: #3a3a3a;
-    border-color: #0066ff;
-    color: #0066ff;
-  }
-
-  .infoverif-panel-content::-webkit-scrollbar-track {
-    background: #2a2a2a;
-  }
-
-  .infoverif-panel-content::-webkit-scrollbar-thumb {
-    background: #4a4a4a;
-  }
-}
 
 /* ============================================================================
    RESPONSIVE (Mobile)
