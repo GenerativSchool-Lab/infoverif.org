@@ -429,6 +429,7 @@ let currentPlatform = null;
 let highlightedElements = new Set();
 let activeOverlay = null;
 let analyzedCache = new Map(); // permalink -> { timestamp, analysis_id }
+let analyzingPosts = new Map(); // permalink -> 'loading' | 'success' | 'error' (in-progress analysis state)
 let floatingPanelInjected = false;
 
 // ============================================================================
@@ -927,14 +928,46 @@ function createAnalyzeOverlay(element, platform) {
   const overlay = document.createElement('div');
   overlay.className = 'infoverif-overlay';
   
-  const button = document.createElement('button');
-  button.className = 'infoverif-analyze-btn';
+  // Extract permalink first (needed for all checks)
+  let permalink = null;
+  try {
+    if (platform === PLATFORMS.TWITTER) {
+      const extracted = extractTwitterData(element);
+      permalink = extracted.metadata?.permalink;
+    } else if (platform === PLATFORMS.TIKTOK) {
+      const extracted = extractTikTokData(element);
+      permalink = extracted.metadata?.permalink;
+    } else if (platform === PLATFORMS.INSTAGRAM) {
+      const extracted = extractInstagramData(element);
+      permalink = extracted.metadata?.permalink;
+    } else if (platform === PLATFORMS.FACEBOOK) {
+      const extracted = extractFacebookData(element);
+      permalink = extracted.metadata?.permalink;
+    } else if (platform === PLATFORMS.LINKEDIN) {
+      const extracted = extractLinkedInData(element);
+      permalink = extracted.metadata?.permalink;
+    }
+  } catch (error) {
+    console.warn('[InfoVerif] Failed to extract permalink:', error);
+  }
   
-  // Check if already analyzed
+  // Check if currently being analyzed (PRIORITY)
+  const analyzingState = permalink ? analyzingPosts.get(permalink) : null;
+  
+  if (analyzingState === 'loading') {
+    // Show loading state (analysis in progress)
+    overlay.innerHTML = `
+      <div class="infoverif-loading">
+        <div class="infoverif-spinner"></div>
+        <span>Analyse en cours...</span>
+      </div>
+    `;
+    return overlay;
+  }
+  
+  // Check if already analyzed (cached)
   let isAnalyzed = false;
-  if (platform === PLATFORMS.TWITTER) {
-    const extracted = extractTwitterData(element);
-    const permalink = extracted.metadata?.permalink;
+  if (permalink) {
     const cached = analyzedCache.get(permalink);
     const CACHE_TTL = 5 * 60 * 1000;
     
@@ -942,6 +975,10 @@ function createAnalyzeOverlay(element, platform) {
       isAnalyzed = true;
     }
   }
+  
+  // Create button with appropriate state
+  const button = document.createElement('button');
+  button.className = 'infoverif-analyze-btn';
   
   if (isAnalyzed) {
     button.innerHTML = '✓ Déjà analysé • Cliquez pour analyser de nouveau';
@@ -990,9 +1027,15 @@ async function handleAnalyzeClick(element, platform) {
     }
     
     metadata = extracted.metadata;
+    const permalink = metadata.permalink;
+    
+    // Check if already being analyzed
+    if (analyzingPosts.get(permalink) === 'loading') {
+      debugLog('CONTENT_SCRIPT', 'Analysis already in progress for this post');
+      return;
+    }
     
     // Check cache first
-    const permalink = metadata.permalink;
     const cached = analyzedCache.get(permalink);
     const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
     
@@ -1008,6 +1051,9 @@ async function handleAnalyzeClick(element, platform) {
       showSuccessOverlay(element);
       return;
     }
+    
+    // Mark as loading
+    analyzingPosts.set(permalink, 'loading');
     
     // Determine mode: video or text
     if (extracted.hasVideo && extracted.videoUrl) {
@@ -1034,6 +1080,9 @@ async function handleAnalyzeClick(element, platform) {
     if (response.success && response.report) {
       debugLog('CONTENT_SCRIPT', 'Analysis complete, showing report');
       
+      // Mark as success
+      analyzingPosts.set(permalink, 'success');
+      
       // Cache the analysis
       if (metadata?.permalink) {
         analyzedCache.set(metadata.permalink, {
@@ -1046,12 +1095,35 @@ async function handleAnalyzeClick(element, platform) {
       showPanelReport(response.report);
       
       showSuccessOverlay(element);
+      
+      // Clean up loading state after 2 seconds
+      setTimeout(() => {
+        analyzingPosts.delete(permalink);
+      }, 2000);
     } else {
+      // Mark as error
+      analyzingPosts.set(permalink, 'error');
+      
       showPanelError(response.message || 'Erreur lors de l\'analyse');
       showErrorOverlay(element, response.message);
+      
+      // Clean up error state after 5 seconds
+      setTimeout(() => {
+        analyzingPosts.delete(permalink);
+      }, 5000);
     }
   } catch (error) {
     console.error('[InfoVerif] Analyze error:', error);
+    
+    // Mark as error
+    if (metadata?.permalink) {
+      analyzingPosts.set(metadata.permalink, 'error');
+      
+      // Clean up error state after 5 seconds
+      setTimeout(() => {
+        analyzingPosts.delete(metadata.permalink);
+      }, 5000);
+    }
     
     showPanelError(error.message);
     
