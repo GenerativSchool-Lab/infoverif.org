@@ -115,6 +115,17 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: 'https://infoverif.org' });
   }
+  
+  // Set default behavior: open side panel when extension icon is clicked
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+    .catch(err => debugLog('BACKGROUND', 'Side panel behavior note:', err.message));
+});
+
+// Handle extension icon click (backup if setPanelBehavior doesn't work)
+chrome.action.onClicked.addListener((tab) => {
+  debugLog('BACKGROUND', 'Extension icon clicked');
+  chrome.sidePanel.open({ windowId: tab.windowId })
+    .catch(err => debugLog('BACKGROUND', 'Could not open panel:', err.message));
 });
 
 // ============================================================================
@@ -317,14 +328,24 @@ async function handleChatRequest(message, sender) {
 
 async function openSidePanel(tabId) {
   try {
+    // MV3 restriction: sidePanel.open() requires user gesture
+    // Instead, we'll set the panel to be available and let user open it
+    // by clicking the extension icon
+    
+    // Enable side panel for this tab
     if (tabId) {
-      await chrome.sidePanel.open({ tabId });
-    } else {
-      await chrome.sidePanel.open({});
+      await chrome.sidePanel.setOptions({
+        tabId,
+        enabled: true
+      });
+      debugLog('BACKGROUND', 'Side panel enabled for tab');
     }
-    debugLog('BACKGROUND', 'Side panel opened');
+    
+    // Note: User must click extension icon to open panel
+    // We can't auto-open due to MV3 restrictions
   } catch (error) {
-    errorLog('BACKGROUND', 'Failed to open side panel:', error);
+    // Ignore error if sidePanel API not fully supported
+    debugLog('BACKGROUND', 'Side panel API note:', error.message);
   }
 }
 
