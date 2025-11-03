@@ -2,33 +2,64 @@
 DIMA-Aware Prompt Engineering
 Builds enhanced prompts with full DIMA taxonomy context and few-shot examples.
 """
-from typing import Dict, List
+from typing import Dict, List, Optional
 from dima_detector import get_detector
 
 
 def build_dima_aware_prompt(content: str, metadata: Dict) -> str:
     """
-    Build DIMA-aware analysis prompt with full taxonomy context.
+    Build DIMA-aware analysis prompt with full taxonomy context (M2.1).
+    
+    Wrapper around build_hybrid_prompt for backward compatibility.
     
     Args:
-        content: Text content to analyze (transcript, extracted text, etc.)
-        metadata: Metadata dictionary (title, description, platform, url)
+        content: Text content to analyze
+        metadata: Metadata dictionary
     
     Returns:
-        Complete prompt string with DIMA taxonomy + few-shot examples + content
+        Complete prompt string
+    """
+    return build_hybrid_prompt(content, metadata, similar_techniques=None)
+
+
+def build_hybrid_prompt(content: str, metadata: Dict, similar_techniques: List[Dict] = None) -> str:
+    """
+    Build hybrid prompt with DIMA taxonomy + embedding similarity hints (M2.2).
+    
+    Args:
+        content: Text content to analyze
+        metadata: Metadata dictionary (title, description, platform, url)
+        similar_techniques: Top-K similar techniques from embeddings (optional)
+    
+    Returns:
+        Enhanced prompt with semantic similarity hints
     """
     detector = get_detector()
     
     # Get compact taxonomy string
     taxonomy_context = detector.build_compact_taxonomy_string()
     
-    # Get few-shot examples for high-priority techniques
+    # Get few-shot examples
     few_shot_examples = _build_few_shot_section()
+    
+    # Build embedding hints section if available
+    embedding_hints = ""
+    if similar_techniques and len(similar_techniques) > 0:
+        embedding_hints = "\n🔍 TECHNIQUES SÉMANTIQUEMENT PROCHES (détectées par analyse d'embeddings):\n"
+        embedding_hints += "Ces techniques ont une forte similarité sémantique avec le contenu analysé.\n"
+        embedding_hints += "PRIORISE leur détection si le contenu correspond:\n\n"
+        
+        for tech in similar_techniques[:5]:  # Top 5
+            embedding_hints += f"- {tech['code']}: {tech['name']} (Famille: {tech['family']}) — Similarité: {tech['similarity']:.2f}\n"
+        
+        embedding_hints += "\n⚠️ IMPORTANT: Si tu détectes ces techniques, cite leur code DIMA exact.\n"
     
     # Build complete prompt
     prompt = f"""{_get_system_instructions()}
 
 {taxonomy_context}
+
+{embedding_hints}
 
 {few_shot_examples}
 

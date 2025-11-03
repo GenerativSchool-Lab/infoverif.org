@@ -11,7 +11,7 @@ from openai import OpenAI
 # DIMA semantic layer imports
 try:
     from dima_detector import get_detector
-    from dima_prompts import build_dima_aware_prompt
+    from dima_prompts import build_dima_aware_prompt, build_hybrid_prompt
     DIMA_ENABLED = True
 except ImportError:
     print("⚠️  DIMA modules not available, using legacy prompts")
@@ -141,22 +141,48 @@ def transcribe_audio(audio_path: str) -> str:
     return transcript
 
 
-def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True) -> Dict:
+def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, use_embeddings: bool = True) -> Dict:
     """
-    Analyze content using OpenAI GPT-4 with JSON mode.
+    Analyze content using OpenAI GPT-4 with JSON mode (M2.2: Hybrid with embeddings).
     
     Args:
         transcript: Text content to analyze
         metadata: Metadata dictionary (title, description, platform, url)
         use_dima: Use DIMA-aware prompts (default: True)
+        use_embeddings: Use embedding similarity hints (default: True, M2.2)
     
     Returns:
         Analysis dictionary with scores, techniques, claims, summary
     """
-    # Choose prompt strategy
+    similar_techniques = []
+    
+    # Step 1: Semantic similarity search (M2.2)
+    if use_embeddings and use_dima and DIMA_ENABLED:
+        try:
+            detector = get_detector()
+            if detector.is_embeddings_enabled():
+                # Use first 2000 chars for similarity search (performance)
+                similar_techniques = detector.find_similar_techniques(
+                    transcript[:2000],
+                    top_k=int(os.getenv("DIMA_EMBEDDINGS_TOP_K", "5")),
+                    min_similarity=float(os.getenv("DIMA_EMBEDDINGS_MIN_SIMILARITY", "0.3"))
+                )
+                if similar_techniques:
+                    print(f"🔍 Embedding similarity: {[t['code'] for t in similar_techniques]}")
+        except Exception as e:
+            print(f"⚠️  Embedding similarity failed: {e}")
+            # Continue without embeddings
+    
+    # Step 2: Choose prompt strategy
     if use_dima and DIMA_ENABLED:
-        prompt = build_dima_aware_prompt(transcript[:8000], metadata)
-        system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique."
+        # Use hybrid prompt with embedding hints if available
+        if use_embeddings and similar_techniques:
+            prompt = build_hybrid_prompt(transcript[:8000], metadata, similar_techniques)
+            system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique. PRIORISE les techniques suggérées par l'analyse sémantique."
+        else:
+            # Standard DIMA prompt (no embedding hints)
+            prompt = build_dima_aware_prompt(transcript[:8000], metadata)
+            system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique."
     else:
         # Legacy prompt (backward compatibility)
         prompt = ANALYSIS_PROMPT.format(
@@ -167,7 +193,7 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True) ->
         )
         system_msg = "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."
 
-    # Use json_object mode (compatible with openai 1.12.0)
+    # Step 3: Call OpenAI API
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -228,6 +254,10 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True) ->
         tech.setdefault("evidence", "")
         tech.setdefault("severity", "medium")
         tech.setdefault("explanation", "")
+    
+    # Add embedding hints metadata if available (M2.2)
+    if similar_techniques:
+        parsed["embedding_hints"] = similar_techniques
     
     return parsed
 

@@ -4,20 +4,32 @@ Loads DIMA taxonomy and provides utilities for DIMA-aware analysis.
 """
 import csv
 import json
+import os
 from pathlib import Path
 from typing import Dict, List, Optional
+
+# M2.2: Semantic Embeddings (optional imports)
+try:
+    import numpy as np
+    import faiss
+    from sentence_transformers import SentenceTransformer
+    EMBEDDINGS_AVAILABLE = True
+except ImportError:
+    EMBEDDINGS_AVAILABLE = False
+    print("⚠️  Embeddings libraries not available (sentence-transformers, faiss-cpu)")
 
 
 class DIMADetector:
     """DIMA taxonomy loader and helper utilities."""
     
-    def __init__(self, csv_path: str = None, examples_dir: str = None):
+    def __init__(self, csv_path: str = None, examples_dir: str = None, enable_embeddings: bool = True):
         """
         Initialize DIMA detector with taxonomy and examples.
         
         Args:
             csv_path: Path to DIMA_Full_Mapping.csv (default: ../docs/DIMA_Full_Mapping.csv)
             examples_dir: Path to examples directory (default: ../data/dima_examples/)
+            enable_embeddings: Load semantic embeddings if available (default: True)
         """
         if csv_path is None:
             # Default: relative to api/ directory
@@ -33,8 +45,18 @@ class DIMADetector:
         self.taxonomy: Dict[str, Dict] = {}
         self.families: Dict[str, List[str]] = {}
         
+        # M2.2: Embeddings support
+        self.embeddings_enabled = enable_embeddings and EMBEDDINGS_AVAILABLE
+        self.embeddings: Optional[np.ndarray] = None
+        self.faiss_index = None
+        self.encoder_model = None
+        
         # Load taxonomy at initialization
         self._load_taxonomy()
+        
+        # Load embeddings if enabled
+        if self.embeddings_enabled:
+            self._load_embeddings()
     
     def _load_taxonomy(self):
         """Load DIMA taxonomy from CSV file."""
@@ -227,6 +249,144 @@ class DIMADetector:
                 return code
         
         return None
+    
+    def _load_embeddings(self):
+        """
+        Load precomputed embeddings and build FAISS index (M2.2).
+        
+        Tries to load from data/dima_embeddings.npy. If not found, generates them
+        on-the-fly using sentence-transformers.
+        """
+        if not EMBEDDINGS_AVAILABLE:
+            print("⚠️  Embeddings disabled: sentence-transformers not installed")
+            return
+        
+        base_dir = Path(__file__).parent.parent
+        embeddings_path = base_dir / "data" / "dima_embeddings.npy"
+        
+        try:
+            # Try to load precomputed embeddings
+            if embeddings_path.exists():
+                print(f"🔄 Loading precomputed embeddings from {embeddings_path}...")
+                self.embeddings = np.load(embeddings_path).astype('float32')
+                print(f"✅ Loaded embeddings: shape={self.embeddings.shape}")
+            else:
+                # Generate embeddings on-the-fly (first run)
+                print("⚠️  Precomputed embeddings not found, generating on-the-fly...")
+                print("   This will download ~470MB model on first run...")
+                self._generate_embeddings()
+            
+            # Validate embeddings
+            if self.embeddings is None or len(self.embeddings) != len(self.taxonomy):
+                raise ValueError(f"Embeddings count mismatch: {len(self.embeddings)} vs {len(self.taxonomy)}")
+            
+            # Build FAISS index for fast similarity search
+            dimension = self.embeddings.shape[1]  # Should be 384
+            self.faiss_index = faiss.IndexFlatIP(dimension)  # Inner product (cosine similarity)
+            
+            # Normalize embeddings for cosine similarity
+            faiss.normalize_L2(self.embeddings)
+            self.faiss_index.add(self.embeddings)
+            
+            # Load encoder model for runtime queries
+            self.encoder_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+            
+            print(f"✅ FAISS index built: {len(self.embeddings)} vectors, dim={dimension}")
+            print(f"✅ Encoder model loaded: paraphrase-multilingual-MiniLM-L12-v2")
+        
+        except Exception as e:
+            print(f"⚠️  Could not load embeddings: {e}")
+            print("   Continuing without embeddings (degraded mode)")
+            self.embeddings = None
+            self.faiss_index = None
+            self.encoder_model = None
+    
+    def _generate_embeddings(self):
+        """Generate embeddings on-the-fly if precomputed file not found."""
+        print("🔄 Generating embeddings for 130 techniques...")
+        
+        # Load model
+        model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+        
+        # Build texts from taxonomy (same format as precompute script)
+        texts = []
+        for code in sorted(self.taxonomy.keys()):  # Ensure consistent order
+            tech = self.taxonomy[code]
+            text = (
+                f"{tech['name_fr']}. "
+                f"{tech['semantic_features']}. "
+                f"Exemples: {tech['example_keywords']}"
+            )
+            texts.append(text)
+        
+        # Encode
+        embeddings = model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
+        self.embeddings = embeddings.astype('float32')
+        
+        # Save for future runs
+        embeddings_path = Path(__file__).parent.parent / "data" / "dima_embeddings.npy"
+        embeddings_path.parent.mkdir(exist_ok=True)
+        np.save(embeddings_path, self.embeddings)
+        
+        print(f"✅ Generated and saved embeddings: {self.embeddings.shape}")
+    
+    def find_similar_techniques(self, text: str, top_k: int = 5, min_similarity: float = 0.3) -> List[Dict]:
+        """
+        Find most similar DIMA techniques using semantic embeddings (M2.2).
+        
+        Args:
+            text: Content to analyze
+            top_k: Number of similar techniques to return (default: 5)
+            min_similarity: Minimum similarity threshold 0-1 (default: 0.3)
+        
+        Returns:
+            List of dicts with code, name, family, similarity, rank
+        """
+        if self.faiss_index is None or self.encoder_model is None:
+            return []
+        
+        try:
+            # Encode query text
+            query_embedding = self.encoder_model.encode([text], convert_to_numpy=True).astype('float32')
+            
+            # Normalize for cosine similarity
+            faiss.normalize_L2(query_embedding)
+            
+            # Search FAISS index (returns cosine similarity scores)
+            similarities, indices = self.faiss_index.search(query_embedding, top_k)
+            
+            # Build results
+            results = []
+            codes_list = sorted(self.taxonomy.keys())  # Same order as embeddings
+            
+            for rank, (similarity, idx) in enumerate(zip(similarities[0], indices[0]), 1):
+                if idx >= len(codes_list):
+                    continue
+                
+                # Filter by minimum similarity
+                if similarity < min_similarity:
+                    continue
+                
+                code = codes_list[idx]
+                technique = self.taxonomy[code]
+                
+                results.append({
+                    'code': code,
+                    'name': technique['name_fr'],
+                    'family': technique['family'],
+                    'similarity': float(similarity),
+                    'rank': rank
+                })
+            
+            return results
+        
+        except Exception as e:
+            print(f"⚠️  Error in similarity search: {e}")
+            return []
+    
+    def is_embeddings_enabled(self) -> bool:
+        """Check if embeddings are loaded and ready."""
+        return self.faiss_index is not None and self.encoder_model is not None
 
 
 # Global singleton instance (loaded at FastAPI startup)
