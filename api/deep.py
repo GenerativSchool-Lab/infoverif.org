@@ -8,6 +8,15 @@ from typing import Dict, Optional
 import ffmpeg
 from openai import OpenAI
 
+# DIMA semantic layer imports
+try:
+    from dima_detector import get_detector
+    from dima_prompts import build_dima_aware_prompt
+    DIMA_ENABLED = True
+except ImportError:
+    print("⚠️  DIMA modules not available, using legacy prompts")
+    DIMA_ENABLED = False
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -132,20 +141,37 @@ def transcribe_audio(audio_path: str) -> str:
     return transcript
 
 
-def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
-    """Analyze content using OpenAI GPT-4 with JSON mode."""
-    prompt = ANALYSIS_PROMPT.format(
-        title=metadata.get('title', 'N/A'),
-        description=metadata.get('description', 'N/A'),
-        platform=metadata.get('platform', 'unknown'),
-        transcript=transcript[:8000]
-    )
+def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True) -> Dict:
+    """
+    Analyze content using OpenAI GPT-4 with JSON mode.
+    
+    Args:
+        transcript: Text content to analyze
+        metadata: Metadata dictionary (title, description, platform, url)
+        use_dima: Use DIMA-aware prompts (default: True)
+    
+    Returns:
+        Analysis dictionary with scores, techniques, claims, summary
+    """
+    # Choose prompt strategy
+    if use_dima and DIMA_ENABLED:
+        prompt = build_dima_aware_prompt(transcript[:8000], metadata)
+        system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique."
+    else:
+        # Legacy prompt (backward compatibility)
+        prompt = ANALYSIS_PROMPT.format(
+            title=metadata.get('title', 'N/A'),
+            description=metadata.get('description', 'N/A'),
+            platform=metadata.get('platform', 'unknown'),
+            transcript=transcript[:8000]
+        )
+        system_msg = "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."
 
     # Use json_object mode (compatible with openai 1.12.0)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."},
+            {"role": "system", "content": system_msg},
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"},
@@ -191,6 +217,17 @@ def analyze_with_gpt4(transcript: str, metadata: Dict) -> Dict:
     parsed.setdefault("techniques", [])
     parsed.setdefault("claims", [])
     parsed.setdefault("summary", "")
+    
+    # Validate techniques structure (accept DIMA fields if present)
+    techniques = parsed.get("techniques", [])
+    for tech in techniques:
+        # DIMA fields are optional (backward compatible)
+        tech.setdefault("dima_code", "")
+        tech.setdefault("dima_family", "")
+        tech.setdefault("name", "Technique non spécifiée")
+        tech.setdefault("evidence", "")
+        tech.setdefault("severity", "medium")
+        tech.setdefault("explanation", "")
     
     return parsed
 

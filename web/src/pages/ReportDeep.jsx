@@ -59,8 +59,20 @@ export default function ReportDeep() {
                 <div className="space-y-4">
                   {report.techniques.map((t, i) => (
                     <div key={i} className="border-l-4 border-white pl-4 pb-3">
-                      <div className="flex items-center justify-between">
-                        <div className="text-white font-medium">{t.name}</div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="text-white font-medium">{t.name}</div>
+                          {t.dima_code && (
+                            <span className="text-xs px-2 py-0.5 rounded bg-black text-white border border-white font-mono">
+                              {t.dima_code}
+                            </span>
+                          )}
+                          {t.dima_family && (
+                            <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-300 border border-gray-600">
+                              {t.dima_family}
+                            </span>
+                          )}
+                        </div>
                         {t.severity && (
                           <span className={`text-xs px-2 py-1 rounded ${
                             t.severity === 'high' ? 'bg-gray-800 text-white border border-white' :

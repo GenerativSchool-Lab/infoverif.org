@@ -12,11 +12,21 @@ try:
 except Exception:
     redis = None
 
+# DIMA semantic layer
+try:
+    from dima_detector import get_detector
+    DIMA_AVAILABLE = True
+except ImportError:
+    DIMA_AVAILABLE = False
+
 # Avoid importing heavy task/redis code at startup; import inside endpoints when needed
 
 load_dotenv()
 
 app = FastAPI(title="InfoVerif API", version="1.0.0")
+
+# Global DIMA detector instance (loaded at startup)
+dima_detector = None
 
 # Feature flags (Deep is default)
 DEEP_ANALYSIS_ENABLED = os.getenv("DEEP_ANALYSIS_ENABLED", "true").lower() == "true"
@@ -39,6 +49,24 @@ except Exception:
     redis_conn = None
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Load DIMA taxonomy at FastAPI startup."""
+    global dima_detector
+    
+    if DIMA_AVAILABLE:
+        try:
+            print("🔄 Loading DIMA taxonomy...")
+            dima_detector = get_detector()
+            stats = dima_detector.get_taxonomy_stats()
+            print(f"✅ DIMA taxonomy loaded: {stats['total_techniques']} techniques, {stats['total_families']} families")
+        except Exception as e:
+            print(f"⚠️  Error loading DIMA taxonomy: {e}")
+            print("   Continuing with degraded functionality (legacy prompts only)")
+    else:
+        print("⚠️  DIMA modules not available, using legacy prompts")
+
+
 # Request/response models kept minimal for POC
 class AnalyzeRequest(BaseModel):
     url: str
@@ -49,6 +77,19 @@ class AnalyzeRequest(BaseModel):
 async def health():
     """Health check endpoint."""
     data = {"status": "ok", "service": "infoverif-api"}
+    
+    # DIMA status
+    if DIMA_AVAILABLE and dima_detector:
+        stats = dima_detector.get_taxonomy_stats()
+        data["dima"] = {
+            "status": "loaded",
+            "techniques": stats['total_techniques'],
+            "families": stats['total_families']
+        }
+    else:
+        data["dima"] = {"status": "unavailable"}
+    
+    # Redis status
     if redis is not None:
         try:
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -58,7 +99,42 @@ async def health():
         except Exception as e:
             data["redis"] = "disconnected"
             data["redis_error"] = str(e)[:80]
+    
     return data
+
+
+@app.get("/dima-taxonomy")
+async def dima_taxonomy_endpoint():
+    """
+    Return DIMA taxonomy information (debug endpoint).
+    
+    Returns:
+        Taxonomy statistics and sample techniques
+    """
+    if not DIMA_AVAILABLE or not dima_detector:
+        raise HTTPException(status_code=503, detail="DIMA taxonomy not loaded")
+    
+    stats = dima_detector.get_taxonomy_stats()
+    families = dima_detector.get_all_families()
+    
+    # Sample techniques per family (first 3)
+    samples = {}
+    for family in families:
+        codes = dima_detector.get_family_techniques(family)[:3]
+        samples[family] = [
+            {
+                "code": code,
+                "name": dima_detector.get_technique(code)['name_fr']
+            }
+            for code in codes
+        ]
+    
+    return {
+        "status": "loaded",
+        "stats": stats,
+        "families": families,
+        "samples": samples
+    }
 
 
 @app.get("/test-openai")
