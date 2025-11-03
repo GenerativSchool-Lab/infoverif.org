@@ -1,9 +1,33 @@
-# InfoVerif Chrome Extension — Installation Guide
+# InfoVerif Chrome Extension 🛡️
+
+**Analyse de propagande et désinformation directement sur Twitter et TikTok**
 
 **Version** : 1.0.0  
 **Status** : Alpha Release  
 **Platforms** : Twitter/X, TikTok  
-**Language** : Français
+**Language** : Français  
+**License** : MIT
+
+---
+
+## 🎯 Installation Rapide (2 minutes)
+
+### Option 1 : Depuis GitHub (Recommandé)
+
+1. **Télécharger** :
+   - Aller sur : https://github.com/GenerativSchool-Lab/infoverif-extension
+   - Cliquer **"Code"** → **"Download ZIP"**
+   - Extraire le fichier
+
+2. **Charger dans Chrome** :
+   - Ouvrir `chrome://extensions/`
+   - Activer **"Mode développeur"** (toggle en haut à droite)
+   - Cliquer **"Charger l'extension non empaquetée"**
+   - Sélectionner le dossier `infoverif-extension-main`
+
+3. **✅ C'est tout !** L'extension est installée.
+
+**Voir ci-dessous pour guide détaillé avec screenshots.**
 
 ---
 
