@@ -60,6 +60,13 @@ async def startup_event():
             dima_detector = get_detector()
             stats = dima_detector.get_taxonomy_stats()
             print(f"✅ DIMA taxonomy loaded: {stats['total_techniques']} techniques, {stats['total_families']} families")
+            
+            # M2.2: Check embeddings status
+            if dima_detector.is_embeddings_enabled():
+                print("✅ DIMA embeddings loaded and ready (FAISS index built)")
+            else:
+                print("⚠️  DIMA embeddings NOT available (sentence-transformers/faiss missing or failed to load)")
+                print("   Continuing with M2.1 (prompts-only, no semantic similarity)")
         except Exception as e:
             print(f"⚠️  Error loading DIMA taxonomy: {e}")
             print("   Continuing with degraded functionality (legacy prompts only)")
@@ -84,7 +91,8 @@ async def health():
         data["dima"] = {
             "status": "loaded",
             "techniques": stats['total_techniques'],
-            "families": stats['total_families']
+            "families": stats['total_families'],
+            "embeddings_enabled": dima_detector.is_embeddings_enabled()
         }
     else:
         data["dima"] = {"status": "unavailable"}
