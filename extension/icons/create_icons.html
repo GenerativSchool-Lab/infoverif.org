@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Extension Icons</title>
+</head>
+<body>
+  <canvas id="canvas16" width="16" height="16"></canvas>
+  <canvas id="canvas32" width="32" height="32"></canvas>
+  <canvas id="canvas48" width="48" height="48"></canvas>
+  <canvas id="canvas128" width="128" height="128"></canvas>
+  
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      
+      // Black background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, size, size);
+      
+      // White shield emoji (simplified)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `${size * 0.7}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🛡️', size / 2, size / 2);
+    }
+    
+    ['16', '32', '48', '128'].forEach(size => {
+      const canvas = document.getElementById('canvas' + size);
+      drawIcon(canvas, parseInt(size));
+      
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon${size}.png`;
+        a.click();
+      });
+    });
+  </script>
+</body>
+</html>
