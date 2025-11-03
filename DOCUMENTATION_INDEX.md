@@ -4,7 +4,27 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ---
 
-## 🎯 DIMA M2.2 Documentation (Nouveau !)
+## 🎓 Documentation Académique (PhD-Grade)
+
+### ⭐ **ARCHITECTURE_AND_PROCESS.md** — NOUVEAU (Janvier 2026)
+
+**Documentation complète de niveau académique** sur l'architecture, les processus d'implémentation, et les lessons learned.
+
+**Contenu** :
+- Architecture système complète (webapp + extension Chrome)
+- Timeline d'implémentation (Phase 1-3)
+- Processus d'intégration DIMA (M2.1, M2.2) avec détails techniques
+- Développement extension Chrome (Twitter + TikTok)
+- **Lessons learned** (15 tentatives deployment, memory planning, platform decisions)
+- Technical debt & future work
+- Références académiques
+
+**Temps de lecture** : 45-60 minutes  
+**Audience** : PhD-level, chercheurs, architectes système, ML engineers
+
+---
+
+## 🎯 DIMA Integration Documentation
 
 ### 🚀 **Semantic Embeddings Layer — Production Deployment Complete**
 
@@ -12,7 +32,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 #### Documents clés :
 
-1. **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** (1807 lignes)
+1. **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** (1884 lignes)
    - RFC-style design document complet
    - Architecture hybride (embeddings + prompts)
    - Alignment tables (DIMA ↔ InfoVerif)
@@ -20,7 +40,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
    - Formules de scoring, exemples JSON
    - Risques et mitigation
 
-2. **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** (455 lignes) ⭐ NEW
+2. **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** (455 lignes)
    - Rapport de production complet
    - Métriques de performance (latency, cost, accuracy)
    - Architecture diagram (Text → FAISS → GPT-4)
@@ -37,7 +57,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
    - Cost estimates vs actual
    - Implementation timeline (3 semaines → 1 jour!)
 
-4. **[CHANGELOG.md](./CHANGELOG.md)** — Sections M2.1 & M2.2 (190 lignes)
+4. **[CHANGELOG.md](./CHANGELOG.md)** — Sections M2.1 & M2.2
    - Summary user-facing des milestones
    - JSON schema enhancements
    - Performance metrics condensés
@@ -68,18 +88,32 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ### Je veux **comprendre le projet** dans son ensemble
 
-➡️ **[README.md](./README.md)** (1177 lignes)
+➡️ **[README.md](./README.md)** (refactorisé Janvier 2026)
 - Mission, valeurs et objectif du projet
-- Fonctionnalités complètes du MVP
-- Architecture système (diagrammes)
-- Stack technique (backend, frontend, OpenAI)
-- Roadmap détaillée (Q1 2026 - 2026+)
-- Méthodologie scientifique (20+ techniques)
+- Architecture système (webapp + extension Chrome)
+- Fonctionnalités en production (multimodal analysis, DIMA 130 techniques)
+- Stack technique (backend, frontend, extension)
+- Documentation académique (références)
+- Méthodologie scientifique (DIMA taxonomy)
 - Limitations et avertissements éthiques
-- Guides de contribution
+- Future work (court/moyen/long terme)
 
 **Temps de lecture** : 30-40 minutes  
 **Audience** : Tous (utilisateurs, développeurs, chercheurs)
+
+### Je veux **comprendre l'architecture et les processus d'implémentation**
+
+➡️ **[ARCHITECTURE_AND_PROCESS.md](./docs/ARCHITECTURE_AND_PROCESS.md)** ⭐ NOUVEAU
+- Architecture système complète (diagrammes)
+- Timeline d'implémentation (Phase 1-3)
+- Processus DIMA integration (M2.1, M2.2) détaillé
+- Extension Chrome development (Twitter + TikTok)
+- Lessons learned (15 tentatives deployment, platform decisions)
+- Technical debt & future work
+- Références académiques
+
+**Temps de lecture** : 45-60 minutes  
+**Audience** : PhD-level, chercheurs, architectes système
 
 ---
 
@@ -159,8 +193,16 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 | Document | Lignes | Description | Niveau |
 |----------|--------|-------------|--------|
-| **[README.md](./README.md)** | 1177 | Vue d'ensemble complète | ⭐ Débutant |
+| **[README.md](./README.md)** | Refactorisé | Vue d'ensemble complète | ⭐ Débutant |
 | **[QUICKSTART.md](./QUICKSTART.md)** | 546 | Installation rapide (5 min) | ⭐ Débutant |
+
+### Documentation Académique & Architecture
+
+| Document | Lignes | Description | Niveau |
+|----------|--------|-------------|--------|
+| **[ARCHITECTURE_AND_PROCESS.md](./docs/ARCHITECTURE_AND_PROCESS.md)** | ~800 | Architecture, processus, lessons learned | ⭐⭐⭐ PhD-level |
+| **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** | 1884 | RFC intégration DIMA | ⭐⭐⭐ Avancé |
+| **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** | 455 | Métriques production | ⭐⭐⭐ Avancé |
 
 ### Documentation Développeur
 
@@ -219,16 +261,18 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ---
 
-### 🔬 Chercheur / Fact-Checker
+### 🔬 Chercheur / Fact-Checker / PhD Student
 
 **Objectif** : Comprendre la méthodologie et intégrer dans recherche
 
 1. **[README.md](./README.md)** — Sections "Mission", "Méthodologie", "Limitations"
-2. **[TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md)** — Section "Algorithmes d'Analyse"
-3. **[README.md](./README.md)** — Section "Roadmap" (Phase 2-5)
-4. **Frontend** : `/method-card` — Formules mathématiques & taxonomie
+2. **[ARCHITECTURE_AND_PROCESS.md](./docs/ARCHITECTURE_AND_PROCESS.md)** ⭐ — Architecture, processus, lessons learned
+3. **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** — Intégration DIMA complète
+4. **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** — Métriques production
+5. **[TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md)** — Section "Algorithmes d'Analyse"
+6. **Frontend** : `/method-card` — Formules mathématiques & taxonomie
 
-**Temps total** : 1-2 heures
+**Temps total** : 2-3 heures
 
 ---
 
@@ -287,20 +331,32 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ---
 
-### 🔬 Parcours Chercheur / Académique (2h)
+### 🔬 Parcours Chercheur / Académique / PhD (3h)
 
 1. **[README.md](./README.md)** — Sections :
    - "Mission & Valeurs" (10 min)
-   - "Fonctionnalités (MVP)" (15 min)
-   - "Méthodologie Scientifique" (30 min)
-   - "Roadmap" (Phase 2-5) (20 min)
+   - "Architecture du Système" (10 min)
+   - "Fonctionnalités Principales" (15 min)
+   - "Méthodologie Scientifique" (20 min)
    - "Limitations & Avertissements" (10 min)
 
-2. **[TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md)** — Section "Algorithmes d'Analyse" (30 min)
+2. **[ARCHITECTURE_AND_PROCESS.md](./docs/ARCHITECTURE_AND_PROCESS.md)** ⭐ — Complet (60 min)
+   - Architecture système
+   - Timeline d'implémentation
+   - Processus DIMA integration
+   - Extension Chrome development
+   - Lessons learned
 
-3. **Frontend Interface** : `/method-card` — Formules & taxonomie (15 min)
+3. **[DIMA_Semantic_RFC.md](./docs/DIMA_Semantic_RFC.md)** — Sections clés (30 min)
+   - Architecture hybride
+   - Alignment tables
+   - Formules de scoring
 
-**Total** : ~2 heures
+4. **[DIMA_M2.2_Performance_Report.md](./docs/DIMA_M2.2_Performance_Report.md)** — Métriques (20 min)
+
+5. **[TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md)** — Section "Algorithmes d'Analyse" (15 min)
+
+**Total** : ~3 heures
 
 ---
 
@@ -423,7 +479,14 @@ curl -X POST http://localhost:8000/analyze-image \
 
 ## 🔄 Mise à Jour de la Documentation
 
-**Dernière mise à jour** : Janvier 2026 (v1.0.0)
+**Dernière mise à jour** : Janvier 2026 (v2.0.0)
+
+### Changements Récents
+
+- ✅ **README.md refactorisé** : Documentation académique, état actuel (webapp + extension)
+- ✅ **ARCHITECTURE_AND_PROCESS.md** : Nouveau document académique (PhD-grade)
+- ✅ **Roadmaps obsolètes supprimées** : Focus sur ce qui existe en production
+- ✅ **Extension Chrome documentée** : Twitter + TikTok support
 
 ### Maintenance
 
