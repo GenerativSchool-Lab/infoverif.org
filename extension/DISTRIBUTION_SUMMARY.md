@@ -37,12 +37,25 @@ git push -u origin main
 
 ## 🔄 Sync Régulier (Après Modifications)
 
+### Option 1 : Git Subtree Push (Recommandé - Plus Simple)
+
+```bash
+cd /Volumes/LaCie/Dev/infoverif.org
+./scripts/push_extension_repo.sh
+```
+
+**Avantages** : Une seule commande, push direct, pas de copie de fichiers
+
+### Option 2 : Sync Script (Copie Fichiers)
+
 ```bash
 cd /Volumes/LaCie/Dev/infoverif.org
 ./scripts/sync_extension_repo.sh
 cd ../infoverif-extension
 git push origin main
 ```
+
+**Avantages** : Contrôle total sur les fichiers inclus
 
 ---
 
@@ -67,6 +80,7 @@ zip -r infoverif-extension-v1.0.0.zip . -x "*.git*" -x ".DS_Store"
 - **User Guide** : `DISTRIBUTION_README.md` → Installation complète
 - **Maintenance** : `MAINTENANCE.md` → Guide développeur
 - **Setup** : `SETUP_DISTRIBUTION_REPO.md` → Setup initial détaillé
+- **Git Subtree** : `GIT_SUBTREE_GUIDE.md` → Push direct avec subtree
 
 ---
 
