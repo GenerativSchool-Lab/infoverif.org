@@ -55,6 +55,10 @@ const TWITTER_SELECTORS = {
   temporal: {
     timestamp: 'time',
     permalink: 'a[href*="/status/"]'
+  },
+  media: {
+    images: 'div[data-testid="tweetPhoto"] img[src]',
+    video: 'div[data-testid="videoPlayer"]'
   }
 };
 
@@ -85,9 +89,21 @@ function extractTwitterData(article) {
   const permalinkEl = article.querySelector(TWITTER_SELECTORS.temporal.permalink);
   const permalink = permalinkEl ? permalinkEl.href : window.location.href;
   
-  // Detect video
-  const hasVideo = !!article.querySelector(TWITTER_SELECTORS.media.video);
+  // Detect video (multiple selectors for robustness)
+  const videoElement = 
+    article.querySelector(TWITTER_SELECTORS.media.video) ||  // Primary
+    article.querySelector('div[data-testid="videoComponent"]') ||  // Alternative
+    article.querySelector('video[src]') ||  // Direct video tag
+    article.querySelector('div[aria-label*="video"]') ||  // Aria label (en)
+    article.querySelector('div[aria-label*="Video"]') ||  // Aria label (en, capitalized)
+    article.querySelector('div[aria-label*="vidéo"]');  // Aria label (fr)
+  
+  const hasVideo = !!videoElement;
   const videoUrl = hasVideo ? permalink : null; // Twitter video URL is the tweet permalink
+  
+  if (hasVideo) {
+    debugLog('CONTENT_SCRIPT', `📹 Video detected! Selector: ${videoElement.tagName}[${videoElement.getAttribute('data-testid') || 'no-testid'}]`);
+  }
   
   return {
     text,
