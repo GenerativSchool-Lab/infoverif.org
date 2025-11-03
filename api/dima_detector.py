@@ -9,25 +9,38 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # M2.2: Semantic Embeddings (optional imports)
+EMBEDDINGS_AVAILABLE = False
+_numpy_ok = False
+_faiss_ok = False
+_transformers_ok = False
+
 try:
     import numpy as np
+    _numpy_ok = True
     print(f"✅ numpy imported: {np.__version__}")
 except ImportError as e:
     print(f"❌ numpy import failed: {e}")
 
 try:
     import faiss
+    _faiss_ok = True
     print(f"✅ faiss imported")
 except ImportError as e:
     print(f"❌ faiss import failed: {e}")
 
 try:
     from sentence_transformers import SentenceTransformer
+    _transformers_ok = True
     print(f"✅ sentence-transformers imported")
-    EMBEDDINGS_AVAILABLE = True
 except ImportError as e:
     print(f"❌ sentence-transformers import failed: {e}")
-    EMBEDDINGS_AVAILABLE = False
+
+# All three must succeed
+if _numpy_ok and _faiss_ok and _transformers_ok:
+    EMBEDDINGS_AVAILABLE = True
+    print("🎉 All embedding libraries loaded successfully!")
+else:
+    print(f"⚠️  Embedding libraries incomplete: numpy={_numpy_ok}, faiss={_faiss_ok}, transformers={_transformers_ok}")
 
 
 class DIMADetector:
