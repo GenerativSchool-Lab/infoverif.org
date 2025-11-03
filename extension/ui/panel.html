@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InfoVerif - Analyse</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <!-- ============================================================================
+       HEADER
+       ============================================================================ -->
+  <header class="panel-header">
+    <div class="header-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">InfoVerif</span>
+    </div>
+    <div class="header-meta" id="headerMeta">
+      <span class="meta-badge" id="taxonomyBadge">DIMA M2.2</span>
+      <span class="meta-badge" id="modelBadge">GPT-4o-mini</span>
+    </div>
+  </header>
+
+  <!-- ============================================================================
+       MAIN CONTENT AREA
+       ============================================================================ -->
+  <main class="panel-main" id="panelMain">
+    
+    <!-- LOADING STATE -->
+    <div class="state-container" id="loadingState">
+      <div class="spinner-large"></div>
+      <p class="state-text">Analyse en cours...</p>
+      <p class="state-subtext">Cela peut prendre quelques secondes</p>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div class="state-container hidden" id="errorState">
+      <div class="error-icon">⚠️</div>
+      <p class="state-text error-text" id="errorMessage">Une erreur est survenue</p>
+      <button class="btn-retry" id="retryButton">Réessayer</button>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="state-container" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <p class="state-text">Prêt à analyser</p>
+      <p class="state-subtext">Sélectionnez un post sur Twitter ou une vidéo sur YouTube</p>
+    </div>
+
+    <!-- REPORT CONTAINER (hidden by default) -->
+    <div class="report-container hidden" id="reportContainer">
+      
+      <!-- PLATFORM & TIMESTAMP -->
+      <div class="report-header" id="reportHeader">
+        <span class="platform-badge" id="platformBadge">Twitter</span>
+        <span class="timestamp" id="reportTimestamp">Il y a quelques instants</span>
+      </div>
+
+      <!-- SCORES SECTION -->
+      <section class="report-section" id="scoresSection">
+        <h2 class="section-title">Scores d'analyse</h2>
+        <div class="scores-grid" id="scoresGrid">
+          <!-- Dynamically populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- TECHNIQUES SECTION -->
+      <section class="report-section" id="techniquesSection">
+        <h2 class="section-title">
+          Techniques détectées
+          <span class="count-badge" id="techniquesCount">0</span>
+        </h2>
+        <div class="techniques-list" id="techniquesList">
+          <!-- Dynamically populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- CLAIMS SECTION -->
+      <section class="report-section" id="claimsSection">
+        <h2 class="section-title">
+          Affirmations analysées
+          <span class="count-badge" id="claimsCount">0</span>
+        </h2>
+        <div class="claims-list" id="claimsList">
+          <!-- Dynamically populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- SUMMARY SECTION -->
+      <section class="report-section" id="summarySection">
+        <h2 class="section-title">Synthèse</h2>
+        <div class="summary-content" id="summaryContent">
+          <!-- Dynamically populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- TRANSCRIPT PREVIEW (for videos) -->
+      <section class="report-section hidden" id="transcriptSection">
+        <h2 class="section-title">Extrait de transcription</h2>
+        <div class="transcript-content" id="transcriptContent">
+          <!-- Dynamically populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- ACTIONS BAR -->
+      <div class="actions-bar">
+        <button class="btn-action" id="copyJsonButton" title="Copier le rapport complet (JSON)">
+          <span class="btn-icon">📋</span>
+          <span class="btn-label">Copier JSON</span>
+        </button>
+        <button class="btn-action" id="copySummaryButton" title="Copier la synthèse">
+          <span class="btn-icon">📝</span>
+          <span class="btn-label">Copier synthèse</span>
+        </button>
+        <button class="btn-action" id="newAnalysisButton" title="Nouvelle analyse">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-label">Nouvelle</span>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================================
+       CHAT SECTION (Phase 2 - Initially hidden)
+       ============================================================================ -->
+  <section class="chat-section hidden" id="chatSection">
+    <div class="chat-header">
+      <h3 class="chat-title">Questions sur cette analyse</h3>
+      <button class="chat-toggle" id="chatToggle" title="Masquer le chat">▼</button>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      <!-- Chat messages dynamically populated -->
+      <div class="chat-welcome">
+        <p>Posez des questions sur les techniques détectées ou demandez des clarifications.</p>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <textarea 
+        class="chat-input" 
+        id="chatInput" 
+        placeholder="Posez une question..."
+        rows="2"
+        maxlength="500"
+      ></textarea>
+      <button class="chat-send" id="chatSendButton" title="Envoyer">
+        <span>→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================================
+       FOOTER
+       ============================================================================ -->
+  <footer class="panel-footer">
+    <div class="footer-links">
+      <a href="https://infoverif.org" target="_blank" class="footer-link">InfoVerif.org</a>
+      <span class="footer-divider">•</span>
+      <a href="https://generativschool.com" target="_blank" class="footer-link">GenerativSchool</a>
+    </div>
+    <div class="footer-privacy">
+      <span class="privacy-badge" title="Aucun tracking, aucun stockage">🔒 Privacy-first</span>
+    </div>
+  </footer>
+
+  <!-- ============================================================================
+       SCRIPTS
+       ============================================================================ -->
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
+
