@@ -32,7 +32,25 @@ Fournir un outil **transparent, éducatif et accessible** pour :
 
 ---
 
-## 🚀 Fonctionnalités (MVP Fonctionnel)
+## 🚀 Fonctionnalités
+
+### 🎯 **NOUVEAU: DIMA M2.2 — Semantic Embeddings Layer (Nov 2025)**
+
+InfoVerif intègre désormais la **taxonomie DIMA (M82 Project)** avec **130 techniques de manipulation** documentées académiquement, combinant :
+
+- 🧠 **Vector Similarity Search** : FAISS + sentence-transformers (470MB model)
+- 💬 **GPT-4o-mini Hybrid Analysis** : Embeddings hints + enhanced prompts
+- 🎨 **JSON Schema Enhanced** : DIMA codes (`[TE-XX]`) et familles pour chaque technique
+- ⚡ **Production Performance** : +100ms latency, +50% detection improvement
+
+**Architecture**:
+```
+Text/Video/Image → Whisper/Vision → FAISS Similarity (Top-5) → GPT-4 + Hints → DIMA Codes
+```
+
+**Voir** : [DIMA_Semantic_RFC.md](docs/DIMA_Semantic_RFC.md) | [M2.2 Performance Report](docs/DIMA_M2.2_Performance_Report.md) | [CHANGELOG.md](CHANGELOG.md)
+
+---
 
 ### ✅ Analyse Multi-Formats
 
