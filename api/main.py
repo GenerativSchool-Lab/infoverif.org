@@ -1,5 +1,6 @@
 """Main FastAPI application (lightweight metadata POC)."""
 import os
+import time
 from typing import Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile, File
@@ -25,19 +26,63 @@ load_dotenv()
 
 app = FastAPI(title="InfoVerif API", version="1.0.0")
 
+# Include extension routes
+try:
+    from routes.extension import router as extension_router
+    app.include_router(extension_router)
+except ImportError:
+    print("⚠️  Extension routes not available")
+
 # Global DIMA detector instance (loaded at startup)
 dima_detector = None
 
 # Feature flags (Deep is default)
 DEEP_ANALYSIS_ENABLED = os.getenv("DEEP_ANALYSIS_ENABLED", "true").lower() == "true"
 
-# CORS
+# Backend version (for extension compatibility tracking)
+BACKEND_VERSION = "2025-11-03"  # Deploy date
+
+
+def create_analysis_response(result: dict, start_time: float) -> JSONResponse:
+    """
+    Create JSONResponse with custom headers for extension compatibility.
+    
+    Args:
+        result: Analysis result dict
+        start_time: Request start timestamp
+    
+    Returns:
+        JSONResponse with custom headers
+    """
+    latency_ms = int((time.time() - start_time) * 1000)
+    
+    # Determine taxonomy version from DIMA availability
+    taxonomy_version = "DIMA-M2.2-130" if DIMA_AVAILABLE and dima_detector else "legacy"
+    
+    headers = {
+        "x-model-card": "gpt-4o-mini",
+        "x-taxonomy-version": taxonomy_version,
+        "x-latency-ms": str(latency_ms),
+        "x-backend-version": BACKEND_VERSION,
+    }
+    
+    return JSONResponse(content=result, headers=headers)
+
+# CORS - Allow web app + Chrome extension
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Local dev
+    "https://infoverif-org.vercel.app",  # Production web app
+    "chrome-extension://*",  # Chrome extension (wildcard for unpacked testing)
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"chrome-extension://[a-z]+",  # Allow any extension ID
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["x-model-card", "x-taxonomy-version", "x-latency-ms", "x-backend-version"],  # Expose custom headers for extension
 )
 
 # Redis connection (optional)
@@ -334,6 +379,7 @@ async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None
 
 @app.post("/analyze-text")
 async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] = Form("text")):
+    start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
@@ -341,7 +387,13 @@ async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] =
     try:
         from deep import analyze_text
         result = analyze_text(text, platform or "text")
-        return JSONResponse(content=result)
+        
+        # Cache for extension chat (if analysis_id present)
+        if result.get("analysis_id"):
+            from routes.extension import cache_analysis
+            cache_analysis(result["analysis_id"], result)
+        
+        return create_analysis_response(result, start_time)
     except Exception as e:
         import traceback
         full_error = traceback.format_exc()
@@ -350,6 +402,7 @@ async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] =
 
 @app.post("/analyze-video")
 async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("video")):
+    start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
@@ -364,7 +417,13 @@ async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optiona
             tmp_path = tmp.name
         try:
             result = analyze_file(tmp_path, platform or "video")
-            return JSONResponse(content=result)
+            
+            # Cache for extension chat (if analysis_id present)
+            if result.get("analysis_id"):
+                from routes.extension import cache_analysis
+                cache_analysis(result["analysis_id"], result)
+            
+            return create_analysis_response(result, start_time)
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
@@ -374,6 +433,7 @@ async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optiona
 
 @app.post("/analyze-image")
 async def analyze_image_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("image")):
+    start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
@@ -382,7 +442,13 @@ async def analyze_image_endpoint(file: UploadFile = File(...), platform: Optiona
         from deep import analyze_image
         content = await file.read()
         result = analyze_image(content, platform or "image")
-        return JSONResponse(content=result)
+        
+        # Cache for extension chat (if analysis_id present)
+        if result.get("analysis_id"):
+            from routes.extension import cache_analysis
+            cache_analysis(result["analysis_id"], result)
+        
+        return create_analysis_response(result, start_time)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"analyze-image failed: {str(e)[:300]}")
 
