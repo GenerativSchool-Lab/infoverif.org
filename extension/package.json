@@ -1,0 +1,27 @@
+{
+  "name": "infoverif-extension",
+  "version": "1.0.0",
+  "description": "InfoVerif Chrome Extension - Analyse de propagande et désinformation sur les réseaux sociaux",
+  "scripts": {
+    "dev": "echo 'Development mode: Load unpacked extension from extension/ directory'",
+    "build": "echo 'Building extension...' && npm run build:icons && npm run build:zip",
+    "build:icons": "echo 'Icons should be created manually or with design tool'",
+    "build:zip": "cd .. && zip -r extension-build.zip extension/ -x '*.git*' -x '*node_modules*' -x '*.DS_Store'",
+    "lint": "echo 'Add ESLint later'"
+  },
+  "keywords": [
+    "infoverif",
+    "chrome-extension",
+    "propaganda",
+    "misinformation",
+    "dima",
+    "fact-checking"
+  ],
+  "author": "GenerativSchool Civic Tech AI Lab",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GenerativSchool-Lab/infoverif.org.git"
+  }
+}
+

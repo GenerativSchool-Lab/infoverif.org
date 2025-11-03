@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+
+# Build artifacts
+build/
+dist/
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Extension private key (for Chrome Web Store)
+*.pem
+key.pem
+
+# Environment
+.env
+.env.local
+
