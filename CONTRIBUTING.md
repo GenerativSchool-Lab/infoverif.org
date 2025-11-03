@@ -183,8 +183,8 @@ Low / Medium / High
 ### 4. 📊 Contributions de Données
 
 **Datasets annotés** :
-- Corpus de propagande (français, anglais, arabe)
-- Exemples de techniques de manipulation
+- Corpus de propagande multilingue (français, anglais, arabe, ukrainien, polonais, espagnol, italien)
+- Exemples de techniques de manipulation par langue
 - Cas d'étude historiques (campagnes, élections)
 - Exemples de deepfakes et manipulations vidéo
 
@@ -228,7 +228,7 @@ Low / Medium / High
 - Tutoriels pas-à-pas (vidéos, GIFs)
 - API documentation (Swagger/OpenAPI)
 - Guides pour chercheurs, journalistes, éducateurs
-- Traductions (anglais, arabe, espagnol)
+- Traductions (anglais, ukrainien, polonais, espagnol, arabe, italien)
 - Papers académiques (méthodologie, résultats)
 
 **Standards** :
@@ -238,29 +238,108 @@ Low / Medium / High
 - Screenshots/GIFs pour UI
 - Liens vers ressources externes pertinentes
 
-### 6. 🌍 Traductions
+### 6. 🌍 Traductions & Localisation
 
-**Langues prioritaires** :
-1. **Anglais** : Interface + documentation
-2. **Arabe** : Interface (support RTL)
-3. **Espagnol** : Interface + documentation
+**Langues prioritaires (roadmap)** :
+1. **Anglais (English)** : Interface + documentation — **En cours**
+2. **Arabe (Arabic)** : Interface + documentation — **Prévu** (support RTL requis)
+3. **Espagnol (Spanish)** : Interface + documentation — **Prévu**
+4. **Italien (Italian)** : Interface + documentation — **Prévu**
+5. **Polonais (Polish)** : Interface + documentation — **À finaliser**
+6. **Ukrainien (Ukrainian)** : Interface + documentation — **Prévu** (priorité élevée)
 
-**Workflow** :
+**Structure de traduction** :
+```
+web/src/locales/
+├── fr.json       # Français (référence)
+├── en.json       # English
+├── es.json       # Español
+├── ar.json       # العربية (RTL)
+├── it.json       # Italiano
+├── pl.json       # Polski
+└── uk.json       # Українська
+```
+
+**Extension Chrome (Manifest V3)** :
+```
+extension/
+├── _locales/
+│   ├── en/
+│   │   └── messages.json
+│   ├── es/
+│   │   └── messages.json
+│   ├── ar/
+│   │   └── messages.json
+│   ├── it/
+│   │   └── messages.json
+│   ├── pl/
+│   │   └── messages.json
+│   └── uk/
+│       └── messages.json
+```
+
+**Workflow de traduction** :
+
+1. **Copier fichier de référence** :
 ```bash
-# 1. Copier fichier de langue
+# Web app
 cp web/src/locales/fr.json web/src/locales/en.json
 
-# 2. Traduire les valeurs (pas les clés)
-{
-  "home.title": "InfoVerif.org",  # NE PAS CHANGER LA CLÉ
-  "home.subtitle": "Advanced Analysis"  # TRADUIRE LA VALEUR
-}
-
-# 3. Tester localement
-npm run dev
-
-# 4. Ouvrir PR avec screenshots
+# Extension Chrome
+cp extension/_locales/fr/messages.json extension/_locales/en/messages.json
 ```
+
+2. **Traduire les valeurs (NE PAS CHANGER LES CLÉS)** :
+```json
+{
+  "home.title": "InfoVerif.org",           // Clé inchangée
+  "home.subtitle": "Advanced Analysis"     // Valeur traduite
+}
+```
+
+3. **Tester localement** :
+```bash
+# Web app
+cd web
+npm run dev
+# Changer langue dans UI
+
+# Extension Chrome
+# Charger extension non-packagée dans Chrome
+# Tester avec langue système différente
+```
+
+4. **Vérifications avant PR** :
+- [ ] Toutes les clés présentes (comparer avec `fr.json`)
+- [ ] Pas de clés supprimées ou ajoutées
+- [ ] Format JSON valide (pas d'erreurs de syntaxe)
+- [ ] Support RTL testé pour l'arabe
+- [ ] Screenshots de l'interface traduite
+- [ ] Documentation traduite si applicable
+
+**Spécificités par langue** :
+
+- **Arabe** : Support RTL (Right-to-Left), adapter CSS avec `direction: rtl` et `text-align: right`
+- **Ukrainien** : Cyrillique, attention aux caractères spéciaux, vérifier encodage UTF-8
+- **Polonais** : Caractères accentués (ą, ć, ę, ł, ń, ó, ś, ź, ż)
+
+**Priorisation** :
+1. **Phase 1 (Court terme)** : Anglais, Ukrainien (priorité)
+2. **Phase 2 (Moyen terme)** : Espagnol, Polonais (finaliser)
+3. **Phase 3 (Long terme)** : Arabe (RTL), Italien
+
+**Contenu à localiser** :
+- Interface utilisateur (boutons, labels, messages d'erreur)
+- Documentation technique (README, guides, API docs)
+- Noms des techniques DIMA (traductions validées par experts)
+- Formules mathématiques : annotations et explications traduites (LaTeX reste universel)
+- Messages de l'extension Chrome
+- Métadonnées et descriptions
+
+**Formules & Documentation technique** :
+- Les équations LaTeX (ex: `I_p = α₁·manipulation_émotionnelle + ...`) restent identiques dans toutes les langues
+- Les annotations, explications contextuelles et descriptions seront traduites
+- Documentation académique (papers, méthodologie) : versions traduites disponibles
 
 ---
 

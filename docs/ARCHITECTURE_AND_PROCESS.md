@@ -612,7 +612,12 @@ if (analyzingPosts.get(permalink) === 'loading') {
 
 ### 6.2 Medium Priority
 
-1. **Multi-language Support**: English output option
+1. **Multi-language Localization (i18n)**: Complete multilingual support
+   - **Phase 1 (Priority)**: English, Ukrainian (interface + extension + documentation)
+   - **Phase 2**: Polish (complete), Spanish (interface + extension + documentation)
+   - **Phase 3**: Arabic (RTL support required), Italian (interface + extension)
+   - **Implementation**: React i18next (web app), Chrome i18n API (extension)
+   - **Scope**: All UI strings, DIMA technique names, documentation, error messages
 2. **Offline Mode**: Service worker caching for extension
 3. **Batch Analysis**: Analyze multiple posts at once
 4. **Export Reports**: PDF/JSON download

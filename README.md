@@ -161,6 +161,8 @@ detected_techniques = GPT-4o-mini(prompt, text) → [{dima_code, family, evidenc
 Φ_influence = f(detected_techniques, embedding_hints, scores)
 ```
 
+**Note** : Les formules mathématiques et la documentation technique seront disponibles dans toutes les langues supportées (anglais, ukrainien, polonais, espagnol, arabe, italien). Les équations LaTeX restent universelles, tandis que les explications et annotations seront traduites.
+
 ---
 
 ## 🇫🇷 Analyse Détaillée en Français
@@ -483,7 +485,13 @@ git push origin feature/ma-super-feature
 - [ ] **Redis caching** : Cache des résultats d'embeddings (réduire coûts API)
 - [ ] **WebSocket streaming** : Mises à jour temps réel de l'analyse
 - [ ] **Confidence calibration** : Intervalles de confiance pour scores
-- [ ] **Multi-language support** : English + French output
+- [ ] **Multi-language localization (i18n)** : Support complet multilingue
+  - [ ] **Anglais (English)** : Interface web + extension + documentation
+  - [ ] **Ukrainien (Ukrainian)** : Interface web + extension (priorité)
+  - [ ] **Polonais (Polish)** : Finaliser interface web + extension
+  - [ ] **Espagnol (Spanish)** : Interface web + extension + documentation
+  - [ ] **Arabe (Arabic)** : Interface web + extension (support RTL)
+  - [ ] **Italien (Italian)** : Interface web + extension
 - [ ] **YouTube extension** : Résoudre problèmes de visibilité bouton
 
 ### Améliorations Fonctionnelles (Moyen Terme)
