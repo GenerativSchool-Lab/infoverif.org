@@ -660,24 +660,53 @@ async function detectTikTokVideo() {
   debugLog('CONTENT_SCRIPT', 'Waiting for TikTok content...');
   
   try {
-    // Check if it's a search page or individual video
-    const isSearchPage = window.location.pathname.includes('/search');
+    // UNIVERSAL DETECTION: Wait for any video element (TikTok always has videos)
+    await waitForElement('video', 10000);
+    
+    // Determine page type based on URL
+    const pathname = window.location.pathname;
+    const isSearchPage = pathname.includes('/search');
+    const isVideoPage = pathname.includes('/video/') || pathname.match(/@[\w.-]+\/video\/\d+/);
+    
+    // Strategy: Use fixed button for all pages (simpler, consistent UX)
+    showTikTokAnalyzeButton();
+    
+    // Watch for URL changes (TikTok feed/FYP changes URL without reload)
+    observeTikTokNavigation();
     
     if (isSearchPage) {
-      // Search results: use hover detection (like Twitter)
-      await waitForElement(TIKTOK_SELECTORS.videoContainer.search, 10000);
-      scanTikTokVideos();
-      observeNewTikTokVideos();
       debugLog('CONTENT_SCRIPT', 'TikTok search page detected');
-    } else {
-      // Individual video: use button (like YouTube)
-      await waitForElement(TIKTOK_SELECTORS.videoContainer.primary, 10000);
-      showTikTokAnalyzeButton();
+    } else if (isVideoPage) {
       debugLog('CONTENT_SCRIPT', 'TikTok video page detected');
+    } else {
+      debugLog('CONTENT_SCRIPT', 'TikTok feed/FYP detected');
     }
   } catch (error) {
-    console.warn('[InfoVerif] TikTok content not found:', error);
+    console.warn('[InfoVerif] TikTok video not found:', error);
   }
+}
+
+function observeTikTokNavigation() {
+  let lastUrl = window.location.href;
+  
+  // Watch for URL changes (TikTok SPA navigation)
+  const observer = new MutationObserver(debounce(() => {
+    const currentUrl = window.location.href;
+    
+    if (currentUrl !== lastUrl) {
+      debugLog('CONTENT_SCRIPT', `TikTok navigation detected: ${lastUrl} → ${currentUrl}`);
+      lastUrl = currentUrl;
+      
+      // Button stays visible (no need to remove/re-inject)
+      // User can analyze any video in feed by clicking button
+      debugLog('CONTENT_SCRIPT', 'TikTok: Button persists across navigation');
+    }
+  }, 300));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 }
 
 function scanTikTokVideos() {
@@ -722,7 +751,7 @@ function showTikTokAnalyzeButton() {
 }
 
 async function handleTikTokAnalyze() {
-  debugLog('CONTENT_SCRIPT', 'Analyze clicked for TikTok (individual video)');
+  debugLog('CONTENT_SCRIPT', 'Analyze clicked for TikTok');
   
   const button = document.getElementById('infoverif-tiktok-button');
   if (button) {
@@ -733,19 +762,54 @@ async function handleTikTokAnalyze() {
   try {
     await injectFloatingPanel();
     
-    const container = document.querySelector(TIKTOK_SELECTORS.videoContainer.primary) ||
-                      document.querySelector(TIKTOK_SELECTORS.videoContainer.fallback);
-    const extracted = extractTikTokData(container || document.body);
+    // UNIVERSAL EXTRACTION: Find currently visible/playing video
+    // TikTok always uses current URL as video identifier (individual, feed, FYP)
+    const url = window.location.href;
+    
+    // Try to find video description from DOM
+    let text = '';
+    const descSelectors = [
+      'h1[data-e2e="browse-video-desc"]',  // Individual video
+      'div[data-e2e="search-card-desc"]',   // Search results
+      'div.tiktok-1ejylhp-DivContainer',    // Feed
+      'span[class*="SpanText"]'              // Generic fallback
+    ];
+    
+    for (const selector of descSelectors) {
+      const el = document.querySelector(selector);
+      if (el && el.textContent.trim()) {
+        text = el.textContent.trim();
+        break;
+      }
+    }
+    
+    // Try to find author
+    let author = 'unknown';
+    const authorSelectors = [
+      'a[data-e2e="browse-username"]',
+      'a[data-e2e="search-card-user-link"]',
+      'span[data-e2e="browse-username"]'
+    ];
+    
+    for (const selector of authorSelectors) {
+      const el = document.querySelector(selector);
+      if (el && el.textContent.trim()) {
+        author = el.textContent.trim().replace('@', '');
+        break;
+      }
+    }
+    
+    const metadata = {
+      author,
+      permalink: url,
+      platform: 'tiktok',
+      hasVideo: true,
+      postText: text  // For multimodal analysis
+    };
     
     showPanelLoading();
     
-    const mode = extracted.hasVideo ? 'video' : 'text';
-    const data = extracted.hasVideo ? { url: extracted.videoUrl } : { text: extracted.text };
-    if (extracted.hasVideo && extracted.text) {
-      extracted.metadata.postText = extracted.text;
-    }
-    
-    const message = createAnalyzeRequest(mode, PLATFORMS.TIKTOK, data, extracted.metadata);
+    const message = createAnalyzeRequest('video', PLATFORMS.TIKTOK, { url }, metadata);
     const response = await chrome.runtime.sendMessage(message);
     
     if (response.success && response.report) {
