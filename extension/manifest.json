@@ -51,10 +51,9 @@
         "https://*.instagram.com/*",
         "https://*.facebook.com/*"
       ],
-      "js": ["contentScript.js"],
+      "js": ["contentScript-bundle.js"],
       "css": ["styles/content.css"],
-      "run_at": "document_idle",
-      "type": "module"
+      "run_at": "document_idle"
     }
   ],
   

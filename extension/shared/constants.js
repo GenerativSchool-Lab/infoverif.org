@@ -171,10 +171,11 @@ export const FEATURES = {
 
 // Development & Debug
 export const DEBUG = {
-  ENABLED: false,  // Set to true for console logs
-  LOG_API_CALLS: false,
-  LOG_MESSAGES: false,
-  LOG_DOM_EXTRACTION: false
+  ENABLED: true,  // Set to true for console logs
+  LOG_API_CALLS: true,
+  LOG_MESSAGES: true,
+  LOG_DOM_EXTRACTION: true,
+  LOG_CONTENT_SCRIPT: true
 };
 
 // Helper: Detect platform from current URL
@@ -195,8 +196,8 @@ export function getApiUrl(endpoint) {
 
 // Helper: Debug log (only if DEBUG.ENABLED)
 export function debugLog(category, ...args) {
-  if (DEBUG.ENABLED && DEBUG[`LOG_${category.toUpperCase()}`]) {
-    console.log(`[InfoVerif Debug: ${category}]`, ...args);
+  if (DEBUG.ENABLED) {
+    console.log(`[InfoVerif:${category}]`, ...args);
   }
 }
 
