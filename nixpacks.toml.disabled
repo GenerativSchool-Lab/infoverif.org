@@ -1,0 +1,26 @@
+[phases.setup]
+nixPkgs = ["python311", "ffmpeg", "stdenv.cc.cc.lib", "gcc"]
+aptPackages = ["curl"]
+
+[phases.install]
+# Optimized for caching: pip will skip if packages already satisfy requirements
+# Use lightweight requirements for metadata POC
+cmds = [
+  "python3.11 -m venv --without-pip /app/.venv",
+  ". /app/.venv/bin/activate && curl -sS https://bootstrap.pypa.io/get-pip.py | python",
+  "cd api && . /app/.venv/bin/activate && pip install --upgrade pip setuptools wheel",
+  "cd api && . /app/.venv/bin/activate && PIP_PREFER_BINARY=1 pip install --prefer-binary --cache-dir /tmp/pip-cache --upgrade-strategy only-if-needed -r requirements-lite.txt"
+]
+
+# Cache pip downloads and built wheels between builds
+# Railway/Docker will reuse these layers if requirements.txt hasn't changed
+[phases.cache]
+directories = [
+  "/tmp/pip-cache",
+  "/root/.cache/pip",
+  "/app/.venv"  # Cache the venv itself if possible
+]
+
+[start]
+cmd = "cd api && . /app/.venv/bin/activate && LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+
