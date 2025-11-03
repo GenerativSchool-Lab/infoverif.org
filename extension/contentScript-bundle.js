@@ -351,9 +351,44 @@ async function detectYouTubeVideo() {
     await waitForElement(YOUTUBE_SELECTORS.videoContainer.primary, 10000);
     showYouTubeAnalyzeButton();
     debugLog('CONTENT_SCRIPT', 'YouTube video detected');
+    
+    // Watch for SPA navigation (YouTube doesn't reload page)
+    observeYouTubeNavigation();
   } catch (error) {
     console.warn('[InfoVerif] YouTube video not found:', error);
   }
+}
+
+function observeYouTubeNavigation() {
+  let lastUrl = window.location.href;
+  
+  // Watch for URL changes (SPA navigation)
+  const observer = new MutationObserver(debounce(() => {
+    const currentUrl = window.location.href;
+    
+    if (currentUrl !== lastUrl) {
+      debugLog('CONTENT_SCRIPT', `YouTube navigation detected: ${lastUrl} → ${currentUrl}`);
+      lastUrl = currentUrl;
+      
+      // Remove old button
+      const oldButton = document.getElementById('infoverif-youtube-button');
+      if (oldButton) {
+        oldButton.remove();
+      }
+      
+      // Re-detect video after short delay (let YouTube load content)
+      setTimeout(() => {
+        if (currentUrl.includes('/watch?v=') || currentUrl.includes('/shorts/')) {
+          detectYouTubeVideo();
+        }
+      }, 500);
+    }
+  }, 300));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 }
 
 function showYouTubeAnalyzeButton() {
@@ -543,7 +578,40 @@ async function handleYouTubeAnalyze() {
   }
   
   try {
+    // Inject floating panel if not already done
+    await injectFloatingPanel();
+    
     const extracted = extractYouTubeData();
+    
+    // Check cache first
+    const videoUrl = extracted.url;
+    const cached = analyzedCache.get(videoUrl);
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+    
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+      debugLog('CONTENT_SCRIPT', 'Using cached YouTube analysis');
+      
+      // Show cached report from storage
+      const { currentReport } = await chrome.storage.session.get('currentReport');
+      if (currentReport) {
+        showPanelReport(currentReport);
+      }
+      
+      if (button) {
+        button.disabled = false;
+        button.textContent = '✓ Déjà analysé';
+        setTimeout(() => {
+          button.innerHTML = `
+            <span class="infoverif-icon">🛡️</span>
+            <span class="infoverif-text">Analyser avec InfoVerif</span>
+          `;
+        }, 2000);
+      }
+      return;
+    }
+    
+    showPanelLoading();
+    
     const message = createAnalyzeRequest(
       'video',
       PLATFORMS.YOUTUBE,
@@ -553,27 +621,31 @@ async function handleYouTubeAnalyze() {
     
     const response = await chrome.runtime.sendMessage(message);
     
-    if (response.success) {
-      debugLog('CONTENT_SCRIPT', 'YouTube analysis request sent');
+    if (response.success && response.report) {
+      debugLog('CONTENT_SCRIPT', 'YouTube analysis complete, showing report');
       
-      // Request background to open side panel
-      chrome.runtime.sendMessage({ 
-        type: 'OPEN_PANEL'
-      }).catch(err => {
-        debugLog('CONTENT_SCRIPT', 'Could not request panel open:', err.message);
+      // Cache the analysis
+      analyzedCache.set(videoUrl, {
+        timestamp: Date.now(),
+        analysis_id: response.analysis_id
       });
       
+      // Show report in floating panel
+      showPanelReport(response.report);
+      
       if (button) {
-        button.textContent = '✓ Analyse en cours';
+        button.disabled = false;
+        button.textContent = '✓ Analyse terminée';
         setTimeout(() => {
-          button.disabled = false;
           button.innerHTML = `
             <span class="infoverif-icon">🛡️</span>
             <span class="infoverif-text">Analyser avec InfoVerif</span>
           `;
-        }, 3000);
+        }, 2000);
       }
     } else {
+      showPanelError(response.message || 'Erreur lors de l\'analyse');
+      
       if (button) {
         button.textContent = '✗ Erreur';
         button.disabled = false;
@@ -581,6 +653,9 @@ async function handleYouTubeAnalyze() {
     }
   } catch (error) {
     console.error('[InfoVerif] YouTube analyze error:', error);
+    
+    showPanelError(error.message);
+    
     if (button) {
       // Check for context invalidation
       if (error.message.includes('Extension context invalidated') || 
