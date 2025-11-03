@@ -85,15 +85,18 @@ const YOUTUBE_SELECTORS = {
 
 const TIKTOK_SELECTORS = {
   videoContainer: {
-    primary: 'div[data-e2e="browse-video"]',
+    primary: 'div[data-e2e="browse-video"]',  // Individual video page
+    search: 'div[data-e2e="search_top-item"]',  // Search results page
     fallback: 'div[class*="DivVideoContainer"]'
   },
   textContent: {
     primary: 'h1[data-e2e="browse-video-desc"]',
+    search: 'div[data-e2e="search-card-desc"]',
     fallback: 'div[class*="SpanText"]'
   },
   author: {
     username: 'a[data-e2e="browse-username"]',
+    search: 'a[data-e2e="search-card-user-link"]',
     fallback: 'span[data-e2e="browse-username"]'
   },
   video: {
@@ -233,24 +236,42 @@ function extractYouTubeData() {
 }
 
 function extractTikTokData(container) {
-  const textEl = container.querySelector(TIKTOK_SELECTORS.textContent.primary) ||
-                 container.querySelector(TIKTOK_SELECTORS.textContent.fallback);
-  const text = textEl ? textEl.textContent.trim() : '';
+  // Check if it's a search result or individual video
+  const isSearchPage = window.location.pathname.includes('/search');
   
-  const authorEl = container.querySelector(TIKTOK_SELECTORS.author.username) ||
-                   container.querySelector(TIKTOK_SELECTORS.author.fallback);
-  const author = authorEl ? authorEl.textContent.trim() : 'Unknown';
+  let textEl, authorEl, text, author, permalink;
   
-  const url = window.location.href;
+  if (isSearchPage) {
+    // Search result selectors
+    textEl = container.querySelector(TIKTOK_SELECTORS.textContent.search) ||
+             container.querySelector(TIKTOK_SELECTORS.textContent.fallback);
+    authorEl = container.querySelector(TIKTOK_SELECTORS.author.search) ||
+               container.querySelector(TIKTOK_SELECTORS.author.fallback);
+    
+    // Try to extract video URL from link
+    const linkEl = container.querySelector('a[href*="/video/"]');
+    permalink = linkEl ? `https://www.tiktok.com${linkEl.getAttribute('href')}` : window.location.href;
+  } else {
+    // Individual video selectors
+    textEl = container.querySelector(TIKTOK_SELECTORS.textContent.primary) ||
+             container.querySelector(TIKTOK_SELECTORS.textContent.fallback);
+    authorEl = container.querySelector(TIKTOK_SELECTORS.author.username) ||
+               container.querySelector(TIKTOK_SELECTORS.author.fallback);
+    permalink = window.location.href;
+  }
+  
+  text = textEl ? textEl.textContent.trim() : '';
+  author = authorEl ? authorEl.textContent.trim().replace('@', '') : 'unknown';
+  
   const hasVideo = !!container.querySelector(TIKTOK_SELECTORS.video.element);
   
   return {
     text,
     hasVideo,
-    videoUrl: hasVideo ? url : null,
+    videoUrl: hasVideo ? permalink : null,
     metadata: {
       author,
-      permalink: url,
+      permalink,
       platform: 'tiktok',
       hasVideo
     }
@@ -635,15 +656,53 @@ function showYouTubeAnalyzeButton() {
 // ============================================================================
 
 async function detectTikTokVideo() {
-  debugLog('CONTENT_SCRIPT', 'Waiting for TikTok video...');
+  debugLog('CONTENT_SCRIPT', 'Waiting for TikTok content...');
   
   try {
-    await waitForElement(TIKTOK_SELECTORS.videoContainer.primary, 10000);
-    showTikTokAnalyzeButton();
-    debugLog('CONTENT_SCRIPT', 'TikTok video detected');
+    // Check if it's a search page or individual video
+    const isSearchPage = window.location.pathname.includes('/search');
+    
+    if (isSearchPage) {
+      // Search results: use hover detection (like Twitter)
+      await waitForElement(TIKTOK_SELECTORS.videoContainer.search, 10000);
+      scanTikTokVideos();
+      observeNewTikTokVideos();
+      debugLog('CONTENT_SCRIPT', 'TikTok search page detected');
+    } else {
+      // Individual video: use button (like YouTube)
+      await waitForElement(TIKTOK_SELECTORS.videoContainer.primary, 10000);
+      showTikTokAnalyzeButton();
+      debugLog('CONTENT_SCRIPT', 'TikTok video page detected');
+    }
   } catch (error) {
-    console.warn('[InfoVerif] TikTok video not found:', error);
+    console.warn('[InfoVerif] TikTok content not found:', error);
   }
+}
+
+function scanTikTokVideos() {
+  const videos = document.querySelectorAll(TIKTOK_SELECTORS.videoContainer.search);
+  
+  videos.forEach(video => {
+    if (highlightedElements.has(video)) return;
+    
+    video.addEventListener('mouseenter', () => showPostHighlight(video, 'tiktok'));
+    video.addEventListener('mouseleave', () => hidePostHighlight(video));
+    
+    highlightedElements.add(video);
+  });
+  
+  debugLog('CONTENT_SCRIPT', `Found ${videos.length} TikTok videos`);
+}
+
+function observeNewTikTokVideos() {
+  const observer = new MutationObserver(debounce(() => {
+    scanTikTokVideos();
+  }, 500));
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 }
 
 function showTikTokAnalyzeButton() {
@@ -662,7 +721,7 @@ function showTikTokAnalyzeButton() {
 }
 
 async function handleTikTokAnalyze() {
-  debugLog('CONTENT_SCRIPT', 'Analyze clicked for TikTok');
+  debugLog('CONTENT_SCRIPT', 'Analyze clicked for TikTok (individual video)');
   
   const button = document.getElementById('infoverif-tiktok-button');
   if (button) {
@@ -918,6 +977,8 @@ async function handleAnalyzeClick(element, platform) {
     let extracted;
     if (platform === PLATFORMS.TWITTER) {
       extracted = extractTwitterData(element);
+    } else if (platform === PLATFORMS.TIKTOK) {
+      extracted = extractTikTokData(element);
     } else if (platform === PLATFORMS.INSTAGRAM) {
       extracted = extractInstagramData(element);
     } else if (platform === PLATFORMS.FACEBOOK) {
