@@ -1,10 +1,6 @@
 [phases.setup]
-nixPkgs = ["python311", "ffmpeg"]
-aptPackages = [
-  "curl",
-  "libstdc++6",
-  "libgomp1"
-]
+nixPkgs = ["python311", "ffmpeg", "stdenv.cc.cc.lib", "gcc"]
+aptPackages = ["curl"]
 
 [phases.install]
 # Optimized for caching: pip will skip if packages already satisfy requirements
