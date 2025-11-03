@@ -874,7 +874,7 @@ function createAnalyzeOverlay(element, platform) {
   }
   
   if (isAnalyzed) {
-    button.innerHTML = '✓ Déjà analysé • Cliquez pour rouvrir';
+    button.innerHTML = '✓ Déjà analysé • Cliquez pour analyser de nouveau';
     button.classList.add('analyzed');
   } else {
     button.textContent = 'Analyser avec InfoVerif';
