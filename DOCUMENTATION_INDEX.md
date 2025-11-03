@@ -413,6 +413,9 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 | **Comment déployer en production ?** | [TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md) — Section "Déploiement" |
 | **Quelles sont les limitations ?** | [README.md](./README.md) — Section "Limitations" |
 | **Roadmap du projet ?** | [README.md](./README.md) + [CHANGELOG.md](./CHANGELOG.md) — Sections "Roadmap" |
+| **Comment contribuer aux traductions ?** | [CONTRIBUTING.md](./CONTRIBUTING.md) — Section "Traductions & Localisation" |
+| **Quelles langues sont supportées ?** | [README.md](./README.md) + [CONTRIBUTING.md](./CONTRIBUTING.md) — Roadmap i18n (EN, UK, PL, ES, AR, IT) |
+| **Comment traduire les formules ?** | [CONTRIBUTING.md](./CONTRIBUTING.md) — Section "Formules & Documentation technique" |
 | **Comment tester l'API ?** | [QUICKSTART.md](./QUICKSTART.md) — Section "Test Rapide" |
 | **Variables d'environnement ?** | [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) — Section "Variables d'Environnement" |
 | **Erreur lors de l'analyse ?** | [QUICKSTART.md](./QUICKSTART.md) + [TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md) — "Troubleshooting" |
