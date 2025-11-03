@@ -22,6 +22,8 @@ class Citation(BaseModel):
 
 class ChatResponse(BaseModel):
     """Response body for /chat endpoint."""
+    model_config = {"protected_namespaces": ()}  # Allow 'model_*' fields
+    
     reply: str = Field(..., description="Bot's answer in requested language")
     citations: List[Citation] = Field(default_factory=list, description="Technique citations in reply")
     latency_ms: int = Field(..., description="Backend processing time")

@@ -553,9 +553,20 @@ async function detectYouTubeVideo() {
   debugLog('CONTENT_SCRIPT', 'Waiting for YouTube video...');
   
   try {
-    await waitForElement(YOUTUBE_SELECTORS.videoContainer.primary, 10000);
+    // Check if it's a Shorts page (different selectors)
+    const isShorts = window.location.pathname.includes('/shorts/');
+    
+    if (isShorts) {
+      // Shorts use different container (#shorts-container)
+      await waitForElement('#shorts-container video, ytd-reel-video-renderer video', 10000);
+      debugLog('CONTENT_SCRIPT', 'YouTube Shorts detected');
+    } else {
+      // Normal video page
+      await waitForElement(YOUTUBE_SELECTORS.videoContainer.primary, 10000);
+      debugLog('CONTENT_SCRIPT', 'YouTube video detected');
+    }
+    
     showYouTubeAnalyzeButton();
-    debugLog('CONTENT_SCRIPT', 'YouTube video detected');
     
     // Watch for SPA navigation (YouTube doesn't reload page)
     observeYouTubeNavigation();
