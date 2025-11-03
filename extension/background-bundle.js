@@ -328,24 +328,32 @@ async function handleChatRequest(message, sender) {
 
 async function openSidePanel(tabId) {
   try {
-    // MV3 restriction: sidePanel.open() requires user gesture
-    // Instead, we'll set the panel to be available and let user open it
-    // by clicking the extension icon
-    
-    // Enable side panel for this tab
-    if (tabId) {
-      await chrome.sidePanel.setOptions({
-        tabId,
-        enabled: true
-      });
-      debugLog('BACKGROUND', 'Side panel enabled for tab');
+    if (!tabId) {
+      debugLog('BACKGROUND', 'No tabId provided to openSidePanel');
+      return;
     }
     
-    // Note: User must click extension icon to open panel
-    // We can't auto-open due to MV3 restrictions
+    // Get tab info to extract windowId
+    const tab = await chrome.tabs.get(tabId);
+    
+    // Try to open side panel (requires user gesture from content script click)
+    await chrome.sidePanel.open({ windowId: tab.windowId });
+    debugLog('BACKGROUND', `Side panel opened for window ${tab.windowId}`);
   } catch (error) {
-    // Ignore error if sidePanel API not fully supported
-    debugLog('BACKGROUND', 'Side panel API note:', error.message);
+    // Fallback: enable panel for manual opening
+    debugLog('BACKGROUND', 'Could not auto-open panel:', error.message);
+    
+    try {
+      if (tabId) {
+        await chrome.sidePanel.setOptions({
+          tabId,
+          enabled: true
+        });
+        debugLog('BACKGROUND', 'Side panel enabled for tab (user must click icon)');
+      }
+    } catch (fallbackError) {
+      debugLog('BACKGROUND', 'Side panel API error:', fallbackError.message);
+    }
   }
 }
 

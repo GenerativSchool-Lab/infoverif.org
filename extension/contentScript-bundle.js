@@ -373,14 +373,13 @@ async function handleAnalyzeClick(element, platform) {
     if (response.success) {
       debugLog('CONTENT_SCRIPT', 'Analysis request sent successfully');
       
-      // Open side panel automatically (requires user gesture, which we have from the click)
-      try {
-        await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-        debugLog('CONTENT_SCRIPT', 'Side panel opened automatically');
-      } catch (panelError) {
-        // Fallback: show message to user
-        debugLog('CONTENT_SCRIPT', 'Could not auto-open panel:', panelError.message);
-      }
+      // Request background to open side panel
+      // (sidePanel API must be called from background, not content script)
+      chrome.runtime.sendMessage({ 
+        type: 'OPEN_PANEL'
+      }).catch(err => {
+        debugLog('CONTENT_SCRIPT', 'Could not request panel open:', err.message);
+      });
       
       showSuccessOverlay(element);
     } else {
@@ -423,34 +422,22 @@ async function handleYouTubeAnalyze() {
     if (response.success) {
       debugLog('CONTENT_SCRIPT', 'YouTube analysis request sent');
       
-      // Open side panel automatically
-      try {
-        await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-        debugLog('CONTENT_SCRIPT', 'Side panel opened automatically');
-        
-        if (button) {
-          button.textContent = '✓ Analyse en cours';
-          setTimeout(() => {
-            button.disabled = false;
-            button.innerHTML = `
-              <span class="infoverif-icon">🛡️</span>
-              <span class="infoverif-text">Analyser avec InfoVerif</span>
-            `;
-          }, 3000);
-        }
-      } catch (panelError) {
-        debugLog('CONTENT_SCRIPT', 'Could not auto-open panel:', panelError.message);
-        
-        if (button) {
-          button.textContent = '✓ Cliquez sur 🛡️';
-          setTimeout(() => {
-            button.disabled = false;
-            button.innerHTML = `
-              <span class="infoverif-icon">🛡️</span>
-              <span class="infoverif-text">Analyser avec InfoVerif</span>
-            `;
-          }, 3000);
-        }
+      // Request background to open side panel
+      chrome.runtime.sendMessage({ 
+        type: 'OPEN_PANEL'
+      }).catch(err => {
+        debugLog('CONTENT_SCRIPT', 'Could not request panel open:', err.message);
+      });
+      
+      if (button) {
+        button.textContent = '✓ Analyse en cours';
+        setTimeout(() => {
+          button.disabled = false;
+          button.innerHTML = `
+            <span class="infoverif-icon">🛡️</span>
+            <span class="infoverif-text">Analyser avec InfoVerif</span>
+          `;
+        }, 3000);
       }
     } else {
       if (button) {
