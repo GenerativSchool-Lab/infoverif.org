@@ -302,6 +302,24 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 
 ---
 
+### 🌍 Traducteur / Contributeur Localisation
+
+**Objectif** : Contribuer aux traductions de l'interface et de la documentation
+
+1. **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Section "Traductions & Localisation" ⭐
+   - Roadmap des langues (EN, UK, PL, ES, AR, IT)
+   - Structure des fichiers de traduction (web app + extension)
+   - Workflow de traduction avec checklist
+   - Spécificités par langue (RTL, Cyrillic, caractères spéciaux)
+   - Priorisation (Phase 1-3)
+   - Guidance pour formules mathématiques (LaTeX universel vs annotations traduites)
+2. **[README.md](./README.md)** — Section "Future Work" → Multi-language localization
+3. **[docs/ARCHITECTURE_AND_PROCESS.md](./docs/ARCHITECTURE_AND_PROCESS.md)** — Section "Multi-language Localization" (implémentation technique)
+
+**Temps total** : 30 minutes (guide de contribution)
+
+---
+
 ## 📖 Guides de Lecture Recommandés
 
 ### 🌟 Parcours Débutant (30 min)
@@ -459,6 +477,8 @@ Consultez la **page `/method-card`** sur le frontend pour :
 - Taxonomie complète des 20+ techniques
 - Roadmap avec objectifs académiques
 - Principes éthiques & limitations
+
+**Note** : Les formules LaTeX restent universelles dans toutes les langues. Les annotations et explications seront traduites dans toutes les langues supportées (EN, UK, PL, ES, AR, IT).
 
 ### Exemples de Code
 
