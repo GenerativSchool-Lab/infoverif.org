@@ -10,6 +10,7 @@ PyYAML==6.0.1
 openai==1.12.0
 httpx<0.28
 ffmpeg-python==0.2.0
+yt-dlp>=2023.12.30  # Video download from Twitter, YouTube, TikTok, etc.
 
 # DIMA M2.2: Semantic Embeddings Layer
 sentence-transformers>=2.2.2,<3.0.0  # Multilingual embeddings (470MB model), let pip resolve compatible version

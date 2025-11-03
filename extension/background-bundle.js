@@ -253,12 +253,13 @@ async function analyzeText(text, platform, metadata) {
 async function analyzeVideo(url, platform, metadata) {
   const apiUrl = getApiUrl();
   
+  // Use new /analyze-video-url endpoint (supports yt-dlp for Twitter, YouTube, etc.)
   const formData = new FormData();
   formData.append('url', url);
   formData.append('platform', platform);
   
   const response = await retryWithBackoff(async () => {
-    const res = await fetch(`${apiUrl}/analyze-video`, {
+    const res = await fetch(`${apiUrl}/analyze-video-url`, {
       method: 'POST',
       body: formData
     });
@@ -269,7 +270,7 @@ async function analyzeVideo(url, platform, metadata) {
     }
     
     return res;
-  }, 2, 2000);
+  }, 2, 5000); // Longer timeout for video download + transcription
   
   const report = await response.json();
   const headers = extractHeaders(response.headers);

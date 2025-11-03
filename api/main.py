@@ -402,6 +402,7 @@ async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] =
 
 @app.post("/analyze-video")
 async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("video")):
+    """Analyze uploaded video file (multipart/form-data)."""
     start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
@@ -429,6 +430,37 @@ async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optiona
                 os.remove(tmp_path)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"analyze-video failed: {str(e)[:300]}")
+
+
+@app.post("/analyze-video-url")
+async def analyze_video_url_endpoint(url: str = Form(...), platform: Optional[str] = Form("video")):
+    """
+    Analyze video from URL (Twitter, YouTube, TikTok, etc.) using yt-dlp.
+    Downloads audio only, transcribes with Whisper, analyzes with GPT-4 + DIMA.
+    """
+    start_time = time.time()
+    if not DEEP_ANALYSIS_ENABLED:
+        raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    
+    try:
+        from deep import analyze_url
+        
+        print(f"🎬 Analyzing video URL: {url}")
+        result = analyze_url(url, platform or "video")
+        
+        # Cache for extension chat (if analysis_id present)
+        if result.get("analysis_id"):
+            from routes.extension import cache_analysis
+            cache_analysis(result["analysis_id"], result)
+        
+        return create_analysis_response(result, start_time)
+    except Exception as e:
+        import traceback
+        full_error = traceback.format_exc()
+        print(f"❌ analyze-video-url failed: {str(e)}\n{full_error}")
+        raise HTTPException(status_code=400, detail=f"analyze-video-url failed: {str(e)[:300]}")
 
 
 @app.post("/analyze-image")

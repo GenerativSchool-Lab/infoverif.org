@@ -85,13 +85,20 @@ function extractTwitterData(article) {
   const permalinkEl = article.querySelector(TWITTER_SELECTORS.temporal.permalink);
   const permalink = permalinkEl ? permalinkEl.href : window.location.href;
   
+  // Detect video
+  const hasVideo = !!article.querySelector(TWITTER_SELECTORS.media.video);
+  const videoUrl = hasVideo ? permalink : null; // Twitter video URL is the tweet permalink
+  
   return {
     text,
+    hasVideo,
+    videoUrl,
     metadata: {
       author: username,
       timestamp,
       permalink,
-      platform: 'twitter'
+      platform: 'twitter',
+      hasVideo
     }
   };
 }
@@ -430,11 +437,10 @@ async function handleAnalyzeClick(element, platform) {
     // Inject panel if not already done
     await injectFloatingPanel();
     
-    let data, metadata;
+    let data, metadata, mode;
     
     if (platform === PLATFORMS.TWITTER) {
       const extracted = extractTwitterData(element);
-      data = { text: extracted.text };
       metadata = extracted.metadata;
       
       // Check cache first
@@ -454,12 +460,22 @@ async function handleAnalyzeClick(element, platform) {
         showSuccessOverlay(element);
         return;
       }
+      
+      // Determine mode: video or text
+      if (extracted.hasVideo && extracted.videoUrl) {
+        mode = 'video';
+        data = { url: extracted.videoUrl };
+        debugLog('CONTENT_SCRIPT', `Video detected! URL: ${extracted.videoUrl}`);
+      } else {
+        mode = 'text';
+        data = { text: extracted.text };
+      }
     }
     
     showLoadingOverlay(element);
     showPanelLoading();
     
-    const message = createAnalyzeRequest('text', platform, data, metadata);
+    const message = createAnalyzeRequest(mode, platform, data, metadata);
     const response = await chrome.runtime.sendMessage(message);
     
     if (response.success && response.report) {

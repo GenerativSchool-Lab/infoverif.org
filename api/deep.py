@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, Optional
 import ffmpeg
 from openai import OpenAI
+import yt_dlp
 
 # DIMA semantic layer imports
 try:
@@ -128,6 +129,59 @@ def extract_audio_from_file(video_path: str) -> str:
         return output_path
     except ffmpeg.Error as e:
         raise Exception(f"FFmpeg error: {e.stderr.decode()}")
+
+
+def download_audio_from_url(url: str) -> str:
+    """
+    Download audio from video URL using yt-dlp (supports Twitter, YouTube, TikTok, etc.).
+    
+    Args:
+        url: Video URL from any supported platform
+    
+    Returns:
+        Path to downloaded audio file (MP3)
+    
+    Raises:
+        Exception: If download fails
+    """
+    temp_dir = tempfile.gettempdir()
+    output_template = os.path.join(temp_dir, '%(id)s.%(ext)s')
+    
+    ydl_opts = {
+        'format': 'bestaudio/best',  # Download best audio quality (not full video)
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '128',  # 128kbps is sufficient for Whisper
+        }],
+        'outtmpl': output_template,
+        'quiet': True,
+        'no_warnings': True,
+        'extract_flat': False,
+        # Cookie/auth options (for private content if needed)
+        'cookiefile': None,  # Can add cookie file path if needed
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            print(f"📥 Downloading audio from: {url}")
+            info = ydl.extract_info(url, download=True)
+            
+            # Get the final audio file path
+            video_id = info.get('id', 'video')
+            audio_path = os.path.join(temp_dir, f"{video_id}.mp3")
+            
+            if not os.path.exists(audio_path):
+                raise Exception(f"Audio file not found after download: {audio_path}")
+            
+            print(f"✅ Audio downloaded: {audio_path} ({os.path.getsize(audio_path) / 1024 / 1024:.2f} MB)")
+            return audio_path
+            
+    except Exception as e:
+        raise Exception(f"yt-dlp download failed: {str(e)}")
 
 
 def transcribe_audio(audio_path: str) -> str:
@@ -285,7 +339,46 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, us
     return parsed
 
 
-# Removed: URL analysis; use file or text/image inputs instead
+def analyze_url(url: str, platform: str = "unknown") -> Dict:
+    """
+    Full analysis pipeline for video URL (Twitter, YouTube, TikTok, etc.).
+    Downloads audio only using yt-dlp, transcribes with Whisper, analyzes with GPT-4.
+    
+    Args:
+        url: Video URL from any supported platform
+        platform: Platform name (twitter, youtube, tiktok, etc.)
+    
+    Returns:
+        Analysis dictionary with scores, techniques, claims, summary
+    """
+    metadata = {
+        'platform': platform,
+        'title': f'{platform.capitalize()} video',
+        'description': 'Video from social media',
+        'url': url
+    }
+    
+    audio_path = None
+    try:
+        # Download audio from URL (yt-dlp)
+        audio_path = download_audio_from_url(url)
+        
+        # Transcribe with Whisper
+        print(f"🎤 Transcribing audio with Whisper...")
+        transcript = transcribe_audio(audio_path)
+        print(f"✅ Transcription complete: {len(transcript)} characters")
+        
+        # Analyze with GPT-4 + DIMA
+        analysis = analyze_with_gpt4(transcript, metadata)
+        analysis['input'] = metadata
+        analysis['transcript_excerpt'] = transcript[:500] + '...' if len(transcript) > 500 else transcript
+        
+        return analysis
+    finally:
+        # Cleanup temp audio file
+        if audio_path and os.path.exists(audio_path):
+            os.remove(audio_path)
+            print(f"🗑️  Cleaned up: {audio_path}")
 
 
 def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
