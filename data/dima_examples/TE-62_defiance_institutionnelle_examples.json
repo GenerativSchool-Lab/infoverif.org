@@ -1,0 +1,88 @@
+{
+  "dima_code": "TE-62",
+  "technique_name": "Défiance institutionnelle",
+  "dima_family": "Diversion",
+  "examples": [
+    {
+      "id": "TE-62-001",
+      "content_fr": "Les médias mainstream sont tous corrompus. Ne faites confiance qu'aux sources alternatives !",
+      "content_en": "Mainstream media are all corrupt. Only trust alternative sources!",
+      "source": "Comment thread (anonymized)",
+      "modality": "text",
+      "evidence_span": "médias mainstream, corrompus, sources alternatives",
+      "infoverif_scores": {
+        "I_p": 0.45,
+        "N_s": 0.88,
+        "F_f": 0.30
+      },
+      "annotation_notes": "Media distrust (médias corrompus), systemic corruption claim, alternative authority appeal",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-62-002",
+      "content_fr": "Les experts officiels mentent pour protéger leurs intérêts. Le système est pourri jusqu'à la moelle.",
+      "content_en": "Official experts lie to protect their interests. The system is rotten to the core.",
+      "source": "Forum post (anonymized)",
+      "modality": "text",
+      "evidence_span": "experts mentent, système pourri",
+      "infoverif_scores": {
+        "I_p": 0.50,
+        "N_s": 0.90,
+        "F_f": 0.35
+      },
+      "annotation_notes": "Expert distrust (experts mentent), systemic corruption (système pourri), totality claim (jusqu'à la moelle)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-62-003",
+      "content_fr": "Ne croyez pas les chiffres officiels ! L'État manipule les données pour nous tromper. Faites vos propres recherches.",
+      "content_en": "Don't believe official numbers! The State manipulates data to deceive us. Do your own research.",
+      "source": "Social media post (anonymized)",
+      "modality": "text",
+      "evidence_span": "Ne croyez pas, manipule, Faites vos propres recherches",
+      "infoverif_scores": {
+        "I_p": 0.48,
+        "N_s": 0.85,
+        "F_f": 0.40
+      },
+      "annotation_notes": "Data distrust (Ne croyez pas chiffres), manipulation claim, DYOR rhetoric (propres recherches)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-62-004",
+      "content_fr": "Les institutions sont toutes infiltrées. Ils travaillent pour les mêmes intérêts. Le peuple est trahi.",
+      "content_en": "Institutions are all infiltrated. They work for the same interests. The people are betrayed.",
+      "source": "Blog post (anonymized)",
+      "modality": "text",
+      "evidence_span": "infiltrées, mêmes intérêts, peuple trahi",
+      "infoverif_scores": {
+        "I_p": 0.55,
+        "N_s": 0.92,
+        "F_f": 0.25
+      },
+      "annotation_notes": "Infiltration claim (infiltrées), unified conspiracy (mêmes intérêts), betrayal narrative (peuple trahi)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-62-005",
+      "content_fr": "L'establishment scientifique est au service des lobbies. Leurs études sont biaisées. Cherchez la vérité ailleurs.",
+      "content_en": "The scientific establishment serves lobbies. Their studies are biased. Seek truth elsewhere.",
+      "source": "Video comment (anonymized)",
+      "modality": "text",
+      "evidence_span": "establishment, au service des lobbies, biaisées",
+      "infoverif_scores": {
+        "I_p": 0.42,
+        "N_s": 0.87,
+        "F_f": 0.38
+      },
+      "annotation_notes": "Scientific distrust (establishment), capture claim (au service des), systematic bias (biaisées)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    }
+  ]
+}
+

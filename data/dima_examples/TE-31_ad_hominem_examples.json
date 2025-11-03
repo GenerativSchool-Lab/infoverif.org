@@ -1,0 +1,88 @@
+{
+  "dima_code": "TE-31",
+  "technique_name": "Ad hominem",
+  "dima_family": "Discrédit",
+  "examples": [
+    {
+      "id": "TE-31-001",
+      "content_fr": "Cet expert est un incompétent notoire. On ne peut pas faire confiance à un menteur comme lui.",
+      "content_en": "This expert is a notorious incompetent. We can't trust a liar like him.",
+      "source": "Comment thread (anonymized)",
+      "modality": "text",
+      "evidence_span": "incompétent, menteur",
+      "infoverif_scores": {
+        "I_p": 0.55,
+        "N_s": 0.10,
+        "F_f": 0.75
+      },
+      "annotation_notes": "Personal attack (incompétent, menteur), character assassination, credential questioning",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-31-002",
+      "content_fr": "Pourquoi écouter cette politicienne corrompue ? Elle est payée par les lobbies pour dire ces mensonges.",
+      "content_en": "Why listen to this corrupt politician? She's paid by lobbies to tell these lies.",
+      "source": "Forum post (anonymized)",
+      "modality": "text",
+      "evidence_span": "corrompue, payée par les lobbies, mensonges",
+      "infoverif_scores": {
+        "I_p": 0.60,
+        "N_s": 0.25,
+        "F_f": 0.70
+      },
+      "annotation_notes": "Corruption accusation (corrompue, payée), motive questioning, credibility attack",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-31-003",
+      "content_fr": "Ce journaliste est un vendu. Ses articles ne valent rien, il défend toujours le même camp.",
+      "content_en": "This journalist is a sellout. His articles are worthless, he always defends the same side.",
+      "source": "Social media post (anonymized)",
+      "modality": "text",
+      "evidence_span": "vendu, ne valent rien",
+      "infoverif_scores": {
+        "I_p": 0.58,
+        "N_s": 0.15,
+        "F_f": 0.72
+      },
+      "annotation_notes": "Integrity attack (vendu), dismissal of work (ne valent rien), bias accusation",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-31-004",
+      "content_fr": "Cette chercheuse est pathétique. Aucune crédibilité. Ses diplômes ne signifient rien.",
+      "content_en": "This researcher is pathetic. No credibility. Her degrees mean nothing.",
+      "source": "Blog comment (anonymized)",
+      "modality": "text",
+      "evidence_span": "pathétique, Aucune crédibilité",
+      "infoverif_scores": {
+        "I_p": 0.62,
+        "N_s": 0.08,
+        "F_f": 0.78
+      },
+      "annotation_notes": "Character attack (pathétique), credibility denial (Aucune crédibilité), credential dismissal",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-31-005",
+      "content_fr": "Il est trop jeune / trop vieux pour comprendre. Son avis ne compte pas, il n'a aucune expérience.",
+      "content_en": "He's too young / too old to understand. His opinion doesn't count, he has no experience.",
+      "source": "Discussion forum (anonymized)",
+      "modality": "text",
+      "evidence_span": "trop jeune / trop vieux, ne compte pas, aucune expérience",
+      "infoverif_scores": {
+        "I_p": 0.50,
+        "N_s": 0.05,
+        "F_f": 0.80
+      },
+      "annotation_notes": "Age-based attack (trop jeune/vieux), opinion dismissal (ne compte pas), experience questioning",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    }
+  ]
+}
+

@@ -1,0 +1,88 @@
+{
+  "dima_code": "TE-58",
+  "technique_name": "Théorie du complot",
+  "dima_family": "Diversion",
+  "examples": [
+    {
+      "id": "TE-58-001",
+      "content_fr": "Ils ne veulent pas que vous connaissiez la VÉRITÉ. Tout est orchestré par les élites pour nous contrôler.",
+      "content_en": "They don't want you to know the TRUTH. Everything is orchestrated by the elites to control us.",
+      "source": "Forum post (anonymized)",
+      "modality": "text",
+      "evidence_span": "Ils ne veulent pas, orchestré, élites, contrôler",
+      "infoverif_scores": {
+        "I_p": 0.40,
+        "N_s": 0.92,
+        "F_f": 0.35
+      },
+      "annotation_notes": "Hidden truth claim (VÉRITÉ), secret cabal (élites), orchestration (orchestré), control narrative (contrôler)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-58-002",
+      "content_fr": "Révélation CHOC : Un plan secret mis en place depuis des décennies. Les médias mainstream vous cachent tout.",
+      "content_en": "SHOCKING revelation: A secret plan in place for decades. Mainstream media hide everything from you.",
+      "source": "Video description (anonymized)",
+      "modality": "text",
+      "evidence_span": "plan secret, décennies, cachent",
+      "infoverif_scores": {
+        "I_p": 0.65,
+        "N_s": 0.88,
+        "F_f": 0.28
+      },
+      "annotation_notes": "Grand scheme (plan secret), long-term conspiracy (décennies), media distrust (médias vous cachent)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-58-003",
+      "content_fr": "COÏNCIDENCE ? Je ne crois pas. Tous ces événements sont liés. Suivez les connexions entre ces personnes.",
+      "content_en": "COINCIDENCE? I don't think so. All these events are connected. Follow the connections between these people.",
+      "source": "Blog post (anonymized)",
+      "modality": "text",
+      "evidence_span": "COÏNCIDENCE, liés, connexions",
+      "infoverif_scores": {
+        "I_p": 0.55,
+        "N_s": 0.85,
+        "F_f": 0.38
+      },
+      "annotation_notes": "Apophenia (tous liés), pattern seeking (connexions), rhetorical question (COÏNCIDENCE?)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-58-004",
+      "content_fr": "Ils contrôlent TOUT : les médias, les gouvernements, les institutions. Réveillez-vous ! La vérité est ailleurs.",
+      "content_en": "They control EVERYTHING: media, governments, institutions. Wake up! The truth is elsewhere.",
+      "source": "Social media post (anonymized)",
+      "modality": "text",
+      "evidence_span": "contrôlent TOUT, Réveillez-vous",
+      "infoverif_scores": {
+        "I_p": 0.70,
+        "N_s": 0.90,
+        "F_f": 0.30
+      },
+      "annotation_notes": "Omnipotent cabal (contrôlent TOUT), awakening narrative (Réveillez-vous), alternative truth claim (vérité ailleurs)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-58-005",
+      "content_fr": "Ce n'est pas un hasard. Derrière chaque crise, il y a un agenda caché. Informez-vous sur les vrais acteurs du pouvoir.",
+      "content_en": "It's not by chance. Behind every crisis, there's a hidden agenda. Inform yourself about the real power players.",
+      "source": "Newsletter (anonymized)",
+      "modality": "text",
+      "evidence_span": "agenda caché, vrais acteurs du pouvoir",
+      "infoverif_scores": {
+        "I_p": 0.60,
+        "N_s": 0.87,
+        "F_f": 0.32
+      },
+      "annotation_notes": "Hidden agenda claim (agenda caché), pattern attribution (derrière chaque), power conspiracy (vrais acteurs)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    }
+  ]
+}
+

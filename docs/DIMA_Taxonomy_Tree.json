@@ -1,0 +1,126 @@
+{
+  "dima_framework": {
+    "version": "2.1.0",
+    "total_techniques": 130,
+    "families": {
+      "Émotion": {
+        "description": "Techniques exploitant les émotions pour contourner la raison",
+        "techniques": [
+          "TE-01", "TE-02", "TE-03", "TE-04", "TE-05", 
+          "TE-06", "TE-07", "TE-08", "TE-09", "TE-10"
+        ],
+        "count": 10
+      },
+      "Simplification": {
+        "description": "Réduction abusive de la complexité, cadrage binaire",
+        "techniques": [
+          "TE-11", "TE-12", "TE-13", "TE-14", "TE-15", 
+          "TE-16", "TE-17", "TE-18", "TE-19", "TE-20",
+          "TE-22", "TE-23", "TE-24", "TE-25", "TE-26",
+          "TE-27", "TE-28", "TE-29", "TE-30"
+        ],
+        "count": 19
+      },
+      "Discrédit": {
+        "description": "Attaques ad hominem, disqualification des sources",
+        "techniques": [
+          "TE-31", "TE-32", "TE-33", "TE-34", "TE-35",
+          "TE-36", "TE-37", "TE-38", "TE-39", "TE-40",
+          "TE-41", "TE-42", "TE-43", "TE-44", "TE-45",
+          "TE-46", "TE-47", "TE-48", "TE-49", "TE-50"
+        ],
+        "count": 20
+      },
+      "Diversion": {
+        "description": "Détournement d'attention, whataboutisme, relativisation",
+        "techniques": [
+          "TE-51", "TE-52", "TE-53", "TE-54", "TE-55",
+          "TE-56", "TE-57", "TE-58", "TE-59", "TE-60",
+          "TE-61", "TE-62", "TE-63", "TE-64", "TE-65",
+          "TE-66", "TE-67", "TE-68", "TE-69", "TE-70"
+        ],
+        "count": 20
+      },
+      "Décontextualisation": {
+        "description": "Retrait du contexte, citations tronquées, statistiques trompeuses",
+        "techniques": [
+          "TE-71", "TE-72", "TE-73", "TE-74", "TE-75",
+          "TE-76", "TE-77", "TE-78", "TE-79", "TE-80",
+          "TE-81", "TE-82", "TE-83", "TE-84", "TE-85",
+          "TE-86", "TE-87", "TE-88", "TE-89", "TE-90"
+        ],
+        "count": 20
+      },
+      "Rhétorique": {
+        "description": "Sophismes logiques, biais cognitifs, techniques persuasives avancées",
+        "techniques": [
+          "TE-91", "TE-92", "TE-93", "TE-94", "TE-95",
+          "TE-96", "TE-97", "TE-98", "TE-99", "TE-100",
+          "TE-101", "TE-102", "TE-103", "TE-104", "TE-105",
+          "TE-106", "TE-107", "TE-108", "TE-109", "TE-110",
+          "TE-111", "TE-112", "TE-113", "TE-114", "TE-115",
+          "TE-116", "TE-117", "TE-118", "TE-119", "TE-120",
+          "TE-121", "TE-122", "TE-123", "TE-124", "TE-125",
+          "TE-126", "TE-127", "TE-128", "TE-129", "TE-130"
+        ],
+        "count": 40
+      }
+    },
+    "infoverif_mapping": {
+      "I_p": {
+        "name": "Intensité persuasive",
+        "description": "Techniques de propagande et manipulation émotionnelle",
+        "dima_techniques_primary": [
+          "TE-01", "TE-02", "TE-03", "TE-04", "TE-05", "TE-06", "TE-07", "TE-08", "TE-09", "TE-10",
+          "TE-11", "TE-12", "TE-13", "TE-14", "TE-15", "TE-16", "TE-19", "TE-20", "TE-22", "TE-24", "TE-25", "TE-26", "TE-27", "TE-28",
+          "TE-33", "TE-34", "TE-38", "TE-39", "TE-40", "TE-41", "TE-43", "TE-44", "TE-45", "TE-46",
+          "TE-54", "TE-60", "TE-63", "TE-64", "TE-65", "TE-66", "TE-67",
+          "TE-84", "TE-89",
+          "TE-95", "TE-96", "TE-97", "TE-98", "TE-99", "TE-100", "TE-103", "TE-104", "TE-105", "TE-106", "TE-108", "TE-109", "TE-110", "TE-111", "TE-112", "TE-113", "TE-114", "TE-115", "TE-116", "TE-117", "TE-118", "TE-119", "TE-120", "TE-128", "TE-129", "TE-130"
+        ],
+        "count_primary": 70
+      },
+      "N_s": {
+        "name": "Narratif spéculatif",
+        "description": "Marqueurs conspirationnistes et défiance institutionnelle",
+        "dima_techniques_primary": [
+          "TE-18", "TE-23", "TE-26",
+          "TE-58", "TE-59", "TE-61", "TE-62", "TE-68",
+          "TE-71",
+          "TE-93", "TE-94", "TE-106", "TE-125", "TE-126"
+        ],
+        "count_primary": 14
+      },
+      "F_f": {
+        "name": "Fiabilité factuelle",
+        "description": "Sophismes logiques et patterns de désinformation",
+        "dima_techniques_primary": [
+          "TE-17", "TE-23",
+          "TE-31", "TE-32", "TE-35", "TE-36", "TE-37", "TE-42", "TE-47", "TE-48", "TE-49", "TE-50",
+          "TE-51", "TE-52", "TE-53", "TE-55", "TE-56", "TE-57", "TE-69", "TE-70",
+          "TE-72", "TE-73", "TE-74", "TE-75", "TE-76", "TE-77", "TE-78", "TE-79", "TE-80", "TE-81", "TE-82", "TE-83", "TE-85", "TE-86", "TE-87", "TE-88",
+          "TE-91", "TE-92", "TE-101", "TE-102", "TE-107", "TE-121", "TE-122", "TE-123", "TE-124", "TE-127"
+        ],
+        "count_primary": 46
+      }
+    },
+    "stats": {
+      "techniques_by_family": {
+        "Émotion": 10,
+        "Simplification": 19,
+        "Discrédit": 20,
+        "Diversion": 20,
+        "Décontextualisation": 20,
+        "Rhétorique": 40
+      },
+      "techniques_by_infoverif_primary": {
+        "I_p": 70,
+        "N_s": 14,
+        "F_f": 46
+      },
+      "many_to_many_mappings": 38,
+      "single_category_mappings": 92
+    }
+  }
+}
+

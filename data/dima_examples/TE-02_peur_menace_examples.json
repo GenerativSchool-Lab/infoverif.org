@@ -1,0 +1,88 @@
+{
+  "dima_code": "TE-02",
+  "technique_name": "Peur / Menace",
+  "dima_family": "Émotion",
+  "examples": [
+    {
+      "id": "TE-02-001",
+      "content_fr": "Si vous ne faites rien MAINTENANT, il sera TROP TARD. Le danger est imminent !",
+      "content_en": "If you do nothing NOW, it will be TOO LATE. The danger is imminent!",
+      "source": "Email campaign (anonymized)",
+      "modality": "text",
+      "evidence_span": "TROP TARD, danger, imminent",
+      "infoverif_scores": {
+        "I_p": 0.88,
+        "N_s": 0.10,
+        "F_f": 0.42
+      },
+      "annotation_notes": "Conditional threat (Si vous ne), urgency (MAINTENANT), imminence (imminent)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-02-002",
+      "content_fr": "Votre santé est en GRAVE DANGER. Les conséquences seront CATASTROPHIQUES si vous continuez à ignorer ces signes.",
+      "content_en": "Your health is in SERIOUS DANGER. The consequences will be CATASTROPHIC if you continue to ignore these signs.",
+      "source": "Health blog (anonymized)",
+      "modality": "text",
+      "evidence_span": "GRAVE DANGER, CATASTROPHIQUES",
+      "infoverif_scores": {
+        "I_p": 0.90,
+        "N_s": 0.05,
+        "F_f": 0.50
+      },
+      "annotation_notes": "Threat language (DANGER), catastrophic scenario (CATASTROPHIQUES), personal targeting (votre santé)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-02-003",
+      "content_fr": "Attention ! Des MILLIERS de victimes chaque année. Vous pourriez être le prochain. Protégez-vous IMMÉDIATEMENT.",
+      "content_en": "Warning! THOUSANDS of victims every year. You could be next. Protect yourself IMMEDIATELY.",
+      "source": "Advertisement (anonymized)",
+      "modality": "text",
+      "evidence_span": "MILLIERS de victimes, le prochain, IMMÉDIATEMENT",
+      "infoverif_scores": {
+        "I_p": 0.85,
+        "N_s": 0.08,
+        "F_f": 0.48
+      },
+      "annotation_notes": "Scale amplification (MILLIERS), personal threat (le prochain), urgency (IMMÉDIATEMENT)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-02-004",
+      "content_fr": "ALERTE ROUGE : Le risque est MAXIMAL. Si vous ne prenez pas de précautions, les conséquences seront terribles.",
+      "content_en": "RED ALERT: The risk is MAXIMUM. If you don't take precautions, the consequences will be terrible.",
+      "source": "Forum post (anonymized)",
+      "modality": "text",
+      "evidence_span": "ALERTE ROUGE, MAXIMAL, terribles",
+      "infoverif_scores": {
+        "I_p": 0.87,
+        "N_s": 0.12,
+        "F_f": 0.45
+      },
+      "annotation_notes": "Alert framing (ALERTE ROUGE), maximization (MAXIMAL), threat consequence (terribles)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-02-005",
+      "content_fr": "Ils ne veulent pas que vous sachiez la VÉRITÉ. Votre vie est en jeu. Agissez avant qu'il ne soit trop tard.",
+      "content_en": "They don't want you to know the TRUTH. Your life is at stake. Act before it's too late.",
+      "source": "Social media post (anonymized)",
+      "modality": "text",
+      "evidence_span": "vie en jeu, trop tard",
+      "infoverif_scores": {
+        "I_p": 0.82,
+        "N_s": 0.35,
+        "F_f": 0.40
+      },
+      "annotation_notes": "Hidden truth claim (VÉRITÉ), existential threat (vie en jeu), urgency (trop tard), conspiracy hint (Ils ne veulent pas)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    }
+  ]
+}
+

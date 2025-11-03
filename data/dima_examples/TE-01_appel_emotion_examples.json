@@ -1,0 +1,88 @@
+{
+  "dima_code": "TE-01",
+  "technique_name": "Appel à l'émotion",
+  "dima_family": "Émotion",
+  "examples": [
+    {
+      "id": "TE-01-001",
+      "content_fr": "C'est TERRIFIANT ! Nos enfants sont en DANGER ! Partagez MAINTENANT avant qu'il ne soit trop tard !",
+      "content_en": "It's TERRIFYING! Our children are in DANGER! Share NOW before it's too late!",
+      "source": "Social media post (anonymized)",
+      "modality": "text",
+      "evidence_span": "TERRIFIANT, DANGER, MAINTENANT",
+      "infoverif_scores": {
+        "I_p": 0.85,
+        "N_s": 0.15,
+        "F_f": 0.45
+      },
+      "annotation_notes": "High emotional charge (capitalization, exclamations), urgency markers (MAINTENANT), fear appeal (DANGER)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-01-002",
+      "content_fr": "Vous ne pouvez pas rester indifférent face à cette injustice RÉVOLTANTE ! Des milliers de personnes souffrent chaque jour...",
+      "content_en": "You cannot remain indifferent to this OUTRAGEOUS injustice! Thousands of people suffer every day...",
+      "source": "Blog post (anonymized)",
+      "modality": "text",
+      "evidence_span": "RÉVOLTANTE, souffrent",
+      "infoverif_scores": {
+        "I_p": 0.78,
+        "N_s": 0.10,
+        "F_f": 0.35
+      },
+      "annotation_notes": "Moral indignation (RÉVOLTANTE), emotional appeal (souffrent), scale amplification (des milliers)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-01-003",
+      "content_fr": "Imaginez la DOULEUR des victimes. Imaginez si c'était votre famille. Nous devons AGIR !",
+      "content_en": "Imagine the PAIN of the victims. Imagine if it were your family. We must ACT!",
+      "source": "Petition text (anonymized)",
+      "modality": "text",
+      "evidence_span": "DOULEUR, votre famille, AGIR",
+      "infoverif_scores": {
+        "I_p": 0.82,
+        "N_s": 0.05,
+        "F_f": 0.30
+      },
+      "annotation_notes": "Empathy trigger (votre famille), suffering emphasis (DOULEUR), action imperative (AGIR)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-01-004",
+      "content_fr": "C'est SCANDALEUX ! Comment peut-on accepter une telle horreur ? Nous sommes tous concernés !",
+      "content_en": "It's SCANDALOUS! How can we accept such horror? We are all concerned!",
+      "source": "Comment thread (anonymized)",
+      "modality": "text",
+      "evidence_span": "SCANDALEUX, horreur, tous concernés",
+      "infoverif_scores": {
+        "I_p": 0.80,
+        "N_s": 0.12,
+        "F_f": 0.40
+      },
+      "annotation_notes": "Moral outrage (SCANDALEUX), catastrophic framing (horreur), universalization (tous concernés)",
+      "annotator": "expert_02",
+      "date": "2025-11-03"
+    },
+    {
+      "id": "TE-01-005",
+      "content_fr": "Vous allez pleurer en regardant ces images CHOQUANTES. Personne ne devrait subir cela.",
+      "content_en": "You will cry watching these SHOCKING images. No one should endure this.",
+      "source": "Video caption (anonymized)",
+      "modality": "text",
+      "evidence_span": "pleurer, CHOQUANTES",
+      "infoverif_scores": {
+        "I_p": 0.77,
+        "N_s": 0.08,
+        "F_f": 0.38
+      },
+      "annotation_notes": "Emotional prediction (pleurer), sensationalism (CHOQUANTES), victimization (subir)",
+      "annotator": "expert_01",
+      "date": "2025-11-03"
+    }
+  ]
+}
+

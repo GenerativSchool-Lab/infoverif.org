@@ -7,6 +7,42 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [Unreleased]
+
+### 🚀 M1 COMPLETED — DIMA Framework Mapping (2025-11-03)
+
+#### 📋 DIMA Integration Milestone 1: Taxonomy Mapping
+
+**Status**: ✅ **COMPLETED**  
+**RFC**: `docs/DIMA_Semantic_RFC.md`  
+**Deliverables**:
+- ✅ Complete mapping of 130 DIMA techniques to InfoVerif categories
+- ✅ CSV mapping table with weights, semantic features, and keywords
+- ✅ Hierarchical taxonomy JSON (6 families → 130 techniques)
+- ✅ Statistical analysis report (distribution, coverage, alignment quality)
+- ✅ Validation script for CSV integrity (weights, codes, fields)
+- ✅ 50+ annotated examples (5 high-priority techniques)
+- ✅ English translation of top 20 techniques for international research
+
+**Key Artifacts**:
+- `docs/DIMA_Full_Mapping.csv` — Full 130-technique mapping table
+- `docs/DIMA_Taxonomy_Tree.json` — Hierarchical structure
+- `docs/DIMA_Mapping_Stats.md` — Distribution analysis & metrics
+- `docs/DIMA_Top20_EN.md` — English translations for collaboration
+- `tools/validate_dima_mapping.py` — Automated validation script
+- `data/dima_examples/*.json` — Annotated corpus (TE-01, TE-02, TE-31, TE-58, TE-62)
+
+**Alignment Summary**:
+- **I_p (Intensité persuasive)**: 70 techniques (54%) — Emotion, persuasion, propaganda
+- **N_s (Narratif spéculatif)**: 14 techniques (11%) — Conspiracy, distrust, speculation
+- **F_f (Fiabilité factuelle)**: 46 techniques (35%) — Fallacies, distortion, misinformation
+- **Many-to-many mappings**: 38 techniques (29%) — Overlapping semantic categories
+
+**Validation**: Automated checks passed ✅ (weights sum to 1.0, no missing codes)  
+**Next Milestone**: M2 — Semantic Detector Design (embedding similarity, zero-shot classification)
+
+---
+
 ## [1.0.0] - 2026-01-20
 
 ### 🎉 Version Initiale — MVP Fonctionnel
