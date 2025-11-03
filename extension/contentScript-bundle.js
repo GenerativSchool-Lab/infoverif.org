@@ -10,11 +10,7 @@
 
 const PLATFORMS = {
   TWITTER: 'twitter',
-  YOUTUBE: 'youtube',
   TIKTOK: 'tiktok',
-  INSTAGRAM: 'instagram',
-  FACEBOOK: 'facebook',
-  LINKEDIN: 'linkedin',
   GENERIC: 'generic'
 };
 
@@ -28,11 +24,7 @@ function detectPlatform(url) {
   try {
     const hostname = new URL(url).hostname.replace('www.', '');
     if (hostname.includes('twitter.com') || hostname.includes('x.com')) return PLATFORMS.TWITTER;
-    if (hostname.includes('youtube.com')) return PLATFORMS.YOUTUBE;
     if (hostname.includes('tiktok.com')) return PLATFORMS.TIKTOK;
-    if (hostname.includes('instagram.com')) return PLATFORMS.INSTAGRAM;
-    if (hostname.includes('facebook.com')) return PLATFORMS.FACEBOOK;
-    if (hostname.includes('linkedin.com')) return PLATFORMS.LINKEDIN;
     return PLATFORMS.GENERIC;
   } catch {
     return PLATFORMS.GENERIC;
@@ -70,19 +62,6 @@ const TWITTER_SELECTORS = {
   }
 };
 
-const YOUTUBE_SELECTORS = {
-  videoContainer: {
-    primary: 'ytd-watch-flexy'
-  },
-  url: {
-    canonical: 'link[rel="canonical"]'
-  },
-  metadata: {
-    title: 'h1.ytd-watch-metadata yt-formatted-string',
-    channel: 'ytd-channel-name a'
-  }
-};
-
 const TIKTOK_SELECTORS = {
   videoContainer: {
     primary: 'div[data-e2e="browse-video"]',  // Individual video page
@@ -101,67 +80,6 @@ const TIKTOK_SELECTORS = {
   },
   video: {
     element: 'video'
-  }
-};
-
-const INSTAGRAM_SELECTORS = {
-  postContainer: {
-    primary: 'article[role="presentation"]',
-    fallback: 'div[class*="_ab6k"]'
-  },
-  textContent: {
-    primary: 'h1._ap3a._aaco._aacu._aacx._aad6._aade',
-    fallback: 'div._a9zs > h1'
-  },
-  author: {
-    username: 'header a[role="link"]',
-    fallback: 'a[class*="_acan"]'
-  },
-  media: {
-    video: 'video',
-    image: 'img[class*="_aagt"]'
-  },
-  reels: {
-    container: 'div[class*="x1ned7t2"]',
-    video: 'video'
-  }
-};
-
-const FACEBOOK_SELECTORS = {
-  postContainer: {
-    primary: 'div[data-pagelet*="FeedUnit"]',
-    fallback: 'div[role="article"]'
-  },
-  textContent: {
-    primary: 'div[data-ad-comet-preview="message"]',
-    fallback: 'div[data-ad-preview="message"]'
-  },
-  author: {
-    name: 'h2 a[role="link"]',
-    fallback: 'strong a'
-  },
-  media: {
-    video: 'video',
-    image: 'img[data-visualcompletion="media-vc-image"]'
-  }
-};
-
-const LINKEDIN_SELECTORS = {
-  postContainer: {
-    primary: 'div[data-id*="urn:li:activity"]',
-    fallback: 'div.feed-shared-update-v2'
-  },
-  textContent: {
-    primary: 'div.feed-shared-update-v2__description',
-    fallback: 'span.break-words'
-  },
-  author: {
-    name: 'span.feed-shared-actor__name',
-    profile: 'a.feed-shared-actor__container-link'
-  },
-  media: {
-    video: 'video',
-    image: 'img[class*="ivm-view-attr__img"]'
   }
 };
 
@@ -209,32 +127,6 @@ function extractTwitterData(article) {
   };
 }
 
-function extractYouTubeData() {
-  const canonicalEl = document.querySelector(YOUTUBE_SELECTORS.url.canonical);
-  let url = canonicalEl ? canonicalEl.href : window.location.href;
-  
-  if (url.includes('/shorts/')) {
-    const videoId = url.split('/shorts/')[1].split('?')[0];
-    url = `https://www.youtube.com/watch?v=${videoId}`;
-  }
-  
-  const titleEl = document.querySelector(YOUTUBE_SELECTORS.metadata.title);
-  const title = titleEl ? titleEl.textContent.trim() : 'Unknown Title';
-  
-  const channelEl = document.querySelector(YOUTUBE_SELECTORS.metadata.channel);
-  const channel = channelEl ? channelEl.textContent.trim() : 'Unknown Channel';
-  
-  return {
-    url,
-    metadata: {
-      title,
-      channel,
-      permalink: url,
-      platform: 'youtube'
-    }
-  };
-}
-
 function extractTikTokData(container) {
   // Check if it's a search result or individual video
   const isSearchPage = window.location.pathname.includes('/search');
@@ -273,91 +165,6 @@ function extractTikTokData(container) {
       author,
       permalink,
       platform: 'tiktok',
-      hasVideo
-    }
-  };
-}
-
-function extractInstagramData(article) {
-  const textEl = article.querySelector(INSTAGRAM_SELECTORS.textContent.primary) ||
-                 article.querySelector(INSTAGRAM_SELECTORS.textContent.fallback);
-  const text = textEl ? textEl.textContent.trim() : '';
-  
-  const authorEl = article.querySelector(INSTAGRAM_SELECTORS.author.username) ||
-                   article.querySelector(INSTAGRAM_SELECTORS.author.fallback);
-  const author = authorEl ? authorEl.textContent.trim().replace('@', '') : 'unknown';
-  
-  const permalink = window.location.href;
-  
-  // Check for video (post or reel)
-  const hasVideo = !!(
-    article.querySelector(INSTAGRAM_SELECTORS.media.video) ||
-    document.querySelector(INSTAGRAM_SELECTORS.reels.video)
-  );
-  const videoUrl = hasVideo ? permalink : null;
-  
-  return {
-    text,
-    hasVideo,
-    videoUrl,
-    metadata: {
-      author,
-      permalink,
-      platform: 'instagram',
-      hasVideo
-    }
-  };
-}
-
-function extractFacebookData(article) {
-  const textEl = article.querySelector(FACEBOOK_SELECTORS.textContent.primary) ||
-                 article.querySelector(FACEBOOK_SELECTORS.textContent.fallback);
-  const text = textEl ? textEl.textContent.trim() : '';
-  
-  const authorEl = article.querySelector(FACEBOOK_SELECTORS.author.name) ||
-                   article.querySelector(FACEBOOK_SELECTORS.author.fallback);
-  const author = authorEl ? authorEl.textContent.trim() : 'unknown';
-  
-  // Facebook doesn't have stable permalinks, use current URL
-  const permalink = window.location.href;
-  
-  const hasVideo = !!article.querySelector(FACEBOOK_SELECTORS.media.video);
-  const videoUrl = hasVideo ? permalink : null;
-  
-  return {
-    text,
-    hasVideo,
-    videoUrl,
-    metadata: {
-      author,
-      permalink,
-      platform: 'facebook',
-      hasVideo
-    }
-  };
-}
-
-function extractLinkedInData(article) {
-  const textEl = article.querySelector(LINKEDIN_SELECTORS.textContent.primary) ||
-                 article.querySelector(LINKEDIN_SELECTORS.textContent.fallback);
-  const text = textEl ? textEl.textContent.trim() : '';
-  
-  const authorEl = article.querySelector(LINKEDIN_SELECTORS.author.name);
-  const author = authorEl ? authorEl.textContent.trim() : 'unknown';
-  
-  const permalink = window.location.href;
-  
-  const hasVideo = !!article.querySelector(LINKEDIN_SELECTORS.media.video);
-  const videoUrl = hasVideo ? permalink : null;
-  
-  return {
-    text,
-    hasVideo,
-    videoUrl,
-    metadata: {
-      author,
-      permalink,
-      platform: 'linkedin',
       hasVideo
     }
   };
@@ -507,16 +314,8 @@ async function startDetection() {
   try {
     if (currentPlatform === PLATFORMS.TWITTER) {
       await detectTwitterPosts();
-    } else if (currentPlatform === PLATFORMS.YOUTUBE) {
-      await detectYouTubeVideo();
     } else if (currentPlatform === PLATFORMS.TIKTOK) {
       await detectTikTokVideo();
-    } else if (currentPlatform === PLATFORMS.INSTAGRAM) {
-      await detectInstagramPosts();
-    } else if (currentPlatform === PLATFORMS.FACEBOOK) {
-      await detectFacebookPosts();
-    } else if (currentPlatform === PLATFORMS.LINKEDIN) {
-      await detectLinkedInPosts();
     }
   } catch (error) {
     console.error('[InfoVerif] Detection error:', error);
@@ -565,91 +364,6 @@ function observeNewTwitterPosts() {
     childList: true,
     subtree: true
   });
-}
-
-// ============================================================================
-// YOUTUBE DETECTION
-// ============================================================================
-
-async function detectYouTubeVideo() {
-  debugLog('CONTENT_SCRIPT', 'Waiting for YouTube video...');
-  
-  try {
-    // Check if it's a Shorts page (different selectors)
-    const isShorts = window.location.pathname.includes('/shorts/');
-    
-    if (isShorts) {
-      // Shorts use different container (#shorts-container)
-      await waitForElement('#shorts-container video, ytd-reel-video-renderer video', 10000);
-      debugLog('CONTENT_SCRIPT', 'YouTube Shorts detected');
-    } else {
-      // Normal video page
-      await waitForElement(YOUTUBE_SELECTORS.videoContainer.primary, 10000);
-      debugLog('CONTENT_SCRIPT', 'YouTube video detected');
-    }
-    
-    showYouTubeAnalyzeButton();
-    
-    // Watch for SPA navigation (YouTube doesn't reload page)
-    observeYouTubeNavigation();
-  } catch (error) {
-    console.warn('[InfoVerif] YouTube video not found:', error);
-  }
-}
-
-function observeYouTubeNavigation() {
-  let lastUrl = window.location.href;
-  
-  // Watch for URL changes (SPA navigation)
-  const observer = new MutationObserver(debounce(() => {
-    const currentUrl = window.location.href;
-    
-    if (currentUrl !== lastUrl) {
-      debugLog('CONTENT_SCRIPT', `YouTube navigation detected: ${lastUrl} → ${currentUrl}`);
-      lastUrl = currentUrl;
-      
-      // Remove old button
-      const oldButton = document.getElementById('infoverif-youtube-button');
-      if (oldButton) {
-        oldButton.remove();
-      }
-      
-      // Re-detect video after short delay (let YouTube load content)
-      setTimeout(() => {
-        if (currentUrl.includes('/watch?v=') || currentUrl.includes('/shorts/')) {
-          detectYouTubeVideo();
-        }
-      }, 500);
-    }
-  }, 300));
-  
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-}
-
-function showYouTubeAnalyzeButton() {
-  if (document.getElementById('infoverif-youtube-button')) return;
-  
-  const button = document.createElement('button');
-  button.id = 'infoverif-youtube-button';
-  button.className = 'infoverif-youtube-analyze-btn';
-  button.innerHTML = `
-    <span class="infoverif-icon">🛡️</span>
-    <span class="infoverif-text">Analyser avec InfoVerif</span>
-  `;
-  
-  button.addEventListener('click', () => handleYouTubeAnalyze());
-  
-  const playerContainer = document.querySelector('#movie_player') || 
-                         document.querySelector(YOUTUBE_SELECTORS.videoContainer.primary);
-  
-  if (playerContainer) {
-    playerContainer.appendChild(button);
-  } else {
-    document.body.appendChild(button);
-  }
 }
 
 // ============================================================================
@@ -834,135 +548,6 @@ async function handleTikTokAnalyze() {
 }
 
 // ============================================================================
-// INSTAGRAM DETECTION
-// ============================================================================
-
-async function detectInstagramPosts() {
-  debugLog('CONTENT_SCRIPT', 'Waiting for Instagram posts...');
-  
-  try {
-    await waitForElement(INSTAGRAM_SELECTORS.postContainer.primary, 10000);
-    scanInstagramPosts();
-    observeNewInstagramPosts();
-    debugLog('CONTENT_SCRIPT', 'Instagram detection active');
-  } catch (error) {
-    console.warn('[InfoVerif] Instagram posts not found:', error);
-  }
-}
-
-function scanInstagramPosts() {
-  const posts = document.querySelectorAll(INSTAGRAM_SELECTORS.postContainer.primary);
-  
-  posts.forEach(post => {
-    if (highlightedElements.has(post)) return;
-    
-    post.addEventListener('mouseenter', () => showPostHighlight(post, 'instagram'));
-    post.addEventListener('mouseleave', () => hidePostHighlight(post));
-    
-    highlightedElements.add(post);
-  });
-  
-  debugLog('CONTENT_SCRIPT', `Found ${posts.length} Instagram posts`);
-}
-
-function observeNewInstagramPosts() {
-  const observer = new MutationObserver(debounce(() => {
-    scanInstagramPosts();
-  }, 500));
-  
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-}
-
-// ============================================================================
-// FACEBOOK DETECTION
-// ============================================================================
-
-async function detectFacebookPosts() {
-  debugLog('CONTENT_SCRIPT', 'Waiting for Facebook posts...');
-  
-  try {
-    await waitForElement(FACEBOOK_SELECTORS.postContainer.primary, 10000);
-    scanFacebookPosts();
-    observeNewFacebookPosts();
-    debugLog('CONTENT_SCRIPT', 'Facebook detection active');
-  } catch (error) {
-    console.warn('[InfoVerif] Facebook posts not found:', error);
-  }
-}
-
-function scanFacebookPosts() {
-  const posts = document.querySelectorAll(FACEBOOK_SELECTORS.postContainer.primary);
-  
-  posts.forEach(post => {
-    if (highlightedElements.has(post)) return;
-    
-    post.addEventListener('mouseenter', () => showPostHighlight(post, 'facebook'));
-    post.addEventListener('mouseleave', () => hidePostHighlight(post));
-    
-    highlightedElements.add(post);
-  });
-  
-  debugLog('CONTENT_SCRIPT', `Found ${posts.length} Facebook posts`);
-}
-
-function observeNewFacebookPosts() {
-  const observer = new MutationObserver(debounce(() => {
-    scanFacebookPosts();
-  }, 500));
-  
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-}
-
-// ============================================================================
-// LINKEDIN DETECTION
-// ============================================================================
-
-async function detectLinkedInPosts() {
-  debugLog('CONTENT_SCRIPT', 'Waiting for LinkedIn posts...');
-  
-  try {
-    await waitForElement(LINKEDIN_SELECTORS.postContainer.primary, 10000);
-    scanLinkedInPosts();
-    observeNewLinkedInPosts();
-    debugLog('CONTENT_SCRIPT', 'LinkedIn detection active');
-  } catch (error) {
-    console.warn('[InfoVerif] LinkedIn posts not found:', error);
-  }
-}
-
-function scanLinkedInPosts() {
-  const posts = document.querySelectorAll(LINKEDIN_SELECTORS.postContainer.primary);
-  
-  posts.forEach(post => {
-    if (highlightedElements.has(post)) return;
-    
-    post.addEventListener('mouseenter', () => showPostHighlight(post, 'linkedin'));
-    post.addEventListener('mouseleave', () => hidePostHighlight(post));
-    
-    highlightedElements.add(post);
-  });
-  
-  debugLog('CONTENT_SCRIPT', `Found ${posts.length} LinkedIn posts`);
-}
-
-function observeNewLinkedInPosts() {
-  const observer = new MutationObserver(debounce(() => {
-    scanLinkedInPosts();
-  }, 500));
-  
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-}
-
-// ============================================================================
 // HIGHLIGHT & OVERLAY
 // ============================================================================
 
@@ -1000,15 +585,6 @@ function createAnalyzeOverlay(element, platform) {
       permalink = extracted.metadata?.permalink;
     } else if (platform === PLATFORMS.TIKTOK) {
       const extracted = extractTikTokData(element);
-      permalink = extracted.metadata?.permalink;
-    } else if (platform === PLATFORMS.INSTAGRAM) {
-      const extracted = extractInstagramData(element);
-      permalink = extracted.metadata?.permalink;
-    } else if (platform === PLATFORMS.FACEBOOK) {
-      const extracted = extractFacebookData(element);
-      permalink = extracted.metadata?.permalink;
-    } else if (platform === PLATFORMS.LINKEDIN) {
-      const extracted = extractLinkedInData(element);
       permalink = extracted.metadata?.permalink;
     }
   } catch (error) {
@@ -1080,12 +656,6 @@ async function handleAnalyzeClick(element, platform) {
       extracted = extractTwitterData(element);
     } else if (platform === PLATFORMS.TIKTOK) {
       extracted = extractTikTokData(element);
-    } else if (platform === PLATFORMS.INSTAGRAM) {
-      extracted = extractInstagramData(element);
-    } else if (platform === PLATFORMS.FACEBOOK) {
-      extracted = extractFacebookData(element);
-    } else if (platform === PLATFORMS.LINKEDIN) {
-      extracted = extractLinkedInData(element);
     } else {
       throw new Error(`Unsupported platform: ${platform}`);
     }
@@ -1198,107 +768,6 @@ async function handleAnalyzeClick(element, platform) {
       showErrorOverlay(element, 'Connexion perdue - Rafraîchissez la page (F5)');
     } else {
       showErrorOverlay(element, 'Une erreur est survenue');
-    }
-  }
-}
-
-async function handleYouTubeAnalyze() {
-  debugLog('CONTENT_SCRIPT', 'Analyze clicked for YouTube');
-  
-  const button = document.getElementById('infoverif-youtube-button');
-  if (button) {
-    button.disabled = true;
-    button.textContent = 'Analyse en cours...';
-  }
-  
-  try {
-    // Inject floating panel if not already done
-    await injectFloatingPanel();
-    
-    const extracted = extractYouTubeData();
-    
-    // Check cache first
-    const videoUrl = extracted.url;
-    const cached = analyzedCache.get(videoUrl);
-    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-    
-    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-      debugLog('CONTENT_SCRIPT', 'Using cached YouTube analysis');
-      
-      // Show cached report from storage
-      const { currentReport } = await chrome.storage.session.get('currentReport');
-      if (currentReport) {
-        showPanelReport(currentReport);
-      }
-      
-      if (button) {
-        button.disabled = false;
-        button.textContent = '✓ Déjà analysé';
-        setTimeout(() => {
-          button.innerHTML = `
-            <span class="infoverif-icon">🛡️</span>
-            <span class="infoverif-text">Analyser avec InfoVerif</span>
-          `;
-        }, 2000);
-      }
-      return;
-    }
-    
-    showPanelLoading();
-    
-    const message = createAnalyzeRequest(
-      'video',
-      PLATFORMS.YOUTUBE,
-      { url: extracted.url },
-      extracted.metadata
-    );
-    
-    const response = await chrome.runtime.sendMessage(message);
-    
-    if (response.success && response.report) {
-      debugLog('CONTENT_SCRIPT', 'YouTube analysis complete, showing report');
-      
-      // Cache the analysis
-      analyzedCache.set(videoUrl, {
-        timestamp: Date.now(),
-        analysis_id: response.analysis_id
-      });
-      
-      // Show report in floating panel
-      showPanelReport(response.report);
-      
-      if (button) {
-        button.disabled = false;
-        button.textContent = '✓ Analyse terminée';
-        setTimeout(() => {
-          button.innerHTML = `
-            <span class="infoverif-icon">🛡️</span>
-            <span class="infoverif-text">Analyser avec InfoVerif</span>
-          `;
-        }, 2000);
-      }
-    } else {
-      showPanelError(response.message || 'Erreur lors de l\'analyse');
-      
-      if (button) {
-        button.textContent = '✗ Erreur';
-        button.disabled = false;
-      }
-    }
-  } catch (error) {
-    console.error('[InfoVerif] YouTube analyze error:', error);
-    
-    showPanelError(error.message);
-    
-    if (button) {
-      // Check for context invalidation
-      if (error.message.includes('Extension context invalidated') || 
-          error.message.includes('message port closed')) {
-        button.textContent = '✗ Rafraîchissez (F5)';
-      } else {
-        button.textContent = '✗ Erreur';
-      }
-      button.disabled = false;
     }
   }
 }
