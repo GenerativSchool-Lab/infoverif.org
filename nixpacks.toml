@@ -1,7 +1,9 @@
 [phases.setup]
 nixPkgs = ["python311", "ffmpeg"]
 aptPackages = [
-  "curl"
+  "curl",
+  "libstdc++6",
+  "libgomp1"
 ]
 
 [phases.install]
