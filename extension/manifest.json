@@ -53,13 +53,22 @@
       ],
       "js": ["contentScript.js"],
       "css": ["styles/content.css"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "type": "module"
     }
   ],
   
   "web_accessible_resources": [
     {
-      "resources": ["ui/panel.html", "styles/*.css", "icons/*.png"],
+      "resources": [
+        "ui/panel.html", 
+        "ui/panel.js",
+        "ui/panel.css",
+        "styles/*.css", 
+        "icons/*.png",
+        "shared/*.js",
+        "lib/*.js"
+      ],
       "matches": ["<all_urls>"]
     }
   ],
