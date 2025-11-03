@@ -177,19 +177,37 @@ function renderReport(report) {
   const claims = report.claims || [];
   const summary = report.summary || 'Aucun résumé disponible.';
   
+  const contentSummary = report.content_summary || null;
+  const techniqueInteractions = report.technique_interactions || null;
+  
+  console.log('[InfoVerif Panel] Rendering content summary:', contentSummary ? 'YES' : 'NO');
   console.log('[InfoVerif Panel] Rendering scores:', scores);
   console.log('[InfoVerif Panel] Rendering techniques:', techniques.length, 'techniques');
   console.log('[InfoVerif Panel] Rendering claims:', claims.length, 'claims');
+  console.log('[InfoVerif Panel] Rendering interactions:', techniqueInteractions ? 'YES' : 'NO');
   console.log('[InfoVerif Panel] Rendering summary length:', summary.length);
   
+  renderContentSummary(contentSummary);
   renderScores(scores);
   renderTechniques(techniques);
   renderClaims(claims);
+  renderTechniqueInteractions(techniqueInteractions);
   renderSummary(summary);
   
   showPanel();
   
   console.log('[InfoVerif Panel] Report rendered successfully');
+}
+
+function renderContentSummary(contentSummary) {
+  const container = document.getElementById('infoverif-content-summary');
+  
+  if (!contentSummary) {
+    container.innerHTML = '<p style="color: #999; font-size: 13px; font-style: italic;">Résumé non disponible</p>';
+    return;
+  }
+  
+  container.innerHTML = `<p style="font-size: 14px; line-height: 1.6; color: #ffffff;">${contentSummary}</p>`;
 }
 
 function renderScores(scores) {
@@ -254,7 +272,8 @@ function renderTechniques(techniques) {
       </div>
       ${tech.evidence ? `<div class="infoverif-technique-evidence">"${tech.evidence}"</div>` : ''}
       ${tech.explanation ? `<p class="infoverif-technique-explanation">${tech.explanation}</p>` : ''}
-      ${tech.source === 'embedding' ? '<p class="infoverif-technique-explanation" style="font-style: italic; color: #0066ff;">🔍 Détecté par analyse sémantique</p>' : ''}
+      ${tech.contextual_impact ? `<div class="infoverif-contextual-impact">🎯 Impact contextuel : ${tech.contextual_impact}</div>` : ''}
+      ${tech.source === 'embedding' ? '<p class="infoverif-technique-explanation" style="font-style: italic; color: #999;">🔍 Détecté par analyse sémantique</p>' : ''}
     `;
     
     container.appendChild(card);
@@ -286,6 +305,19 @@ function renderClaims(claims) {
     
     container.appendChild(card);
   });
+}
+
+function renderTechniqueInteractions(interactions) {
+  const section = document.getElementById('infoverif-interactions-section');
+  const container = document.getElementById('infoverif-interactions-container');
+  
+  if (!interactions || interactions === 'null' || interactions.trim() === '') {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  container.innerHTML = `<p style="font-size: 13px; line-height: 1.6; color: #ffffff; padding: 12px; background: #0a0a0a; border-left: 3px solid #ffffff; border-radius: 4px;">${interactions}</p>`;
 }
 
 function renderSummary(summary) {

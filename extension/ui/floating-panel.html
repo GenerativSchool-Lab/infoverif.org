@@ -30,6 +30,12 @@
 
     <!-- Report Content -->
     <div id="infoverif-panel-report" style="display: none;">
+      <!-- Content Summary Section -->
+      <section class="infoverif-section">
+        <h3 class="infoverif-section-title">📄 Contenu analysé</h3>
+        <div id="infoverif-content-summary" class="infoverif-content-summary"></div>
+      </section>
+
       <!-- Scores Section -->
       <section class="infoverif-section">
         <h3 class="infoverif-section-title">📊 Scores d'analyse</h3>
@@ -50,6 +56,12 @@
           ✓ Affirmations (<span id="infoverif-claims-count">0</span>)
         </h3>
         <div id="infoverif-claims-container"></div>
+      </section>
+
+      <!-- Technique Interactions Section -->
+      <section class="infoverif-section" id="infoverif-interactions-section" style="display: none;">
+        <h3 class="infoverif-section-title">🔗 Synergies des techniques</h3>
+        <div id="infoverif-interactions-container" class="infoverif-interactions"></div>
       </section>
 
       <!-- Summary Section -->

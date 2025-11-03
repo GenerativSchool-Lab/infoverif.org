@@ -107,6 +107,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE dans ce format exact (en français) :
   "conspiracy_score": 0-100,
   "misinfo_score": 0-100,
   "overall_risk": 0-100,
+  "content_summary": "Résumé objectif du contenu analysé en 2-3 phrases (QUI dit QUOI, COMMENT, DANS QUEL CONTEXTE)",
   "techniques": [
     {{{{
       "dima_code": "TE-XX",
@@ -114,9 +115,11 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE dans ce format exact (en français) :
       "name": "Nom de la technique en français",
       "evidence": "Citation exacte du contenu qui illustre cette technique",
       "severity": "high/medium/low",
-      "explanation": "Explication détaillée de comment cette technique est utilisée (2-3 phrases)"
+      "explanation": "Explication détaillée de comment cette technique est utilisée (2-3 phrases)",
+      "contextual_impact": "Pourquoi cette technique est particulièrement efficace/dangereuse DANS CE CONTEXTE précis (1-2 phrases)"
     }}}}
   ],
+  "technique_interactions": "Si plusieurs techniques se renforcent mutuellement, explique leurs synergies (ex: peur + bouc émissaire = double manipulation). Sinon: null",
   "claims": [
     {{{{
       "claim": "Affirmation textuelle extraite du contenu",
