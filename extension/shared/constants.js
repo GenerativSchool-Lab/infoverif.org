@@ -200,3 +200,8 @@ export function debugLog(category, ...args) {
   }
 }
 
+// Helper: Error log (always logged)
+export function errorLog(category, ...args) {
+  console.error(`[InfoVerif Error: ${category}]`, ...args);
+}
+
