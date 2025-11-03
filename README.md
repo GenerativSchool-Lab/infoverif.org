@@ -58,6 +58,7 @@ InfoVerif.org est déployé en production avec **deux interfaces complémentaire
 - Cache 5 minutes (réduit appels API)
 - État de chargement persistant
 
+**📦 Installation** : [GitHub - infoverif-extension](https://github.com/GenerativSchool-Lab/infoverif-extension)  
 **Déploiement** : Extension Chrome Web Store (en développement)
 
 ---
@@ -393,15 +394,29 @@ npm run dev
 
 ### Extension Chrome (Développement)
 
+**📦 Repo de distribution** : [github.com/GenerativSchool-Lab/infoverif-extension](https://github.com/GenerativSchool-Lab/infoverif-extension)
+
+**Installation pour utilisateurs** :
 ```bash
-# Load unpacked extension
+# Option 1 : Depuis le repo de distribution (recommandé pour utilisateurs finaux)
+# 1. Aller sur: https://github.com/GenerativSchool-Lab/infoverif-extension
+# 2. Télécharger ZIP → Extraire
+# 3. Chrome → chrome://extensions/ → Mode développeur
+# 4. Charger l'extension non empaquetée → Sélectionner le dossier
+```
+
+**Installation pour développeurs** :
+```bash
+# Option 2 : Depuis ce repo (développement)
 # 1. Chrome → chrome://extensions/
-# 2. Enable "Developer mode"
+# 2. Enable "Developer mode" (top-right toggle)
 # 3. Click "Load unpacked"
 # 4. Select: /path/to/infoverif.org/extension
 ```
 
-Voir **[extension/README.md](extension/README.md)** pour détails.
+**Documentation** :
+- **[Extension Repo GitHub](https://github.com/GenerativSchool-Lab/infoverif-extension)** — Installation simple pour utilisateurs finaux (guide en français)
+- **[extension/README.md](extension/README.md)** — Guide d'installation détaillé (développement)
 
 ### Déploiement Production
 

@@ -437,6 +437,7 @@ Bienvenue dans la documentation d'**InfoVerif.org** ! Ce fichier vous guide vers
 ### Code Source
 
 - **GitHub Repository** : [github.com/GenerativSchool-Lab/infoverif.org](https://github.com/GenerativSchool-Lab/infoverif.org)
+- **Extension Chrome Repo** : [github.com/GenerativSchool-Lab/infoverif-extension](https://github.com/GenerativSchool-Lab/infoverif-extension)
 - **Frontend (Vercel)** : [infoverif.org](https://infoverif.org)
 - **Backend (Railway)** : [infoveriforg-production.up.railway.app](https://infoveriforg-production.up.railway.app)
 
