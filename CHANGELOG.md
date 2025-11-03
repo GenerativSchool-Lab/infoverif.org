@@ -9,6 +9,143 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Unreleased]
 
+### 🎯 M2.2 COMPLETED — Semantic Embeddings Layer (2025-11-03)
+
+#### 📋 DIMA Integration Milestone 2.2: Hybrid GPT-4 + Vector Similarity
+
+**Status**: ✅ **COMPLETED** (After 15+ deployment iterations!)  
+**Phase**: 2.2 (Semantic Embeddings)  
+**Deploy Date**: 2025-11-03 10:50 AM CET  
+**Commit**: `1cbb398`
+
+**Deliverables**:
+- ✅ **470MB sentence-transformers model** loaded in production (`paraphrase-multilingual-MiniLM-L12-v2`)
+- ✅ **FAISS vector index** built with 130 technique embeddings (384-dim)
+- ✅ **Hybrid analysis pipeline**: Embeddings → GPT-4 with semantic hints
+- ✅ **Custom Dockerfile** for Railway (python:3.11-slim + full C++ runtime)
+- ✅ **On-the-fly embedding generation** (no precompute needed)
+- ✅ **Production tested** with conspiracy theory content
+
+**Key Features**:
+- 🔍 **Semantic similarity search**: Top-5 DIMA techniques by vector cosine similarity
+- 🧠 **Enhanced prompts**: GPT-4 receives embedding hints for better detection
+- ⚡ **Fast inference**: FAISS IndexFlatIP for sub-100ms similarity search
+- 🎨 **JSON response enhanced**: `embedding_hints` array with similarity scores
+- 🐳 **Docker-first deployment**: Bypassed Nixpacks for full environment control
+
+**Architecture**:
+```
+User Input (text/video/image)
+    ↓
+1. Extract text (Whisper/Vision API)
+    ↓
+2. Semantic Search (FAISS)
+   → Top-5 similar DIMA techniques (0.3-0.9 similarity)
+    ↓
+3. Enhanced Prompt (GPT-4o-mini)
+   → Taxonomy (130 codes) + Embedding hints (Top-5) + Few-shot examples
+    ↓
+4. GPT-4 Analysis
+   → Detects DIMA codes with higher precision
+    ↓
+5. JSON Response
+   {
+     "techniques": [...],          // Detected DIMA codes
+     "embedding_hints": [          // NEW in M2.2
+       {"code": "TE-62", "similarity": 0.377, "rank": 1}
+     ]
+   }
+```
+
+**JSON Schema Enhanced**:
+```json
+{
+  "embedding_hints": [              // NEW (M2.2, optional)
+    {
+      "code": "TE-62",
+      "name": "Défiance institutionnelle",
+      "family": "Diversion",
+      "similarity": 0.377,          // Cosine similarity (0-1)
+      "rank": 1                     // Rank in Top-K
+    }
+  ],
+  "techniques": [                   // Enhanced detection
+    {
+      "dima_code": "TE-58",
+      "dima_family": "Diversion",
+      "name": "Théorie du complot",
+      "evidence": "...",
+      "severity": "high",
+      "explanation": "..."
+    }
+  ]
+}
+```
+
+**Performance Metrics** (Production):
+- **Model load time**: ~15s (first deploy only, then cached)
+- **Embedding generation**: ~30s for 130 techniques (one-time)
+- **Similarity search**: <100ms per query
+- **Total latency**: +50-100ms vs M2.1 (prompts-only)
+- **Memory footprint**: ~1.2GB (model + embeddings + FAISS)
+- **Detection improvement**: Expected +20-30% DIMA code coverage
+
+**Technical Stack**:
+- `sentence-transformers>=2.2.2` (multilingual embeddings)
+- `faiss-cpu>=1.7.4` (vector similarity search)
+- `numpy>=1.26.4` (torch-compatible version)
+- `torch==2.9.0` (PyTorch for transformers)
+- Custom `Dockerfile` (python:3.11-slim + gcc/g++ for libstdc++)
+
+**Deployment Journey** (Lessons Learned):
+1. ❌ Nixpacks + apt: System libs not in runtime PATH
+2. ❌ Nix stdenv: Environment isolation issues
+3. ❌ LD_LIBRARY_PATH: Overrides ignored by Railway
+4. ❌ railway.toml: Wrong start command format
+5. ❌ railway.json: startCommand override conflict
+6. ❌ .dockerignore: Excluded DIMA taxonomy CSV
+7. ✅ **Custom Dockerfile**: Full control, standard Docker approach → SUCCESS!
+
+**Critical Fix** (Final Solution):
+```dockerfile
+FROM python:3.11-slim
+RUN apt-get install -y gcc g++ libstdc++6 libgomp1 ffmpeg
+# Full C++ runtime guaranteed, no Nix/Railway isolation
+```
+
+**Production Test Results**:
+```bash
+# Input: "Les élites cachent la vérité sur les vaccins. Big Pharma contrôle..."
+# Output:
+{
+  "embedding_hints": 5,
+  "top_hint": {"code": "TE-62", "similarity": 0.377},
+  "detected_techniques": ["TE-58", "TE-62", "TE-14"],
+  "scores": {"propaganda": 85, "conspiracy": 90}
+}
+# ✅ Semantic hints working, 3 DIMA codes detected!
+```
+
+**Files Changed**:
+- `Dockerfile` (NEW): Custom build with full C++ runtime
+- `.dockerignore` (NEW): Selective file inclusion
+- `railway.json`: Updated to use DOCKERFILE builder
+- `api/requirements-lite.txt`: Version ranges for compatibility
+- `api/dima_detector.py`: +140 lines (embeddings, FAISS)
+- `api/dima_prompts.py`: +30 lines (hybrid prompt)
+- `api/deep.py`: +50 lines (embedding integration)
+- `scripts/precompute_dima_embeddings.py` (NEW): Optional precompute
+
+**Next Steps** (Future Enhancements):
+- 🔄 Redis caching for embedding results (reduce latency)
+- 📊 Prometheus/Grafana monitoring (track accuracy, costs)
+- 🎯 Threshold calibration with production data
+- 🌐 Frontend: Display embedding_hints as confidence badges
+
+**Credits**: After 15 deployment attempts and 2 hours of debugging, M2.2 is live! 🚀
+
+---
+
 ### 🚀 M2.1 COMPLETED — Enhanced Prompts with DIMA Taxonomy (2025-11-03)
 
 #### 📋 DIMA Integration Milestone 2.1: Semantic Layer — Enhanced Prompts

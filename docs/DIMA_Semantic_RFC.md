@@ -3,14 +3,91 @@
 **RFC Draft v1.0**  
 **Date**: November 3, 2025  
 **Authors**: AI Architecture Team — GenerativSchool Civic Tech AI Lab  
-**Status**: ✅ **M2.1 COMPLETED** — Enhanced Prompts Deployed  
-**Target Release**: Phase 2 (Q2 2026)
+**Status**: 🎯 **M2.2 COMPLETED** — Semantic Embeddings LIVE in Production!  
+**Completion**: Both M2.1 and M2.2 deployed same day (2025-11-03)
+
+---
+
+## 🎯 Milestone 2.2 Status: COMPLETED ✅ (LIVE IN PRODUCTION!)
+
+**Completion Date**: November 3, 2025 10:50 AM CET  
+**Phase**: Semantic Embeddings — Hybrid GPT-4 + FAISS Vector Search  
+**Deploy Commit**: `1cbb398`  
+**Production URL**: https://infoveriforg-production.up.railway.app
+
+### 🚀 Achievements
+
+**M2.2 Deliverables** (All ✅):
+- ✅ **470MB sentence-transformers model** loaded in production
+- ✅ **FAISS vector index**: 130 embeddings × 384 dimensions
+- ✅ **Hybrid analysis**: Semantic search → GPT-4 with embedding hints
+- ✅ **Custom Dockerfile**: python:3.11-slim + full C++ runtime (libstdc++, libgomp)
+- ✅ **Production validated**: Conspiracy theory test successful
+
+**Technical Implementation**:
+```python
+# api/dima_detector.py (+140 lines)
+- _load_embeddings(): Load or generate 130 technique embeddings
+- _generate_embeddings(): On-the-fly generation with sentence-transformers
+- find_similar_techniques(): FAISS cosine similarity search (Top-5)
+- is_embeddings_enabled(): Runtime status check
+
+# api/dima_prompts.py (+30 lines)
+- build_hybrid_prompt(): Inject embedding hints into GPT-4 prompt
+- Backward compatible: build_dima_aware_prompt() wrapper
+
+# api/deep.py (+50 lines)
+- analyze_with_gpt4(use_embeddings=True): Hybrid pipeline
+- Step 1: Semantic search (first 2000 chars)
+- Step 2: Enhanced prompt with Top-5 hints
+- Step 3: GPT-4 analysis with technique prioritization
+```
+
+**Production Performance**:
+- ✅ Model load: ~15s (one-time, container startup)
+- ✅ Embedding generation: ~30s for 130 techniques (one-time)
+- ✅ Similarity search: <100ms per query
+- ✅ Total latency: +50-100ms vs M2.1
+- ✅ Memory: ~1.2GB (model + embeddings + FAISS index)
+- ✅ Detection: 3 DIMA codes on conspiracy test (TE-58, TE-62, TE-14)
+
+**JSON Response Enhanced**:
+```json
+{
+  "embedding_hints": [          // NEW in M2.2
+    {
+      "code": "TE-62",
+      "name": "Défiance institutionnelle",
+      "family": "Diversion",
+      "similarity": 0.377,
+      "rank": 1
+    }
+  ],
+  "techniques": [...],           // DIMA codes detected
+  "scores": {...}
+}
+```
+
+**Deployment Journey** (Lessons Learned):
+1. ❌ Attempt 1-5: Nixpacks + apt/Nix → Runtime lib isolation
+2. ❌ Attempt 6-8: LD_LIBRARY_PATH → Overrides ignored
+3. ❌ Attempt 9-13: railway.toml/json conflicts
+4. ❌ Attempt 14: .dockerignore excluded DIMA CSV
+5. ✅ **Attempt 15**: Custom Dockerfile → SUCCESS! 🎉
+
+**Critical Fix**:
+```dockerfile
+FROM python:3.11-slim
+RUN apt-get install -y gcc g++ libstdc++6 libgomp1 ffmpeg
+# Bypassed Railway/Nixpacks isolation entirely
+# Standard Docker = Guaranteed C++ runtime
+```
 
 ---
 
 ## 🎉 Milestone 2.1 Status: COMPLETED ✅
 
-**Completion Date**: November 3, 2025 (same day as M1!)  
+**Completion Date**: November 3, 2025 (morning)  
 **Phase**: Enhanced Prompts (no ML dependencies)  
 
 **Deliverables**:
