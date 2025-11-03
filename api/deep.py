@@ -339,7 +339,7 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, us
     return parsed
 
 
-def analyze_url(url: str, platform: str = "unknown") -> Dict:
+def analyze_url(url: str, platform: str = "unknown", post_text: str = None) -> Dict:
     """
     Full analysis pipeline for video URL (Twitter, YouTube, TikTok, etc.).
     Downloads audio only using yt-dlp, transcribes with Whisper, analyzes with GPT-4.
@@ -347,6 +347,7 @@ def analyze_url(url: str, platform: str = "unknown") -> Dict:
     Args:
         url: Video URL from any supported platform
         platform: Platform name (twitter, youtube, tiktok, etc.)
+        post_text: Optional text from post/tweet (for multimodal analysis)
     
     Returns:
         Analysis dictionary with scores, techniques, claims, summary
@@ -365,8 +366,30 @@ def analyze_url(url: str, platform: str = "unknown") -> Dict:
         
         # Transcribe with Whisper
         print(f"🎤 Transcribing audio with Whisper...")
-        transcript = transcribe_audio(audio_path)
-        print(f"✅ Transcription complete: {len(transcript)} characters")
+        audio_transcript = transcribe_audio(audio_path)
+        print(f"✅ Transcription complete: {len(audio_transcript)} characters")
+        
+        # CRITICAL FIX: Handle empty/music-only transcripts
+        if len(audio_transcript.strip()) < 10:
+            print("⚠️  Audio transcript is empty or music-only (< 10 chars)")
+            audio_transcript = "[Audio sans paroles détectées - musique de fond uniquement]"
+        
+        # MULTIMODAL FUSION: Combine post text + audio transcript if both available
+        if post_text and len(post_text.strip()) > 5:
+            print(f"📝 Fusing post text ({len(post_text)} chars) + audio transcript ({len(audio_transcript)} chars)")
+            transcript = f"""TEXTE DU POST:
+{post_text}
+
+TRANSCRIPTION AUDIO:
+{audio_transcript}"""
+            metadata['multimodal'] = True
+            metadata['has_post_text'] = True
+            metadata['has_audio'] = len(audio_transcript.strip()) > 10
+        else:
+            transcript = audio_transcript
+            metadata['multimodal'] = False
+            metadata['has_post_text'] = False
+            metadata['has_audio'] = True
         
         # Analyze with GPT-4 + DIMA
         analysis = analyze_with_gpt4(transcript, metadata)

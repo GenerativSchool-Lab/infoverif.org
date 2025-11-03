@@ -481,7 +481,11 @@ async function handleAnalyzeClick(element, platform) {
       if (extracted.hasVideo && extracted.videoUrl) {
         mode = 'video';
         data = { url: extracted.videoUrl };
-        debugLog('CONTENT_SCRIPT', `Video detected! URL: ${extracted.videoUrl}`);
+        
+        // MULTIMODAL: Include post text with video for fusion analysis
+        metadata.postText = extracted.text; // Add text to metadata
+        
+        debugLog('CONTENT_SCRIPT', `Video detected! URL: ${extracted.videoUrl}, Text: ${extracted.text.substring(0, 50)}...`);
       } else {
         mode = 'text';
         data = { text: extracted.text };

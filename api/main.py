@@ -433,10 +433,19 @@ async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optiona
 
 
 @app.post("/analyze-video-url")
-async def analyze_video_url_endpoint(url: str = Form(...), platform: Optional[str] = Form("video")):
+async def analyze_video_url_endpoint(
+    url: str = Form(...), 
+    platform: Optional[str] = Form("video"),
+    text: Optional[str] = Form(None)  # NEW: Optional post text for multimodal analysis
+):
     """
     Analyze video from URL (Twitter, YouTube, TikTok, etc.) using yt-dlp.
     Downloads audio only, transcribes with Whisper, analyzes with GPT-4 + DIMA.
+    
+    NEW: If 'text' parameter is provided (e.g., tweet text), performs multimodal fusion:
+    - Combines post text + audio transcript
+    - Weighted analysis based on both sources
+    - Handles music-only videos gracefully
     """
     start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
@@ -448,7 +457,10 @@ async def analyze_video_url_endpoint(url: str = Form(...), platform: Optional[st
         from deep import analyze_url
         
         print(f"🎬 Analyzing video URL: {url}")
-        result = analyze_url(url, platform or "video")
+        if text:
+            print(f"📝 Multimodal mode: Post text provided ({len(text)} chars)")
+        
+        result = analyze_url(url, platform or "video", post_text=text)
         
         # Cache for extension chat (if analysis_id present)
         if result.get("analysis_id"):

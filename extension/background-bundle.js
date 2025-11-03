@@ -258,6 +258,12 @@ async function analyzeVideo(url, platform, metadata) {
   formData.append('url', url);
   formData.append('platform', platform);
   
+  // MULTIMODAL FUSION: Include post text if available (for tweets with video)
+  if (metadata && metadata.postText && metadata.postText.length > 5) {
+    formData.append('text', metadata.postText);
+    debugLog('BACKGROUND', `Including post text (${metadata.postText.length} chars) for multimodal analysis`);
+  }
+  
   const response = await retryWithBackoff(async () => {
     const res = await fetch(`${apiUrl}/analyze-video-url`, {
       method: 'POST',
