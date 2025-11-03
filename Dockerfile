@@ -28,5 +28,6 @@ COPY . /app/
 EXPOSE 8080
 
 # Start command
-CMD cd api && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+WORKDIR /app/api
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
 
