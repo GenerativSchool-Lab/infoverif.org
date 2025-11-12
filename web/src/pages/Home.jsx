@@ -7,7 +7,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 export default function Home() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState('text')
   const [text, setText] = useState('')
   const [file, setFile] = useState(null)
@@ -21,21 +21,26 @@ export default function Home() {
     setError(null)
 
     try {
+      const currentLanguage = i18n.language || 'fr'
+      
       let response
       if (activeTab === 'text') {
         if (!text || !text.trim()) throw new Error(t('home.text.error'))
         const form = new FormData()
         form.append('text', text)
+        form.append('language', currentLanguage)
         response = await axios.post(`${API_URL}/analyze-text`, form)
       } else if (activeTab === 'video') {
         if (!file) throw new Error(t('home.video.error'))
         const form = new FormData()
         form.append('file', file)
+        form.append('language', currentLanguage)
         response = await axios.post(`${API_URL}/analyze-video`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
       } else {
         if (!file) throw new Error(t('home.image.error'))
         const form = new FormData()
         form.append('file', file)
+        form.append('language', currentLanguage)
         response = await axios.post(`${API_URL}/analyze-image`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
       }
 

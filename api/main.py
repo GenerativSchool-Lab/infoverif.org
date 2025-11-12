@@ -71,7 +71,8 @@ def create_analysis_response(result: dict, start_time: float) -> JSONResponse:
 # CORS - Allow web app + Chrome extension
 ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Local dev
-    "https://infoverif-org.vercel.app",  # Production web app
+    "https://infoverif-org.vercel.app",  # Production web app (Vercel preview)
+    "https://app.infoverif.org",  # Production web app
     "chrome-extension://*",  # Chrome extension (wildcard for unpacked testing)
 ]
 
@@ -378,15 +379,18 @@ async def analyze_lite(url: str = Form(...), platform: Optional[str] = Form(None
 
 
 @app.post("/analyze-text")
-async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] = Form("text")):
+async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] = Form("text"), language: Optional[str] = Form("fr")):
     start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    # Validate language parameter
+    if language not in ["fr", "en"]:
+        language = "fr"  # Default to French
     try:
         from deep import analyze_text
-        result = analyze_text(text, platform or "text")
+        result = analyze_text(text, platform or "text", language=language)
         
         # Cache for extension chat (if analysis_id present)
         if result.get("analysis_id"):
@@ -401,13 +405,16 @@ async def analyze_text_endpoint(text: str = Form(...), platform: Optional[str] =
 
 
 @app.post("/analyze-video")
-async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("video")):
+async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("video"), language: Optional[str] = Form("fr")):
     """Analyze uploaded video file (multipart/form-data)."""
     start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    # Validate language parameter
+    if language not in ["fr", "en"]:
+        language = "fr"  # Default to French
     try:
         from deep import analyze_file
         import tempfile
@@ -417,7 +424,7 @@ async def analyze_video_endpoint(file: UploadFile = File(...), platform: Optiona
             tmp.write(content)
             tmp_path = tmp.name
         try:
-            result = analyze_file(tmp_path, platform or "video")
+            result = analyze_file(tmp_path, platform or "video", language=language)
             
             # Cache for extension chat (if analysis_id present)
             if result.get("analysis_id"):
@@ -476,16 +483,19 @@ async def analyze_video_url_endpoint(
 
 
 @app.post("/analyze-image")
-async def analyze_image_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("image")):
+async def analyze_image_endpoint(file: UploadFile = File(...), platform: Optional[str] = Form("image"), language: Optional[str] = Form("fr")):
     start_time = time.time()
     if not DEEP_ANALYSIS_ENABLED:
         raise HTTPException(status_code=404, detail="Deep analysis is disabled by configuration")
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    # Validate language parameter
+    if language not in ["fr", "en"]:
+        language = "fr"  # Default to French
     try:
         from deep import analyze_image
         content = await file.read()
-        result = analyze_image(content, platform or "image")
+        result = analyze_image(content, platform or "image", language=language)
         
         # Cache for extension chat (if analysis_id present)
         if result.get("analysis_id"):

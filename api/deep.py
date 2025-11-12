@@ -220,7 +220,7 @@ def transcribe_audio(audio_path: str) -> str:
     return transcript
 
 
-def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, use_embeddings: bool = True) -> Dict:
+def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, use_embeddings: bool = True, language: str = "fr") -> Dict:
     """
     Analyze content using OpenAI GPT-4 with JSON mode (M2.2: Hybrid with embeddings).
     
@@ -256,12 +256,18 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, us
     if use_dima and DIMA_ENABLED:
         # Use hybrid prompt with embedding hints if available
         if use_embeddings and similar_techniques:
-            prompt = build_hybrid_prompt(transcript[:8000], metadata, similar_techniques)
-            system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique. PRIORISE les techniques suggérées par l'analyse sémantique."
+            prompt = build_hybrid_prompt(transcript[:8000], metadata, similar_techniques, language=language)
+            if language == "en":
+                system_msg = "You are an expert in media analysis using the DIMA taxonomy (M82 Project). You MUST respond ONLY in valid JSON, in English. Cite the exact DIMA CODES (e.g., TE-58) for each technique. PRIORITIZE techniques suggested by semantic analysis."
+            else:
+                system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique. PRIORISE les techniques suggérées par l'analyse sémantique."
         else:
             # Standard DIMA prompt (no embedding hints)
-            prompt = build_dima_aware_prompt(transcript[:8000], metadata)
-            system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique."
+            prompt = build_dima_aware_prompt(transcript[:8000], metadata, language=language)
+            if language == "en":
+                system_msg = "You are an expert in media analysis using the DIMA taxonomy (M82 Project). You MUST respond ONLY in valid JSON, in English. Cite the exact DIMA CODES (e.g., TE-58) for each technique."
+            else:
+                system_msg = "Tu es un expert en analyse médiatique utilisant la taxonomie DIMA (M82 Project). Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Cite les CODES DIMA exacts (ex: TE-58) pour chaque technique."
     else:
         # Legacy prompt (backward compatibility)
         prompt = ANALYSIS_PROMPT.format(
@@ -270,7 +276,10 @@ def analyze_with_gpt4(transcript: str, metadata: Dict, use_dima: bool = True, us
             platform=metadata.get('platform', 'unknown'),
             transcript=transcript[:8000]
         )
-        system_msg = "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."
+        if language == "en":
+            system_msg = "You are an expert in media analysis. You MUST respond ONLY in valid JSON, in English. No markdown, no code blocks, no explanations outside the JSON."
+        else:
+            system_msg = "Tu es un expert en analyse médiatique. Tu DOIS répondre UNIQUEMENT en JSON valide, en français. Pas de markdown, pas de blocs de code, pas d'explications hors du JSON."
 
     # Step 3: Call OpenAI API
     response = client.chat.completions.create(
@@ -429,7 +438,7 @@ TRANSCRIPTION AUDIO:
             print(f"🗑️  Cleaned up: {audio_path}")
 
 
-def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
+def analyze_file(file_path: str, platform: str = "unknown", language: str = "fr") -> Dict:
     """Full analysis pipeline for uploaded file."""
     metadata = {
         'platform': platform,
@@ -446,7 +455,7 @@ def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
         transcript = transcribe_audio(audio_path)
         
         # Analyze with GPT-4
-        analysis = analyze_with_gpt4(transcript, metadata)
+        analysis = analyze_with_gpt4(transcript, metadata, language=language)
         analysis['input'] = metadata
         analysis['transcript_excerpt'] = transcript[:500] + '...' if len(transcript) > 500 else transcript
         
@@ -457,7 +466,7 @@ def analyze_file(file_path: str, platform: str = "unknown") -> Dict:
             os.remove(audio_path)
 
 
-def analyze_text(text: str, platform: str = "text") -> Dict:
+def analyze_text(text: str, platform: str = "text", language: str = "fr") -> Dict:
     """Analyze plain text directly with GPT-4 using the same schema."""
     metadata = {
         'platform': platform,
@@ -466,13 +475,13 @@ def analyze_text(text: str, platform: str = "text") -> Dict:
         'url': None,
     }
     transcript = text
-    analysis = analyze_with_gpt4(transcript, metadata)
+    analysis = analyze_with_gpt4(transcript, metadata, language=language)
     analysis['input'] = metadata
     analysis['transcript_excerpt'] = transcript[:500] + '...' if len(transcript) > 500 else transcript
     return analysis
 
 
-def analyze_image(image_bytes: bytes, platform: str = "image") -> Dict:
+def analyze_image(image_bytes: bytes, platform: str = "image", language: str = "fr") -> Dict:
     """Extract text-like content from a screenshot using OpenAI vision, then analyze with GPT-4."""
     # Encode image to base64 for inline message
     b64 = base64.b64encode(image_bytes).decode('utf-8')
@@ -507,7 +516,7 @@ def analyze_image(image_bytes: bytes, platform: str = "image") -> Dict:
     }
 
     # Reuse the same analysis pipeline
-    analysis = analyze_with_gpt4(extracted, metadata)
+    analysis = analyze_with_gpt4(extracted, metadata, language=language)
     analysis['input'] = metadata
     analysis['transcript_excerpt'] = extracted[:500] + '...' if len(extracted) > 500 else extracted
     return analysis
