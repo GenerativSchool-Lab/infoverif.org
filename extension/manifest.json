@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "InfoVerif — Analyse de Propagande & Désinformation",
+  "name": "__MSG_extensionName__",
   "version": "1.0.0",
-  "description": "Analysez les posts, vidéos et contenus sur les réseaux sociaux avec la taxonomie DIMA (130 techniques de manipulation).",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "fr",
   
   "action": {
-    "default_title": "Analyser avec InfoVerif",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

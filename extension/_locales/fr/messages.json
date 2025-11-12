@@ -1,0 +1,102 @@
+{
+  "extensionName": {
+    "message": "InfoVerif — Analyse de Propagande & Désinformation"
+  },
+  "extensionDescription": {
+    "message": "Analysez les posts, vidéos et contenus sur les réseaux sociaux avec la taxonomie DIMA (130 techniques de manipulation)."
+  },
+  "actionTitle": {
+    "message": "Analyser avec InfoVerif"
+  },
+  "panelTitle": {
+    "message": "InfoVerif"
+  },
+  "panelSubtitle": {
+    "message": "Analyse DIMA"
+  },
+  "panelLoading": {
+    "message": "Analyse en cours..."
+  },
+  "panelEmptyTitle": {
+    "message": "Aucune analyse"
+  },
+  "panelEmptyMessage": {
+    "message": "Survolez un post et cliquez \"Analyser avec InfoVerif\""
+  },
+  "sectionContent": {
+    "message": "📄 Contenu analysé"
+  },
+  "sectionScores": {
+    "message": "📊 Scores d'analyse"
+  },
+  "sectionTechniques": {
+    "message": "🎯 Techniques DIMA"
+  },
+  "sectionClaims": {
+    "message": "✓ Affirmations"
+  },
+  "sectionInteractions": {
+    "message": "🔗 Synergies des techniques"
+  },
+  "sectionSummary": {
+    "message": "📝 Synthèse"
+  },
+  "buttonCopyJson": {
+    "message": "📋 Copier JSON"
+  },
+  "buttonCopySummary": {
+    "message": "📄 Copier synthèse"
+  },
+  "scorePropaganda": {
+    "message": "Intensité persuasive"
+  },
+  "scoreConspiracy": {
+    "message": "Narratif spéculatif"
+  },
+  "scoreMisinfo": {
+    "message": "Fiabilité factuelle"
+  },
+  "scoreOverall": {
+    "message": "Indice d'influence"
+  },
+  "techniquesNone": {
+    "message": "Aucune technique détectée"
+  },
+  "techniquesDetectedBySemantic": {
+    "message": "🔍 Détecté par analyse sémantique"
+  },
+  "techniquesContextualImpact": {
+    "message": "🎯 Impact contextuel"
+  },
+  "claimsNone": {
+    "message": "Aucune affirmation analysée"
+  },
+  "contentSummaryNotAvailable": {
+    "message": "Résumé non disponible"
+  },
+  "summaryNotAvailable": {
+    "message": "Aucun résumé disponible."
+  },
+  "errorTitle": {
+    "message": "Erreur"
+  },
+  "errorEmptyReport": {
+    "message": "Rapport vide ou invalide"
+  },
+  "buttonMinimize": {
+    "message": "Minimiser"
+  },
+  "buttonMaximize": {
+    "message": "Maximiser"
+  },
+  "buttonClose": {
+    "message": "Fermer"
+  },
+  "buttonAnalyze": {
+    "message": "Analyser avec InfoVerif"
+  },
+  "copied": {
+    "message": "Copié!"
+  }
+}
+

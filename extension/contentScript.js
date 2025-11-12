@@ -169,7 +169,7 @@ function showYouTubeAnalyzeButton() {
   button.className = 'infoverif-youtube-analyze-btn';
   button.innerHTML = `
     <span class="infoverif-icon">🛡️</span>
-    <span class="infoverif-text">Analyser avec InfoVerif</span>
+    <span class="infoverif-text">${chrome.i18n.getMessage('buttonAnalyze')}</span>
   `;
   
   // Click handler
@@ -239,7 +239,7 @@ function createAnalyzeOverlay(element, platform) {
   // Analyze button
   const button = document.createElement('button');
   button.className = 'infoverif-analyze-btn';
-  button.textContent = 'Analyser avec InfoVerif';
+  button.textContent = chrome.i18n.getMessage('buttonAnalyze');
   
   // Click handler
   button.addEventListener('click', (e) => {

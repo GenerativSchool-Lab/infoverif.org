@@ -1,0 +1,102 @@
+{
+  "extensionName": {
+    "message": "InfoVerif — Propaganda & Disinformation Analysis"
+  },
+  "extensionDescription": {
+    "message": "Analyze posts, videos and content on social media with the DIMA taxonomy (130 manipulation techniques)."
+  },
+  "actionTitle": {
+    "message": "Analyze with InfoVerif"
+  },
+  "panelTitle": {
+    "message": "InfoVerif"
+  },
+  "panelSubtitle": {
+    "message": "DIMA Analysis"
+  },
+  "panelLoading": {
+    "message": "Analysis in progress..."
+  },
+  "panelEmptyTitle": {
+    "message": "No analysis"
+  },
+  "panelEmptyMessage": {
+    "message": "Hover over a post and click \"Analyze with InfoVerif\""
+  },
+  "sectionContent": {
+    "message": "📄 Analyzed content"
+  },
+  "sectionScores": {
+    "message": "📊 Analysis scores"
+  },
+  "sectionTechniques": {
+    "message": "🎯 DIMA Techniques"
+  },
+  "sectionClaims": {
+    "message": "✓ Claims"
+  },
+  "sectionInteractions": {
+    "message": "🔗 Technique synergies"
+  },
+  "sectionSummary": {
+    "message": "📝 Summary"
+  },
+  "buttonCopyJson": {
+    "message": "📋 Copy JSON"
+  },
+  "buttonCopySummary": {
+    "message": "📄 Copy summary"
+  },
+  "scorePropaganda": {
+    "message": "Persuasive intensity"
+  },
+  "scoreConspiracy": {
+    "message": "Speculative narrative"
+  },
+  "scoreMisinfo": {
+    "message": "Factual reliability"
+  },
+  "scoreOverall": {
+    "message": "Influence index"
+  },
+  "techniquesNone": {
+    "message": "No techniques detected"
+  },
+  "techniquesDetectedBySemantic": {
+    "message": "🔍 Detected by semantic analysis"
+  },
+  "techniquesContextualImpact": {
+    "message": "🎯 Contextual impact"
+  },
+  "claimsNone": {
+    "message": "No claims analyzed"
+  },
+  "contentSummaryNotAvailable": {
+    "message": "Summary not available"
+  },
+  "summaryNotAvailable": {
+    "message": "No summary available."
+  },
+  "errorTitle": {
+    "message": "Error"
+  },
+  "errorEmptyReport": {
+    "message": "Empty or invalid report"
+  },
+  "buttonMinimize": {
+    "message": "Minimize"
+  },
+  "buttonMaximize": {
+    "message": "Maximize"
+  },
+  "buttonClose": {
+    "message": "Close"
+  },
+  "buttonAnalyze": {
+    "message": "Analyze with InfoVerif"
+  },
+  "copied": {
+    "message": "Copied!"
+  }
+}
+

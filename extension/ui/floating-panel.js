@@ -20,6 +20,66 @@ function initFloatingPanel() {
   const panel = document.getElementById('infoverif-floating-panel');
   if (!panel) return;
 
+  // Set i18n text for static elements
+  const titleText = document.querySelector('.infoverif-title-text');
+  if (titleText) titleText.textContent = chrome.i18n.getMessage('panelTitle');
+  
+  const subtitle = document.querySelector('.infoverif-subtitle');
+  if (subtitle) subtitle.textContent = chrome.i18n.getMessage('panelSubtitle');
+  
+  const loadingText = document.querySelector('#infoverif-panel-loading p');
+  if (loadingText) loadingText.textContent = chrome.i18n.getMessage('panelLoading');
+  
+  const emptyTitle = document.querySelector('#infoverif-panel-empty h3');
+  if (emptyTitle) emptyTitle.textContent = chrome.i18n.getMessage('panelEmptyTitle');
+  
+  const emptyMessage = document.querySelector('#infoverif-panel-empty p');
+  if (emptyMessage) emptyMessage.textContent = chrome.i18n.getMessage('panelEmptyMessage');
+  
+  // Update section titles (match by emoji/icon for reliability)
+  const sections = document.querySelectorAll('.infoverif-section-title');
+  sections.forEach(section => {
+    const text = section.textContent;
+    // Match by emoji/icon prefix
+    if (text.includes('📄')) {
+      section.textContent = chrome.i18n.getMessage('sectionContent');
+    } else if (text.includes('📊')) {
+      section.textContent = chrome.i18n.getMessage('sectionScores');
+    } else if (text.includes('🎯')) {
+      // Keep count if present
+      const countMatch = text.match(/\(<span[^>]*>(\d+)<\/span>\)/);
+      if (countMatch) {
+        section.innerHTML = `${chrome.i18n.getMessage('sectionTechniques')} (<span id="infoverif-techniques-count">${countMatch[1]}</span>)`;
+      } else {
+        section.textContent = chrome.i18n.getMessage('sectionTechniques');
+      }
+    } else if (text.includes('✓')) {
+      // Keep count if present
+      const countMatch = text.match(/\(<span[^>]*>(\d+)<\/span>\)/);
+      if (countMatch) {
+        section.innerHTML = `${chrome.i18n.getMessage('sectionClaims')} (<span id="infoverif-claims-count">${countMatch[1]}</span>)`;
+      } else {
+        section.textContent = chrome.i18n.getMessage('sectionClaims');
+      }
+    } else if (text.includes('🔗')) {
+      section.textContent = chrome.i18n.getMessage('sectionInteractions');
+    } else if (text.includes('📝')) {
+      section.textContent = chrome.i18n.getMessage('sectionSummary');
+    }
+  });
+  
+  const copyJsonBtn = document.getElementById('infoverif-copy-json-btn');
+  if (copyJsonBtn) copyJsonBtn.textContent = chrome.i18n.getMessage('buttonCopyJson');
+  
+  const copySummaryBtn = document.getElementById('infoverif-copy-summary-btn');
+  if (copySummaryBtn) copySummaryBtn.textContent = chrome.i18n.getMessage('buttonCopySummary');
+  
+  const minimizeBtn = document.getElementById('infoverif-minimize-btn');
+  if (minimizeBtn) minimizeBtn.title = chrome.i18n.getMessage('buttonMinimize');
+  
+  const closeBtn = document.getElementById('infoverif-close-btn');
+  if (closeBtn) closeBtn.title = chrome.i18n.getMessage('buttonClose');
+
   // Drag functionality
   const header = document.getElementById('infoverif-panel-header');
   header.addEventListener('mousedown', startDrag);
@@ -69,11 +129,11 @@ function toggleMinimize() {
   if (isMinimized) {
     panel.classList.add('minimized');
     btn.textContent = '□';
-    btn.title = 'Maximiser';
+    btn.title = chrome.i18n.getMessage('buttonMaximize');
   } else {
     panel.classList.remove('minimized');
     btn.textContent = '−';
-    btn.title = 'Minimiser';
+    btn.title = chrome.i18n.getMessage('buttonMinimize');
   }
 }
 
@@ -140,7 +200,7 @@ function showLoading() {
 function showError(message) {
   const emptyState = document.getElementById('infoverif-panel-empty');
   emptyState.style.display = 'flex';
-  emptyState.querySelector('h3').textContent = 'Erreur';
+  emptyState.querySelector('h3').textContent = chrome.i18n.getMessage('errorTitle');
   emptyState.querySelector('p').textContent = message;
   
   document.getElementById('infoverif-panel-loading').style.display = 'none';
@@ -153,7 +213,7 @@ function renderReport(report) {
   
   if (!report) {
     console.error('[InfoVerif Panel] No report provided!');
-    showError('Rapport vide ou invalide');
+    showError(chrome.i18n.getMessage('errorEmptyReport'));
     return;
   }
   
@@ -203,7 +263,7 @@ function renderContentSummary(contentSummary) {
   const container = document.getElementById('infoverif-content-summary');
   
   if (!contentSummary) {
-    container.innerHTML = '<p style="color: #999; font-size: 13px; font-style: italic;">Résumé non disponible</p>';
+    container.innerHTML = `<p style="color: #999; font-size: 13px; font-style: italic;">${chrome.i18n.getMessage('contentSummaryNotAvailable')}</p>`;
     return;
   }
   
@@ -215,10 +275,10 @@ function renderScores(scores) {
   container.innerHTML = '';
   
   const scoreItems = [
-    { key: 'propaganda_score', label: 'Intensité persuasive' },
-    { key: 'conspiracy_score', label: 'Narratif spéculatif' },
-    { key: 'misinfo_score', label: 'Fiabilité factuelle' },
-    { key: 'overall_risk', label: 'Indice d\'influence' }
+    { key: 'propaganda_score', label: chrome.i18n.getMessage('scorePropaganda') },
+    { key: 'conspiracy_score', label: chrome.i18n.getMessage('scoreConspiracy') },
+    { key: 'misinfo_score', label: chrome.i18n.getMessage('scoreMisinfo') },
+    { key: 'overall_risk', label: chrome.i18n.getMessage('scoreOverall') }
   ];
   
   scoreItems.forEach(({ key, label }) => {
@@ -254,7 +314,7 @@ function renderTechniques(techniques) {
   countEl.textContent = techniques ? techniques.length : 0;
   
   if (!techniques || techniques.length === 0) {
-    container.innerHTML = '<p style="color: #999; font-size: 13px;">Aucune technique détectée</p>';
+    container.innerHTML = `<p style="color: #999; font-size: 13px;">${chrome.i18n.getMessage('techniquesNone')}</p>`;
     return;
   }
   
@@ -272,8 +332,8 @@ function renderTechniques(techniques) {
       </div>
       ${tech.evidence ? `<div class="infoverif-technique-evidence">"${tech.evidence}"</div>` : ''}
       ${tech.explanation ? `<p class="infoverif-technique-explanation">${tech.explanation}</p>` : ''}
-      ${tech.contextual_impact ? `<div class="infoverif-contextual-impact">🎯 Impact contextuel : ${tech.contextual_impact}</div>` : ''}
-      ${tech.source === 'embedding' ? '<p class="infoverif-technique-explanation" style="font-style: italic; color: #999;">🔍 Détecté par analyse sémantique</p>' : ''}
+      ${tech.contextual_impact ? `<div class="infoverif-contextual-impact">${chrome.i18n.getMessage('techniquesContextualImpact')} : ${tech.contextual_impact}</div>` : ''}
+      ${tech.source === 'embedding' ? `<p class="infoverif-technique-explanation" style="font-style: italic; color: #999;">${chrome.i18n.getMessage('techniquesDetectedBySemantic')}</p>` : ''}
     `;
     
     container.appendChild(card);
@@ -288,7 +348,7 @@ function renderClaims(claims) {
   countEl.textContent = claims ? claims.length : 0;
   
   if (!claims || claims.length === 0) {
-    container.innerHTML = '<p style="color: #999; font-size: 13px;">Aucune affirmation analysée</p>';
+    container.innerHTML = `<p style="color: #999; font-size: 13px;">${chrome.i18n.getMessage('claimsNone')}</p>`;
     return;
   }
   
@@ -322,7 +382,7 @@ function renderTechniqueInteractions(interactions) {
 
 function renderSummary(summary) {
   const container = document.getElementById('infoverif-summary-container');
-  container.innerHTML = `<p class="infoverif-summary-text">${summary || 'Aucun résumé disponible.'}</p>`;
+  container.innerHTML = `<p class="infoverif-summary-text">${summary || chrome.i18n.getMessage('summaryNotAvailable')}</p>`;
 }
 
 // ============================================================================
@@ -334,7 +394,7 @@ function copyJSON() {
   
   const json = JSON.stringify(currentReport, null, 2);
   navigator.clipboard.writeText(json).then(() => {
-    showCopyFeedback('infoverif-copy-json-btn', 'Copié!');
+    showCopyFeedback('infoverif-copy-json-btn', chrome.i18n.getMessage('copied'));
   }).catch(err => {
     console.error('[InfoVerif] Copy failed:', err);
   });
@@ -345,7 +405,7 @@ function copySummary() {
   
   const summary = currentReport.summary || '';
   navigator.clipboard.writeText(summary).then(() => {
-    showCopyFeedback('infoverif-copy-summary-btn', 'Copié!');
+    showCopyFeedback('infoverif-copy-summary-btn', chrome.i18n.getMessage('copied'));
   }).catch(err => {
     console.error('[InfoVerif] Copy failed:', err);
   });

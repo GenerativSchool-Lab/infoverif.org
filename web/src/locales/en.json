@@ -1,0 +1,200 @@
+{
+  "common": {
+    "back": "← Back",
+    "loading": "Analysis in progress…",
+    "error": "Error",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "close": "Close",
+    "minimize": "Minimize",
+    "maximize": "Maximize"
+  },
+  "header": {
+    "title": "🛡️ InfoVerif.org",
+    "subtitle": "Analysis of persuasion techniques, propaganda, emotional manipulation and disinformation"
+  },
+  "home": {
+    "title": "Advanced analysis",
+    "tabs": {
+      "text": "Text",
+      "video": "Video",
+      "image": "Screenshot"
+    },
+    "text": {
+      "label": "Text (paste or write)",
+      "placeholder": "Paste a post, article or script…",
+      "error": "Please enter some text"
+    },
+    "video": {
+      "label": "Upload a video",
+      "clickToUpload": "Click to upload",
+      "dragDrop": "or drag and drop",
+      "formats": "MP4, MOV, AVI up to 60 MB",
+      "error": "Please select a video file"
+    },
+    "image": {
+      "label": "Upload a screenshot (PNG/JPG)",
+      "clickToUpload": "Click to upload",
+      "dragDrop": "or drag and drop",
+      "formats": "PNG, JPG, WEBP · Screenshot of posts (Twitter/X, TikTok, etc.)",
+      "error": "Please select an image"
+    },
+    "submit": "Start analysis",
+    "analyzing": "Analysis in progress…"
+  },
+  "report": {
+    "title": "Deep analysis",
+    "subtitle": "Persuasion techniques, emotional manipulation and disinformation",
+    "scores": {
+      "title": "Scores",
+      "overall": "Influence index",
+      "propaganda": "Persuasive intensity",
+      "conspiracy": "Speculative narrative",
+      "misinfo": "Factual reliability"
+    },
+    "techniques": {
+      "title": "Detected techniques",
+      "none": "No techniques detected",
+      "severity": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "claims": {
+      "title": "Analyzed claims",
+      "none": "No claims analyzed",
+      "confidence": {
+        "supported": "Supported",
+        "unsupported": "Unsupported",
+        "misleading": "Misleading"
+      },
+      "problems": "Problems",
+      "reasoning": "Reasoning"
+    },
+    "input": {
+      "title": "Input",
+      "url": "URL",
+      "platform": "Platform",
+      "title_label": "Title",
+      "description": "Description"
+    },
+    "summary": {
+      "title": "Summary"
+    },
+    "transcript": {
+      "title": "Transcript excerpt"
+    }
+  },
+  "extension": {
+    "panel": {
+      "title": "InfoVerif",
+      "subtitle": "DIMA Analysis",
+      "loading": "Analysis in progress...",
+      "empty": {
+        "title": "No analysis",
+        "message": "Hover over a post and click \"Analyze with InfoVerif\""
+      },
+      "sections": {
+        "content": "📄 Analyzed content",
+        "scores": "📊 Analysis scores",
+        "techniques": "🎯 DIMA Techniques",
+        "claims": "✓ Claims",
+        "interactions": "🔗 Technique synergies",
+        "summary": "📝 Summary"
+      },
+      "actions": {
+        "copyJson": "📋 Copy JSON",
+        "copySummary": "📄 Copy summary"
+      },
+      "scores": {
+        "propaganda": "Persuasive intensity",
+        "conspiracy": "Speculative narrative",
+        "misinfo": "Factual reliability",
+        "overall": "Influence index"
+      },
+      "techniques": {
+        "none": "No techniques detected",
+        "detectedBySemantic": "🔍 Detected by semantic analysis",
+        "contextualImpact": "🎯 Contextual impact"
+      },
+      "claims": {
+        "none": "No claims analyzed"
+      },
+      "contentSummary": {
+        "notAvailable": "Summary not available"
+      },
+      "summary": {
+        "notAvailable": "No summary available."
+      },
+      "error": {
+        "title": "Error",
+        "emptyReport": "Empty or invalid report"
+      }
+    },
+    "button": {
+      "analyze": "Analyze with InfoVerif"
+    }
+  },
+  "footer": {
+    "openSource": "Open Source Project — GenerativSchool.com",
+    "contributions": "Contributions welcome · MIT License code",
+    "method": "Method & Roadmap",
+    "github": "GitHub",
+    "about": "About"
+  },
+  "methodCard": {
+    "title": "Method & Roadmap",
+    "subtitle": "Goal: break down persuasion techniques, propaganda, emotional manipulation and disinformation with explainable scores.",
+    "current": {
+      "title": "Current capabilities (MVP — Multi-format AI analysis)",
+      "items": {
+        "extraction": "Multimodal extraction and transcription (text, audio via Whisper, images via Vision API)",
+        "analysis": "Contextual semantic analysis of statements with detection of 20+ persuasive techniques",
+        "scores": "Normalized scores [0-100]: Persuasive intensity (I), Speculative narrative (N), Factual reliability (F)",
+        "algorithm": "Algorithmic formulation:"
+      },
+      "algorithmNote": "where α, β, γ ∈ [0,1] are calibrated by language models with structured prompts, and λ adjusts according to detected context"
+    },
+    "phase2": {
+      "title": "Phase 2 — Fine-tuning & specialized models (Q2 2026)",
+      "items": {
+        "finetuning": "Fine-tuning BERT/RoBERTa on annotated corpus of persuasive and manipulative techniques",
+        "embeddings": "Semantic embeddings for narrative clustering and influence propagation",
+        "vector": "Vector database of known rhetorical patterns with cosine similarity search",
+        "improvement": "Influence index improvement:"
+      },
+      "improvementNote": "where ω₁ + ω₂ + ω₃ = 1, combining LLM analysis, known pattern matching, and fine-tuned classification"
+    },
+    "phase3": {
+      "title": "Phase 3 — Network analysis & monitoring (Q3-Q4 2026)",
+      "items": {
+        "graph": "Graph Database to map narrative propagation between accounts and platforms",
+        "detection": "Detection of coordinated inauthentic behavior",
+        "temporal": "Temporal analysis of persuasive trends and emergence of new patterns",
+        "multimodal": "Multimodal detection: deepfakes, manipulative editing, audio-video coherence",
+        "modeling": "Influence propagation modeling:"
+      },
+      "modelingNote": "Quantifies the cumulative impact of a narrative through its diffusion graph"
+    },
+    "ethics": {
+      "title": "Ethical & methodological principles",
+      "transparency": "Transparency",
+      "transparencyDesc": "Open source code (MIT), documented methodology, explainable justifications",
+      "privacy": "Privacy",
+      "privacyDesc": "No permanent storage, no user profiling, ephemeral processing",
+      "education": "Education",
+      "educationDesc": "Educational tool to understand persuasive mechanisms, not an absolute verdict",
+      "nuance": "Nuance",
+      "nuanceDesc": "Cultural context, humor and satire can create false positives",
+      "collaboration": "Collaboration",
+      "collaborationDesc": "Open community, contributions welcome (researchers, fact-checkers, educators)"
+    },
+    "mission": {
+      "text": "Our mission: Make visible the mechanisms of persuasion, propaganda, emotional manipulation and disinformation through quantified scores, explicit mathematical formulas and consultable evidence. A critical analysis tool for informed and auditable decisions, serving media literacy and critical thinking.",
+      "back": "← Back to analysis"
+    }
+  }
+}
+
+
